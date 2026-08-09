@@ -10,33 +10,245 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AiReviewRouteImport } from './routes/ai-review'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as ChartCritiqueRouteImport } from './routes/chart-critique'
+import { Route as CoachRouteImport } from './routes/coach'
+import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as GoalsRouteImport } from './routes/goals'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as PlaybookRouteImport } from './routes/playbook'
+import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as ScreenshotReaderRouteImport } from './routes/screenshot-reader'
+import { Route as StrategyDiscoveryRouteImport } from './routes/strategy-discovery'
+import { Route as TeamsRouteImport } from './routes/teams'
+import { Route as TraderDnaRouteImport } from './routes/trader-dna'
+import { Route as VoiceSummaryRouteImport } from './routes/voice-summary'
+import { Route as JournalIndexRouteImport } from './routes/journal.index'
+import { Route as JournalNewRouteImport } from './routes/journal.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiReviewRoute = AiReviewRouteImport.update({
+  id: '/ai-review',
+  path: '/ai-review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChartCritiqueRoute = ChartCritiqueRouteImport.update({
+  id: '/chart-critique',
+  path: '/chart-critique',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachRoute = CoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GoalsRoute = GoalsRouteImport.update({
+  id: '/goals',
+  path: '/goals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybookRoute = PlaybookRouteImport.update({
+  id: '/playbook',
+  path: '/playbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScreenshotReaderRoute = ScreenshotReaderRouteImport.update({
+  id: '/screenshot-reader',
+  path: '/screenshot-reader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StrategyDiscoveryRoute = StrategyDiscoveryRouteImport.update({
+  id: '/strategy-discovery',
+  path: '/strategy-discovery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamsRoute = TeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TraderDnaRoute = TraderDnaRouteImport.update({
+  id: '/trader-dna',
+  path: '/trader-dna',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VoiceSummaryRoute = VoiceSummaryRouteImport.update({
+  id: '/voice-summary',
+  path: '/voice-summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalIndexRoute = JournalIndexRouteImport.update({
+  id: '/journal/',
+  path: '/journal/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalNewRoute = JournalNewRouteImport.update({
+  id: '/journal/new',
+  path: '/journal/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-review': typeof AiReviewRoute
+  '/analytics': typeof AnalyticsRoute
+  '/chart-critique': typeof ChartCritiqueRoute
+  '/coach': typeof CoachRoute
+  '/gallery': typeof GalleryRoute
+  '/goals': typeof GoalsRoute
+  '/notifications': typeof NotificationsRoute
+  '/playbook': typeof PlaybookRoute
+  '/reports': typeof ReportsRoute
+  '/screenshot-reader': typeof ScreenshotReaderRoute
+  '/strategy-discovery': typeof StrategyDiscoveryRoute
+  '/teams': typeof TeamsRoute
+  '/trader-dna': typeof TraderDnaRoute
+  '/voice-summary': typeof VoiceSummaryRoute
+  '/journal/new': typeof JournalNewRoute
+  '/journal/': typeof JournalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-review': typeof AiReviewRoute
+  '/analytics': typeof AnalyticsRoute
+  '/chart-critique': typeof ChartCritiqueRoute
+  '/coach': typeof CoachRoute
+  '/gallery': typeof GalleryRoute
+  '/goals': typeof GoalsRoute
+  '/notifications': typeof NotificationsRoute
+  '/playbook': typeof PlaybookRoute
+  '/reports': typeof ReportsRoute
+  '/screenshot-reader': typeof ScreenshotReaderRoute
+  '/strategy-discovery': typeof StrategyDiscoveryRoute
+  '/teams': typeof TeamsRoute
+  '/trader-dna': typeof TraderDnaRoute
+  '/voice-summary': typeof VoiceSummaryRoute
+  '/journal/new': typeof JournalNewRoute
+  '/journal': typeof JournalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-review': typeof AiReviewRoute
+  '/analytics': typeof AnalyticsRoute
+  '/chart-critique': typeof ChartCritiqueRoute
+  '/coach': typeof CoachRoute
+  '/gallery': typeof GalleryRoute
+  '/goals': typeof GoalsRoute
+  '/notifications': typeof NotificationsRoute
+  '/playbook': typeof PlaybookRoute
+  '/reports': typeof ReportsRoute
+  '/screenshot-reader': typeof ScreenshotReaderRoute
+  '/strategy-discovery': typeof StrategyDiscoveryRoute
+  '/teams': typeof TeamsRoute
+  '/trader-dna': typeof TraderDnaRoute
+  '/voice-summary': typeof VoiceSummaryRoute
+  '/journal/new': typeof JournalNewRoute
+  '/journal/': typeof JournalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/ai-review'
+    | '/analytics'
+    | '/chart-critique'
+    | '/coach'
+    | '/gallery'
+    | '/goals'
+    | '/notifications'
+    | '/playbook'
+    | '/reports'
+    | '/screenshot-reader'
+    | '/strategy-discovery'
+    | '/teams'
+    | '/trader-dna'
+    | '/voice-summary'
+    | '/journal/new'
+    | '/journal/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/ai-review'
+    | '/analytics'
+    | '/chart-critique'
+    | '/coach'
+    | '/gallery'
+    | '/goals'
+    | '/notifications'
+    | '/playbook'
+    | '/reports'
+    | '/screenshot-reader'
+    | '/strategy-discovery'
+    | '/teams'
+    | '/trader-dna'
+    | '/voice-summary'
+    | '/journal/new'
+    | '/journal'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai-review'
+    | '/analytics'
+    | '/chart-critique'
+    | '/coach'
+    | '/gallery'
+    | '/goals'
+    | '/notifications'
+    | '/playbook'
+    | '/reports'
+    | '/screenshot-reader'
+    | '/strategy-discovery'
+    | '/teams'
+    | '/trader-dna'
+    | '/voice-summary'
+    | '/journal/new'
+    | '/journal/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiReviewRoute: typeof AiReviewRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  ChartCritiqueRoute: typeof ChartCritiqueRoute
+  CoachRoute: typeof CoachRoute
+  GalleryRoute: typeof GalleryRoute
+  GoalsRoute: typeof GoalsRoute
+  NotificationsRoute: typeof NotificationsRoute
+  PlaybookRoute: typeof PlaybookRoute
+  ReportsRoute: typeof ReportsRoute
+  ScreenshotReaderRoute: typeof ScreenshotReaderRoute
+  StrategyDiscoveryRoute: typeof StrategyDiscoveryRoute
+  TeamsRoute: typeof TeamsRoute
+  TraderDnaRoute: typeof TraderDnaRoute
+  VoiceSummaryRoute: typeof VoiceSummaryRoute
+  JournalNewRoute: typeof JournalNewRoute
+  JournalIndexRoute: typeof JournalIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +260,140 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-review': {
+      id: '/ai-review'
+      path: '/ai-review'
+      fullPath: '/ai-review'
+      preLoaderRoute: typeof AiReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chart-critique': {
+      id: '/chart-critique'
+      path: '/chart-critique'
+      fullPath: '/chart-critique'
+      preLoaderRoute: typeof ChartCritiqueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach': {
+      id: '/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof CoachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/goals': {
+      id: '/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof GoalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playbook': {
+      id: '/playbook'
+      path: '/playbook'
+      fullPath: '/playbook'
+      preLoaderRoute: typeof PlaybookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/screenshot-reader': {
+      id: '/screenshot-reader'
+      path: '/screenshot-reader'
+      fullPath: '/screenshot-reader'
+      preLoaderRoute: typeof ScreenshotReaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/strategy-discovery': {
+      id: '/strategy-discovery'
+      path: '/strategy-discovery'
+      fullPath: '/strategy-discovery'
+      preLoaderRoute: typeof StrategyDiscoveryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teams': {
+      id: '/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof TeamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trader-dna': {
+      id: '/trader-dna'
+      path: '/trader-dna'
+      fullPath: '/trader-dna'
+      preLoaderRoute: typeof TraderDnaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/voice-summary': {
+      id: '/voice-summary'
+      path: '/voice-summary'
+      fullPath: '/voice-summary'
+      preLoaderRoute: typeof VoiceSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal/': {
+      id: '/journal/'
+      path: '/journal'
+      fullPath: '/journal/'
+      preLoaderRoute: typeof JournalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal/new': {
+      id: '/journal/new'
+      path: '/journal/new'
+      fullPath: '/journal/new'
+      preLoaderRoute: typeof JournalNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiReviewRoute: AiReviewRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  ChartCritiqueRoute: ChartCritiqueRoute,
+  CoachRoute: CoachRoute,
+  GalleryRoute: GalleryRoute,
+  GoalsRoute: GoalsRoute,
+  NotificationsRoute: NotificationsRoute,
+  PlaybookRoute: PlaybookRoute,
+  ReportsRoute: ReportsRoute,
+  ScreenshotReaderRoute: ScreenshotReaderRoute,
+  StrategyDiscoveryRoute: StrategyDiscoveryRoute,
+  TeamsRoute: TeamsRoute,
+  TraderDnaRoute: TraderDnaRoute,
+  VoiceSummaryRoute: VoiceSummaryRoute,
+  JournalNewRoute: JournalNewRoute,
+  JournalIndexRoute: JournalIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
