@@ -65,10 +65,10 @@ function Teams() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          ["Shared playbooks", "Publish your system once; every student's trades are graded against it."],
-          ["Mentor feedback", "Comment directly on a student's trade alongside the AI review."],
-          ["Permission controls", "Choose exactly what each student and assistant coach can see."],
-        ].map(([k, v]) => (
+          { k: "Shared playbooks", v: "Publish your system once; every student's trades are graded against it." },
+          { k: "Mentor feedback", v: "Comment directly on a student's trade alongside the AI review." },
+          { k: "Permission controls", v: "Choose exactly what each student and assistant coach can see." },
+        ].map(({ k, v }) => (
           <Panel key={k} title={k}>
             <p className="text-xs leading-relaxed text-muted-foreground">{v}</p>
           </Panel>
