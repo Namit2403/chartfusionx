@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AiReviewRouteImport } from './routes/ai-review'
 import { Route as JournalIndexRouteImport } from './routes/journal.index'
 import { Route as JournalNewRouteImport } from './routes/journal.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiReviewRoute = AiReviewRouteImport.update({
+  id: '/ai-review',
+  path: '/ai-review',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JournalIndexRoute = JournalIndexRouteImport.update({
@@ -31,30 +37,34 @@ const JournalNewRoute = JournalNewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-review': typeof AiReviewRoute
   '/journal/new': typeof JournalNewRoute
   '/journal/': typeof JournalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-review': typeof AiReviewRoute
   '/journal/new': typeof JournalNewRoute
   '/journal': typeof JournalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-review': typeof AiReviewRoute
   '/journal/new': typeof JournalNewRoute
   '/journal/': typeof JournalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/journal/new' | '/journal/'
+  fullPaths: '/' | '/ai-review' | '/journal/new' | '/journal/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/journal/new' | '/journal'
-  id: '__root__' | '/' | '/journal/new' | '/journal/'
+  to: '/' | '/ai-review' | '/journal/new' | '/journal'
+  id: '__root__' | '/' | '/ai-review' | '/journal/new' | '/journal/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiReviewRoute: typeof AiReviewRoute
   JournalNewRoute: typeof JournalNewRoute
   JournalIndexRoute: typeof JournalIndexRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-review': {
+      id: '/ai-review'
+      path: '/ai-review'
+      fullPath: '/ai-review'
+      preLoaderRoute: typeof AiReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/journal/': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiReviewRoute: AiReviewRoute,
   JournalNewRoute: JournalNewRoute,
   JournalIndexRoute: JournalIndexRoute,
 }
