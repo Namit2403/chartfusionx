@@ -11,6 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiReviewRouteImport } from './routes/ai-review'
+import { Route as ChartCritiqueRouteImport } from './routes/chart-critique'
+import { Route as ScreenshotReaderRouteImport } from './routes/screenshot-reader'
+import { Route as StrategyDiscoveryRouteImport } from './routes/strategy-discovery'
+import { Route as VoiceSummaryRouteImport } from './routes/voice-summary'
 import { Route as JournalIndexRouteImport } from './routes/journal.index'
 import { Route as JournalNewRouteImport } from './routes/journal.new'
 
@@ -22,6 +26,26 @@ const IndexRoute = IndexRouteImport.update({
 const AiReviewRoute = AiReviewRouteImport.update({
   id: '/ai-review',
   path: '/ai-review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChartCritiqueRoute = ChartCritiqueRouteImport.update({
+  id: '/chart-critique',
+  path: '/chart-critique',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScreenshotReaderRoute = ScreenshotReaderRouteImport.update({
+  id: '/screenshot-reader',
+  path: '/screenshot-reader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StrategyDiscoveryRoute = StrategyDiscoveryRouteImport.update({
+  id: '/strategy-discovery',
+  path: '/strategy-discovery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VoiceSummaryRoute = VoiceSummaryRouteImport.update({
+  id: '/voice-summary',
+  path: '/voice-summary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JournalIndexRoute = JournalIndexRouteImport.update({
@@ -38,12 +62,20 @@ const JournalNewRoute = JournalNewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai-review': typeof AiReviewRoute
+  '/chart-critique': typeof ChartCritiqueRoute
+  '/screenshot-reader': typeof ScreenshotReaderRoute
+  '/strategy-discovery': typeof StrategyDiscoveryRoute
+  '/voice-summary': typeof VoiceSummaryRoute
   '/journal/new': typeof JournalNewRoute
   '/journal/': typeof JournalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai-review': typeof AiReviewRoute
+  '/chart-critique': typeof ChartCritiqueRoute
+  '/screenshot-reader': typeof ScreenshotReaderRoute
+  '/strategy-discovery': typeof StrategyDiscoveryRoute
+  '/voice-summary': typeof VoiceSummaryRoute
   '/journal/new': typeof JournalNewRoute
   '/journal': typeof JournalIndexRoute
 }
@@ -51,20 +83,53 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ai-review': typeof AiReviewRoute
+  '/chart-critique': typeof ChartCritiqueRoute
+  '/screenshot-reader': typeof ScreenshotReaderRoute
+  '/strategy-discovery': typeof StrategyDiscoveryRoute
+  '/voice-summary': typeof VoiceSummaryRoute
   '/journal/new': typeof JournalNewRoute
   '/journal/': typeof JournalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ai-review' | '/journal/new' | '/journal/'
+  fullPaths:
+    | '/'
+    | '/ai-review'
+    | '/chart-critique'
+    | '/screenshot-reader'
+    | '/strategy-discovery'
+    | '/voice-summary'
+    | '/journal/new'
+    | '/journal/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ai-review' | '/journal/new' | '/journal'
-  id: '__root__' | '/' | '/ai-review' | '/journal/new' | '/journal/'
+  to:
+    | '/'
+    | '/ai-review'
+    | '/chart-critique'
+    | '/screenshot-reader'
+    | '/strategy-discovery'
+    | '/voice-summary'
+    | '/journal/new'
+    | '/journal'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai-review'
+    | '/chart-critique'
+    | '/screenshot-reader'
+    | '/strategy-discovery'
+    | '/voice-summary'
+    | '/journal/new'
+    | '/journal/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiReviewRoute: typeof AiReviewRoute
+  ChartCritiqueRoute: typeof ChartCritiqueRoute
+  ScreenshotReaderRoute: typeof ScreenshotReaderRoute
+  StrategyDiscoveryRoute: typeof StrategyDiscoveryRoute
+  VoiceSummaryRoute: typeof VoiceSummaryRoute
   JournalNewRoute: typeof JournalNewRoute
   JournalIndexRoute: typeof JournalIndexRoute
 }
@@ -83,6 +148,34 @@ declare module '@tanstack/react-router' {
       path: '/ai-review'
       fullPath: '/ai-review'
       preLoaderRoute: typeof AiReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chart-critique': {
+      id: '/chart-critique'
+      path: '/chart-critique'
+      fullPath: '/chart-critique'
+      preLoaderRoute: typeof ChartCritiqueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/screenshot-reader': {
+      id: '/screenshot-reader'
+      path: '/screenshot-reader'
+      fullPath: '/screenshot-reader'
+      preLoaderRoute: typeof ScreenshotReaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/strategy-discovery': {
+      id: '/strategy-discovery'
+      path: '/strategy-discovery'
+      fullPath: '/strategy-discovery'
+      preLoaderRoute: typeof StrategyDiscoveryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/voice-summary': {
+      id: '/voice-summary'
+      path: '/voice-summary'
+      fullPath: '/voice-summary'
+      preLoaderRoute: typeof VoiceSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/journal/': {
@@ -105,6 +198,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiReviewRoute: AiReviewRoute,
+  ChartCritiqueRoute: ChartCritiqueRoute,
+  ScreenshotReaderRoute: ScreenshotReaderRoute,
+  StrategyDiscoveryRoute: StrategyDiscoveryRoute,
+  VoiceSummaryRoute: VoiceSummaryRoute,
   JournalNewRoute: JournalNewRoute,
   JournalIndexRoute: JournalIndexRoute,
 }
