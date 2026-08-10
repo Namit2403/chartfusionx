@@ -30,18 +30,32 @@ export function OnboardingModal() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!window.localStorage.getItem(STORAGE_KEY)) setOpen(true);
-  }, []);
-
-  const close = () => {
-    setOpen(false);
+  const markSeen = () => {
     try {
       window.localStorage.setItem(STORAGE_KEY, "1");
     } catch {
       /* ignore */
     }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let seen = false;
+    try {
+      seen = window.localStorage.getItem(STORAGE_KEY) === "1";
+    } catch {
+      seen = true;
+    }
+    if (!seen) {
+      setOpen(true);
+      // Persist immediately so it never shows again, however it's dismissed.
+      markSeen();
+    }
+  }, []);
+
+  const close = () => {
+    setOpen(false);
+    markSeen();
   };
 
   const current = steps[step]!;
