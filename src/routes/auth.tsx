@@ -199,13 +199,13 @@ function AuthPage() {
             </form>
 
             <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-              <button
-                type="button"
+              <Link
+                to="/signup"
                 className="underline-offset-4 hover:text-foreground hover:underline"
-                onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
               >
-                {mode === "signin" ? "Create an account" : "I already have an account"}
-              </button>
+                Create an account
+              </Link>
+
               {mode === "signin" && (
                 <button
                   type="button"
