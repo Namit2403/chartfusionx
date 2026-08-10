@@ -13,7 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SubscriptionWidget } from "@/components/subscription-widget";
 import { readProfile } from "@/lib/profile";
+
 import { getLegalAcceptance } from "@/utils/profile.functions";
 import { supabase } from "@/integrations/supabase/client";
 
