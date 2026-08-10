@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, Panel, Pill } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/teams")({
+export const Route = createFileRoute("/_authenticated/teams")({
   head: () => ({
     meta: [
       { title: "Teams & Mentorship — ChartFusionX" },

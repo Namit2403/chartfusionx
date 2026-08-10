@@ -9,7 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-export const Route = createFileRoute("/playbook")({
+export const Route = createFileRoute("/_authenticated/playbook")({
   head: () => ({
     meta: [
       { title: "Playbook Builder — ChartFusionX" },

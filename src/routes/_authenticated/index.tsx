@@ -16,7 +16,7 @@ import { Panel, Pill, Stat } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { currency, equityCurve, stats, trades, weekdayPerf } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "Performance Dashboard — ChartFusionX" },

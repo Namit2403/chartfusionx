@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/journal/new")({
+export const Route = createFileRoute("/_authenticated/journal/new")({
   head: () => ({
     meta: [
       { title: "Log a Trade — ChartFusionX" },

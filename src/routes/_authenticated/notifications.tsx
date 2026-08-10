@@ -4,7 +4,7 @@ import { AlertTriangle, CheckCircle2, Clock, TrendingUp } from "lucide-react";
 import { PageHeader, Panel } from "@/components/shell";
 import { Switch } from "@/components/ui/switch";
 
-export const Route = createFileRoute("/notifications")({
+export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
     meta: [
       { title: "Smart Notifications — ChartFusionX" },

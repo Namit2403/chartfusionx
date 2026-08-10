@@ -7,7 +7,7 @@ import { VoiceOrb } from "@/components/voice-orb";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/voice-summary")({
+export const Route = createFileRoute("/_authenticated/voice-summary")({
   head: () => ({
     meta: [
       { title: "AI Voice Trading Summary — ChartFusionX" },

@@ -4,7 +4,7 @@ import { Check, Upload, X } from "lucide-react";
 import { EmptyHint, PageHeader, Panel, ScoreBar } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/chart-critique")({
+export const Route = createFileRoute("/_authenticated/chart-critique")({
   head: () => ({
     meta: [
       { title: "AI Chart Critique — ChartFusionX" },

@@ -10,7 +10,7 @@ import {
 import { PageHeader, Panel, ScoreBar } from "@/components/shell";
 import { dnaScores } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/trader-dna")({
+export const Route = createFileRoute("/_authenticated/trader-dna")({
   head: () => ({
     meta: [
       { title: "Trader DNA — ChartFusionX" },
