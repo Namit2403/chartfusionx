@@ -1,14 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 
 import { LegalPage, LegalSection } from "@/components/legal-page";
-import {
-  REFUND_WINDOW_DAYS,
-  formatDate,
-  formatMoney,
-  getRefundEligibility,
-  payments,
-} from "@/lib/billing";
+import { useSubscription, type PaymentTransaction } from "@/hooks/useSubscription";
+
+const REFUND_WINDOW_DAYS = 7;
 
 export const Route = createFileRoute("/refund-policy")({
   head: () => ({
@@ -40,24 +36,89 @@ export const Route = createFileRoute("/refund-policy")({
   component: RefundPage,
 });
 
-function EligibilityPanel() {
-  const eligibility = getRefundEligibility(payments);
-  const { firstPayment } = eligibility;
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 
-  const message = (() => {
-    switch (eligibility.reason) {
-      case "eligible":
-        return `You're eligible. ${eligibility.daysRemaining} day${eligibility.daysRemaining === 1 ? "" : "s"} left to request a refund of your first payment (window closes ${formatDate(eligibility.deadline!)}).`;
-      case "window-expired":
-        return `Your ${REFUND_WINDOW_DAYS}-day window closed on ${formatDate(eligibility.deadline!)}, ${eligibility.daysSinceFirstPayment} days after your first payment.`;
-      case "already-refunded":
-        return "Your first payment has already been refunded, so no further refund is available.";
-      case "no-payments":
-        return "No payments on file yet. Your 7-day window starts the day of your first payment.";
-      default:
-        return "Only your first payment qualifies for a refund.";
-    }
-  })();
+function money(cents: number, currency: string) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(cents / 100);
+}
+
+type Eligibility = {
+  eligible: boolean;
+  message: string;
+  firstPaymentId: string | null;
+};
+
+function evaluate(transactions: PaymentTransaction[]): Eligibility {
+  const paid = transactions
+    .filter((t) => t.status === "completed" && t.amount_cents > 0)
+    .sort((a, b) => a.billed_at.localeCompare(b.billed_at));
+
+  const first = paid[0];
+  if (!first) {
+    return {
+      eligible: false,
+      firstPaymentId: null,
+      message:
+        "No payments on file yet. Your 7-day window starts the day your first charge is taken, after the free trial ends.",
+    };
+  }
+
+  if (first.refunded_cents > 0) {
+    return {
+      eligible: false,
+      firstPaymentId: first.id,
+      message: "Your first payment has already been refunded, so no further refund is available.",
+    };
+  }
+
+  const deadline = new Date(
+    new Date(first.billed_at).getTime() + REFUND_WINDOW_DAYS * 24 * 60 * 60 * 1000,
+  );
+  const msLeft = deadline.getTime() - Date.now();
+
+  if (msLeft <= 0) {
+    return {
+      eligible: false,
+      firstPaymentId: first.id,
+      message: `Your ${REFUND_WINDOW_DAYS}-day window closed on ${formatDate(deadline.toISOString())}, 7 days after your first payment on ${formatDate(first.billed_at)}.`,
+    };
+  }
+
+  const daysLeft = Math.max(1, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
+  return {
+    eligible: true,
+    firstPaymentId: first.id,
+    message: `You're eligible. ${daysLeft} day${daysLeft === 1 ? "" : "s"} left to request a refund of your first payment (window closes ${formatDate(deadline.toISOString())}).`,
+  };
+}
+
+function EligibilityPanel() {
+  const { transactions, loading, userId } = useSubscription();
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin" /> Checking your payment history…
+      </div>
+    );
+  }
+
+  if (!userId) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+        Sign in to see whether your first payment is still inside the {REFUND_WINDOW_DAYS}-day
+        refund window.
+      </div>
+    );
+  }
+
+  const eligibility = evaluate(transactions);
 
   return (
     <div className="rounded-xl border border-border bg-card p-5">
@@ -71,11 +132,13 @@ function EligibilityPanel() {
           <div className="text-sm font-semibold">
             {eligibility.eligible ? "Refund available" : "Not eligible for a refund"}
           </div>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{message}</p>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            {eligibility.message}
+          </p>
         </div>
       </div>
 
-      {payments.length > 0 && (
+      {transactions.length > 0 && (
         <div className="mt-5 overflow-x-auto">
           <table className="w-full min-w-[480px] text-sm">
             <thead>
@@ -87,28 +150,28 @@ function EligibilityPanel() {
               </tr>
             </thead>
             <tbody>
-              {[...payments]
-                .sort((a, b) => a.date.localeCompare(b.date))
-                .map((p) => {
-                  const isFirst = p.id === firstPayment?.id;
-                  const refundable = isFirst && eligibility.eligible;
-                  return (
-                    <tr key={p.id} className="border-t border-border/60">
-                      <td className="py-2 num text-muted-foreground">{formatDate(p.date)}</td>
-                      <td className="py-2">{p.description}</td>
-                      <td className="py-2 num">{formatMoney(p.amount, p.currency)}</td>
-                      <td className="py-2 text-right">
-                        <span
-                          className={
-                            refundable ? "text-positive" : "text-muted-foreground"
-                          }
-                        >
-                          {refundable ? "Yes" : isFirst ? "Window closed" : "No — renewal"}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+              {transactions.map((tx) => {
+                const isFirst = tx.id === eligibility.firstPaymentId;
+                const refundable = isFirst && eligibility.eligible;
+                return (
+                  <tr key={tx.id} className="border-t border-border/60">
+                    <td className="num py-2 text-muted-foreground">{formatDate(tx.billed_at)}</td>
+                    <td className="py-2">{tx.description ?? "Subscription"}</td>
+                    <td className="num py-2">{money(tx.amount_cents, tx.currency)}</td>
+                    <td className="py-2 text-right">
+                      <span className={refundable ? "text-positive" : "text-muted-foreground"}>
+                        {tx.status !== "completed"
+                          ? "No — not paid"
+                          : refundable
+                            ? "Yes"
+                            : isFirst
+                              ? "Window closed"
+                              : "No — renewal"}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -144,14 +207,15 @@ function RefundPage() {
         <p>
           If you are not satisfied with ChartFusionX, you can request a full refund within 7 days of
           your <span className="text-foreground">first</span> payment. This applies once per
-          customer and only to the initial charge on your account, whether monthly or annual.
+          customer and only to the initial charge on your account. Your 7-day free trial is not a
+          charge, so the window starts on the first payment taken after the trial ends.
         </p>
       </LegalSection>
 
       <LegalSection heading="2. What is not refundable">
         <ul className="space-y-1">
           <li>Renewal charges after your first payment, including monthly and annual renewals.</li>
-          <li>Plan upgrades, add-ons, and any subsequent purchases.</li>
+          <li>Plan upgrades, prorated charges, add-ons, and any subsequent purchases.</li>
           <li>Requests made more than 7 days after the first payment.</li>
           <li>Accounts terminated for breach of our Terms of Service.</li>
         </ul>
@@ -175,10 +239,10 @@ function RefundPage() {
 
       <LegalSection heading="5. Cancelling instead of refunding">
         <p>
-          You can cancel your subscription at any time from your account settings. Cancelling stops
-          all future charges and you keep access until the end of the current billing period.
-          Cancellation on its own does not trigger a refund of an already-paid period outside the
-          7-day first-payment window.
+          You can cancel your subscription at any time from Plans & billing. Cancellation takes
+          effect immediately: future charges stop and paid features are locked right away, while
+          your trades and journal stay saved. Cancelling on its own does not trigger a refund of an
+          already-paid period outside the 7-day first-payment window.
         </p>
       </LegalSection>
 
