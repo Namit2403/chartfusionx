@@ -4,7 +4,7 @@ import { Upload } from "lucide-react";
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/screenshot-reader")({
+export const Route = createFileRoute("/_authenticated/screenshot-reader")({
   head: () => ({
     meta: [
       { title: "AI Screenshot Reader — ChartFusionX" },

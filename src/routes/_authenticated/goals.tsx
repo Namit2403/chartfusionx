@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/goals")({
+export const Route = createFileRoute("/_authenticated/goals")({
   head: () => ({
     meta: [
       { title: "Goals & Habit Tracking — ChartFusionX" },

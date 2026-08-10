@@ -5,7 +5,7 @@ import { PageHeader, Panel, Pill, ScoreBar } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { currency, trades } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/ai-review")({
+export const Route = createFileRoute("/_authenticated/ai-review")({
   head: () => ({
     meta: [
       { title: "AI Trade Review — ChartFusionX" },

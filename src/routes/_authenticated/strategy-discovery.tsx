@@ -4,7 +4,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { PageHeader, Panel, Pill } from "@/components/shell";
 import { currency, sessionPerf, strategyPerf } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/strategy-discovery")({
+export const Route = createFileRoute("/_authenticated/strategy-discovery")({
   head: () => ({
     meta: [
       { title: "AI Strategy Discovery — ChartFusionX" },

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { PageHeader, Panel, Pill } from "@/components/shell";
 import { currency, trades } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/gallery")({
+export const Route = createFileRoute("/_authenticated/gallery")({
   head: () => ({
     meta: [
       { title: "Trade Gallery — ChartFusionX" },

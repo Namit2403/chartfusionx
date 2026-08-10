@@ -5,7 +5,7 @@ import { PageHeader, Panel, Pill } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { currency, stats } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/reports")({
+export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
     meta: [
       { title: "Reports & Analytics — ChartFusionX" },

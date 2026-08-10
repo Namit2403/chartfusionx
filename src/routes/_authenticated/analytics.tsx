@@ -15,7 +15,7 @@ import {
 import { PageHeader, Panel, Stat } from "@/components/shell";
 import { currency, sessionPerf, stats, weekdayPerf } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/analytics")({
+export const Route = createFileRoute("/_authenticated/analytics")({
   head: () => ({
     meta: [
       { title: "Performance Analytics — ChartFusionX" },

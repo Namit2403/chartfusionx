@@ -6,7 +6,7 @@ import { PageHeader, Panel } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export const Route = createFileRoute("/coach")({
+export const Route = createFileRoute("/_authenticated/coach")({
   head: () => ({
     meta: [
       { title: "AI Trading Coach — ChartFusionX" },

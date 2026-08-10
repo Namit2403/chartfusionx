@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { currency, trades } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/journal/")({
+export const Route = createFileRoute("/_authenticated/journal/")({
   head: () => ({
     meta: [
       { title: "Smart Trading Journal — ChartFusionX" },
