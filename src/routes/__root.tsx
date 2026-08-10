@@ -137,22 +137,21 @@ function RootComponent() {
           <div className="flex min-w-0 flex-1 flex-col">
             <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
               <SidebarTrigger />
-              <div className="hidden text-xs text-muted-foreground sm:block">
-                Account <span className="num text-foreground">#FX-88421</span> · Live · $12,405.99
-              </div>
               <div className="ml-auto flex items-center gap-2">
-                <Button asChild size="sm" variant="secondary">
+                <Button asChild size="sm" variant="secondary" className="hidden sm:inline-flex">
                   <Link to="/coach">Ask coach</Link>
                 </Button>
                 <Button asChild size="sm">
                   <Link to="/journal/new">Log trade</Link>
                 </Button>
+                <AccountMenu />
               </div>
             </header>
-            <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <main className="flex-1 px-4 py-6 pb-24 sm:px-6 lg:px-8 md:pb-6">
               <Outlet />
             </main>
           </div>
+          <MobileBottomNav />
         </div>
       </SidebarProvider>
       <Toaster />
