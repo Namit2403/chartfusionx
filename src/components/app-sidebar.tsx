@@ -5,6 +5,7 @@ import {
   BarChart3,
   BellRing,
   BookOpen,
+  CreditCard,
   Bot,
   ChevronDown,
   Dna,
@@ -54,6 +55,7 @@ const moreItems = [
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Teams", url: "/teams", icon: Users },
   { title: "Notifications", url: "/notifications", icon: BellRing },
+  { title: "Plans & billing", url: "/billing", icon: CreditCard },
 ];
 
 export function AppSidebar() {

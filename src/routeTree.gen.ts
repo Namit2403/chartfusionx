@@ -21,6 +21,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAiReviewRouteImport } from './routes/_authenticated/ai-review'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as AuthenticatedChartCritiqueRouteImport } from './routes/_authenticated/chart-critique'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedGalleryRouteImport } from './routes/_authenticated/gallery'
@@ -35,6 +36,7 @@ import { Route as AuthenticatedTraderDnaRouteImport } from './routes/_authentica
 import { Route as AuthenticatedVoiceSummaryRouteImport } from './routes/_authenticated/voice-summary'
 import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal.index'
 import { Route as AuthenticatedJournalNewRouteImport } from './routes/_authenticated/journal.new'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -93,6 +95,11 @@ const AuthenticatedAiReviewRoute = AuthenticatedAiReviewRouteImport.update({
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedChartCritiqueRoute =
@@ -171,6 +178,12 @@ const AuthenticatedJournalNewRoute = AuthenticatedJournalNewRouteImport.update({
   path: '/journal/new',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -184,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/ai-review': typeof AuthenticatedAiReviewRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/chart-critique': typeof AuthenticatedChartCritiqueRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/gallery': typeof AuthenticatedGalleryRoute
@@ -198,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/voice-summary': typeof AuthenticatedVoiceSummaryRoute
   '/journal/new': typeof AuthenticatedJournalNewRoute
   '/journal/': typeof AuthenticatedJournalIndexRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -210,6 +225,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/ai-review': typeof AuthenticatedAiReviewRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/chart-critique': typeof AuthenticatedChartCritiqueRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/gallery': typeof AuthenticatedGalleryRoute
@@ -225,6 +241,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/journal/new': typeof AuthenticatedJournalNewRoute
   '/journal': typeof AuthenticatedJournalIndexRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -239,6 +256,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/ai-review': typeof AuthenticatedAiReviewRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/chart-critique': typeof AuthenticatedChartCritiqueRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/gallery': typeof AuthenticatedGalleryRoute
@@ -254,6 +272,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/journal/new': typeof AuthenticatedJournalNewRoute
   '/_authenticated/journal/': typeof AuthenticatedJournalIndexRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -269,6 +288,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai-review'
     | '/analytics'
+    | '/billing'
     | '/chart-critique'
     | '/coach'
     | '/gallery'
@@ -283,6 +303,7 @@ export interface FileRouteTypes {
     | '/voice-summary'
     | '/journal/new'
     | '/journal/'
+    | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -295,6 +316,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai-review'
     | '/analytics'
+    | '/billing'
     | '/chart-critique'
     | '/coach'
     | '/gallery'
@@ -310,6 +332,7 @@ export interface FileRouteTypes {
     | '/'
     | '/journal/new'
     | '/journal'
+    | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/_authenticated'
@@ -323,6 +346,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/ai-review'
     | '/_authenticated/analytics'
+    | '/_authenticated/billing'
     | '/_authenticated/chart-critique'
     | '/_authenticated/coach'
     | '/_authenticated/gallery'
@@ -338,6 +362,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/journal/new'
     | '/_authenticated/journal/'
+    | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -350,6 +375,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -436,6 +462,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing': {
+      id: '/_authenticated/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chart-critique': {
@@ -536,12 +569,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJournalNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiReviewRoute: typeof AuthenticatedAiReviewRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedChartCritiqueRoute: typeof AuthenticatedChartCritiqueRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedGalleryRoute: typeof AuthenticatedGalleryRoute
@@ -562,6 +603,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiReviewRoute: AuthenticatedAiReviewRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedChartCritiqueRoute: AuthenticatedChartCritiqueRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedGalleryRoute: AuthenticatedGalleryRoute,
@@ -592,17 +634,8 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
