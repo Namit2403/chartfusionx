@@ -199,10 +199,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      ai_usage_this_period: {
-        Args: { _since: string; _user_id: string }
-        Returns: number
-      }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
