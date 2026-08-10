@@ -31,6 +31,11 @@ const steps = [
 export function OnboardingModal() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
+  const [accepted, setAccepted] = useState(false);
+
+  useEffect(() => {
+    if (hasAcceptedLegal()) setAccepted(true);
+  }, []);
 
   const markSeen = () => {
     try {
