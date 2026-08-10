@@ -37,21 +37,22 @@ export const Route = createFileRoute("/")({
 function Dashboard() {
   return (
     <div className="mx-auto max-w-7xl space-y-6">
+      <OnboardingModal />
       <section className="panel-hero grid-lines overflow-hidden p-6 sm:p-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
-              The AI operating system for serious traders
+              The AI trading coach built for traders who are still learning.
             </div>
             <h1 className="mt-3 max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">
-              Track every trade. Understand your behavior. Improve your execution.
+              Log your trades. Get AI feedback. Understand exactly why you win and lose.
             </h1>
             <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild>
-                <Link to="/journal/new">Log a trade</Link>
+                <Link to="/journal/new">Log your first trade</Link>
               </Button>
               <Button asChild variant="secondary">
-                <Link to="/ai-review">Run AI trade review</Link>
+                <Link to="/ai-review">Get AI feedback</Link>
               </Button>
             </div>
           </div>
