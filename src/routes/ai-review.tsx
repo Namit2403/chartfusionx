@@ -26,7 +26,7 @@ export const Route = createFileRoute("/ai-review")({
 
 const strengths = [
   "Strong setup selection — matched your playbook's Break & Retest criteria",
-  "Risk sized at 0.75%, consistent with your last 20 trades",
+  "Risk sized at 0.50%, consistent with your last 20 trades",
   "Stop placed behind structure, not at an arbitrary distance",
 ];
 const mistakes = [
