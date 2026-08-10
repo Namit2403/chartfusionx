@@ -80,7 +80,7 @@ export function AccountMenu() {
           <UserRound className="size-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64">
+      <DropdownMenuContent align="end" className="w-72">
         <DropdownMenuLabel className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
           Account
         </DropdownMenuLabel>
@@ -115,8 +115,11 @@ export function AccountMenu() {
           )}
         </div>
         <DropdownMenuSeparator />
+        <SubscriptionWidget />
+        <DropdownMenuSeparator />
         <DropdownMenuItem>Switch account</DropdownMenuItem>
         <DropdownMenuItem onSelect={() => void signOut()}>Sign out</DropdownMenuItem>
+
       </DropdownMenuContent>
     </DropdownMenu>
   );
