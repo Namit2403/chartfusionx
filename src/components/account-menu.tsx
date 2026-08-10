@@ -43,6 +43,18 @@ export function AccountMenu() {
             <span className="text-muted-foreground">Balance</span>
             <span className="num font-semibold">$12,405.99</span>
           </div>
+          {acceptedAt && (
+            <div className="flex justify-between gap-2">
+              <span className="text-muted-foreground">Terms accepted</span>
+              <span className="num text-xs">
+                {new Date(acceptedAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+          )}
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Switch account</DropdownMenuItem>
