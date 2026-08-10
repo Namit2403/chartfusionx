@@ -17,8 +17,16 @@ export const Route = createFileRoute("/terms")({
         content: "Accounts, subscriptions, acceptable use, and disclaimers for ChartFusionX.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "ChartFusionX" },
+      { property: "og:url", content: "https://chartfusionx.lovable.app/terms" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Terms of Service — ChartFusionX" },
+      {
+        name: "twitter:description",
+        content: "Accounts, subscriptions, acceptable use, and disclaimers for ChartFusionX.",
+      },
     ],
+    links: [{ rel: "canonical", href: "https://chartfusionx.lovable.app/terms" }],
   }),
   component: TermsPage,
 });

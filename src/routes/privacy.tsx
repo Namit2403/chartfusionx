@@ -17,8 +17,16 @@ export const Route = createFileRoute("/privacy")({
         content: "How ChartFusionX handles your trading data, screenshots, and account information.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "ChartFusionX" },
+      { property: "og:url", content: "https://chartfusionx.lovable.app/privacy" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Privacy Policy — ChartFusionX" },
+      {
+        name: "twitter:description",
+        content: "How ChartFusionX handles your trading data, screenshots, and account information.",
+      },
     ],
+    links: [{ rel: "canonical", href: "https://chartfusionx.lovable.app/privacy" }],
   }),
   component: PrivacyPage,
 });
