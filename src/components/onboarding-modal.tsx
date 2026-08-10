@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { hasAcceptedLegal, recordLegalAcceptance } from "@/lib/profile";
 
 const STORAGE_KEY = "cfx-onboarded";
 
