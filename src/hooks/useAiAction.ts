@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
+import { openPaywall } from "@/components/paywall-dialog";
 import { consumeAiAction } from "@/hooks/useSubscription";
 
 /**
@@ -10,7 +9,6 @@ import { consumeAiAction } from "@/hooks/useSubscription";
  */
 export function useAiAction(feature: string) {
   const [checking, setChecking] = useState(false);
-  const navigate = useNavigate();
 
   const run = useCallback(async () => {
     setChecking(true);
@@ -19,25 +17,29 @@ export function useAiAction(feature: string) {
       if (result.ok) return true;
 
       if (result.reason === "limit-reached") {
-        toast.error(
-          `You've used all ${result.aiLimit} AI actions in this billing period. Upgrade to Pro for unlimited.`,
-          {
-            action: { label: "Upgrade", onClick: () => void navigate({ to: "/billing" }) },
-          },
-        );
+        openPaywall({
+          title: "You've hit your monthly AI limit",
+          description: `You've used all ${result.aiLimit} AI actions in this billing period. Upgrade to Pro for unlimited AI reviews, coaching and summaries.`,
+        });
       } else {
-        toast.error("Your plan isn't active. Start a plan to use the AI tools.", {
-          action: { label: "View plans", onClick: () => void navigate({ to: "/billing" }) },
+        openPaywall({
+          title: "Unlock the AI tools",
+          description:
+            "AI reviews, coaching and summaries need an active plan. Both plans include a 7-day free trial — you won't be charged if you cancel before it ends.",
         });
       }
       return false;
     } catch {
-      toast.error("Could not verify your AI usage. Please try again.");
+      openPaywall({
+        title: "Unlock the AI tools",
+        description:
+          "We couldn't verify your plan. Start a plan to run AI actions, or try again in a moment.",
+      });
       return false;
     } finally {
       setChecking(false);
     }
-  }, [feature, navigate]);
+  }, [feature]);
 
   return { run, checking };
 }

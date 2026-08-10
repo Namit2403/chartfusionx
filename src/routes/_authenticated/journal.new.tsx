@@ -4,6 +4,9 @@ import { toast } from "sonner";
 import { Paperclip } from "lucide-react";
 
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
+import { openPaywall } from "@/components/paywall-dialog";
+import { useSubscription } from "@/hooks/useSubscription";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -80,6 +83,29 @@ function Picker({ label, options }: { label: string; options: string[] }) {
 function NewTrade() {
   const [selected, setSelected] = useState<string[]>(["A+ Setup"]);
   const [confidence, setConfidence] = useState([7]);
+  const { isActive, loading: subLoading } = useSubscription();
+
+  function requirePlan() {
+    if (isActive) return true;
+    openPaywall({
+      title: "Start your trial to log trades",
+      description:
+        "Journaling trades needs an active plan. Both plans include a 7-day free trial — you won't be charged if you cancel before it ends.",
+    });
+    return false;
+  }
+
+  function saveTrade() {
+    if (!requirePlan()) return;
+    toast.success("Trade saved — AI review queued");
+  }
+
+  function saveDraft() {
+    if (!requirePlan()) return;
+    toast.success("Draft saved");
+  }
+
+
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -209,11 +235,14 @@ function NewTrade() {
       </Panel>
 
       <div className="flex justify-end gap-2 pb-4">
-        <Button variant="secondary">Save draft</Button>
-        <Button onClick={() => toast.success("Trade saved — AI review queued")}>
+        <Button variant="secondary" onClick={saveDraft}>
+          Save draft
+        </Button>
+        <Button onClick={saveTrade} disabled={subLoading}>
           Save trade
         </Button>
       </div>
+
     </div>
   );
 }
