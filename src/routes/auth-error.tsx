@@ -72,7 +72,7 @@ function AuthErrorPage() {
     void supabase.auth.getUser().then(({ data }) => setSignedIn(Boolean(data.user)));
   }, []);
 
-  const info = REASONS[reason ?? "unknown"];
+  const info = REASONS[(reason ?? "unknown") as Reason];
 
   const signOutAndRestart = async () => {
     setBusy(true);
