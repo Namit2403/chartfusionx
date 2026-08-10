@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { getPaddleEnvironment } from "@/lib/paddle";
+import { getBillingOverview, recordAiUsage } from "@/utils/payments.functions";
 
 export type SubscriptionRow = {
   id: string;
@@ -18,34 +19,56 @@ export type SubscriptionRow = {
   created_at: string;
 };
 
-const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
+export type PaymentTransaction = {
+  id: string;
+  paddle_transaction_id: string;
+  amount_cents: number;
+  currency: string;
+  status: string;
+  description: string | null;
+  billed_at: string;
+  refunded_cents: number;
+};
 
-export function isSubscriptionActive(sub: SubscriptionRow | null): boolean {
-  if (!sub) return false;
-  const notExpired =
-    !sub.current_period_end || new Date(sub.current_period_end).getTime() > Date.now();
-  if (ACTIVE_STATUSES.includes(sub.status)) return notExpired;
-  if (sub.status === "canceled") return notExpired;
-  return false;
-}
+export type BillingOverview = {
+  subscription: SubscriptionRow | null;
+  entitled: boolean;
+  planId: string | null;
+  planName: string | null;
+  aiUsed: number;
+  aiLimit: number | null;
+  aiRemaining: number | null;
+  transactions: PaymentTransaction[];
+};
+
+const EMPTY: BillingOverview = {
+  subscription: null,
+  entitled: false,
+  planId: null,
+  planName: null,
+  aiUsed: 0,
+  aiLimit: null,
+  aiRemaining: null,
+  transactions: [],
+};
 
 export function useSubscription() {
-  const [subscription, setSubscription] = useState<SubscriptionRow | null>(null);
+  const [overview, setOverview] = useState<BillingOverview>(EMPTY);
   const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async (uid: string) => {
-    const { data } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("user_id", uid)
-      .eq("environment", getPaddleEnvironment())
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    setSubscription((data as SubscriptionRow | null) ?? null);
-    setLoading(false);
+  const load = useCallback(async () => {
+    try {
+      const result = await getBillingOverview({
+        data: { environment: getPaddleEnvironment() },
+      });
+      setOverview(result as unknown as BillingOverview);
+    } catch {
+      setOverview(EMPTY);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -59,7 +82,7 @@ export function useSubscription() {
       }
       setUserId(user.id);
       setEmail(user.email ?? null);
-      void load(user.id);
+      void load();
 
       channel = supabase
         .channel(`subscriptions:${user.id}`)
@@ -71,7 +94,7 @@ export function useSubscription() {
             table: "subscriptions",
             filter: `user_id=eq.${user.id}`,
           },
-          () => void load(user.id),
+          () => void load(),
         )
         .subscribe();
     });
@@ -82,11 +105,22 @@ export function useSubscription() {
   }, [load]);
 
   return {
-    subscription,
+    ...overview,
+    subscription: overview.subscription,
     userId,
     email,
     loading,
-    isActive: isSubscriptionActive(subscription),
-    refresh: () => (userId ? load(userId) : Promise.resolve()),
+    isActive: overview.entitled,
+    refresh: load,
   };
+}
+
+/**
+ * Runs an AI action through the server-side entitlement + quota check.
+ * Returns false when the action was refused, so callers can show a paywall.
+ */
+export async function consumeAiAction(feature: string) {
+  return recordAiUsage({
+    data: { feature, environment: getPaddleEnvironment() },
+  }) as Promise<{ ok: boolean; reason: string; aiUsed: number; aiLimit: number | null }>;
 }
