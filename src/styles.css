@@ -39,6 +39,8 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-viz: var(--viz);
+  --color-viz-deep: var(--viz-deep);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-positive: var(--positive);
@@ -89,6 +91,8 @@
 
   --accent: oklch(0.8 0.135 78);
   --accent-foreground: oklch(0.2 0.05 70);
+  --viz: oklch(0.82 0.13 183);
+  --viz-deep: oklch(0.3 0.07 190);
 
   --destructive: oklch(0.62 0.2 21);
   --destructive-foreground: oklch(0.97 0.01 260);
