@@ -7,10 +7,10 @@ export function usePaddleCheckout() {
 
   const openCheckout = async (options: {
     priceId: string;
-    quantity?: number;
-    customerEmail?: string;
-    customData?: Record<string, string>;
-    successUrl?: string;
+    quantity?: number | undefined;
+    customerEmail?: string | undefined;
+    customData?: Record<string, string> | undefined;
+    successUrl?: string | undefined;
   }) => {
     setLoading(true);
     try {

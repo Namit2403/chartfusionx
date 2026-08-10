@@ -21,6 +21,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAiReviewRouteImport } from './routes/_authenticated/ai-review'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as AuthenticatedChartCritiqueRouteImport } from './routes/_authenticated/chart-critique'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedGalleryRouteImport } from './routes/_authenticated/gallery'
@@ -94,6 +95,11 @@ const AuthenticatedAiReviewRoute = AuthenticatedAiReviewRouteImport.update({
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedChartCritiqueRoute =
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/ai-review': typeof AuthenticatedAiReviewRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/chart-critique': typeof AuthenticatedChartCritiqueRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/gallery': typeof AuthenticatedGalleryRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/ai-review': typeof AuthenticatedAiReviewRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/chart-critique': typeof AuthenticatedChartCritiqueRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/gallery': typeof AuthenticatedGalleryRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/ai-review': typeof AuthenticatedAiReviewRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/chart-critique': typeof AuthenticatedChartCritiqueRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/gallery': typeof AuthenticatedGalleryRoute
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai-review'
     | '/analytics'
+    | '/billing'
     | '/chart-critique'
     | '/coach'
     | '/gallery'
@@ -306,6 +316,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai-review'
     | '/analytics'
+    | '/billing'
     | '/chart-critique'
     | '/coach'
     | '/gallery'
@@ -335,6 +346,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/ai-review'
     | '/_authenticated/analytics'
+    | '/_authenticated/billing'
     | '/_authenticated/chart-critique'
     | '/_authenticated/coach'
     | '/_authenticated/gallery'
@@ -452,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/billing': {
+      id: '/_authenticated/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chart-critique': {
       id: '/_authenticated/chart-critique'
       path: '/chart-critique'
@@ -563,6 +582,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiReviewRoute: typeof AuthenticatedAiReviewRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedChartCritiqueRoute: typeof AuthenticatedChartCritiqueRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedGalleryRoute: typeof AuthenticatedGalleryRoute
@@ -583,6 +603,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiReviewRoute: AuthenticatedAiReviewRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedChartCritiqueRoute: AuthenticatedChartCritiqueRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedGalleryRoute: AuthenticatedGalleryRoute,
