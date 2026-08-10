@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { readProfile } from "@/lib/profile";
 
 export function AccountMenu() {
+  const [acceptedAt, setAcceptedAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAcceptedAt(readProfile().legalAcceptedAt ?? null);
+  }, []);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
