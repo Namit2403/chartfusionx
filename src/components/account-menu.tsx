@@ -25,19 +25,32 @@ export function AccountMenu() {
 
   useEffect(() => {
     setAcceptedAt(readProfile().legalAcceptedAt ?? null);
-    void getLegalAcceptance()
-      .then((result) => {
-        if (result.acceptedAt) setAcceptedAt(result.acceptedAt);
-      })
-      .catch(() => {
-        /* signed out — fall back to the local record */
-      });
-    void supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
+
+    // Only ask the server once we know there IS a session — this server fn
+    // requires auth and throws a 401 for signed-out visitors (e.g. /auth).
+    const loadAcceptance = () => {
+      void getLegalAcceptance()
+        .then((result) => {
+          if (result.acceptedAt) setAcceptedAt(result.acceptedAt);
+        })
+        .catch(() => {
+          /* fall back to the local record */
+        });
+    };
+
+    void supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user ?? null);
+      if (data.user) loadAcceptance();
+    });
+
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) loadAcceptance();
+      else setAcceptedAt(null);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
+
 
   const signOut = async () => {
     await queryClient.cancelQueries();
