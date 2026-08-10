@@ -19,6 +19,7 @@ import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PlaybookRouteImport } from './routes/playbook'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ScreenshotReaderRouteImport } from './routes/screenshot-reader'
 import { Route as StrategyDiscoveryRouteImport } from './routes/strategy-discovery'
@@ -79,6 +80,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/playbook': typeof PlaybookRoute
   '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsRoute
   '/playbook': typeof PlaybookRoute
   '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsRoute
   '/playbook': typeof PlaybookRoute
   '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/playbook'
     | '/privacy'
+    | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
@@ -223,6 +233,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/playbook'
     | '/privacy'
+    | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/playbook'
     | '/privacy'
+    | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
@@ -266,6 +278,7 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   PlaybookRoute: typeof PlaybookRoute
   PrivacyRoute: typeof PrivacyRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
   ReportsRoute: typeof ReportsRoute
   ScreenshotReaderRoute: typeof ScreenshotReaderRoute
   StrategyDiscoveryRoute: typeof StrategyDiscoveryRoute
@@ -349,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reports': {
       id: '/reports'
       path: '/reports'
@@ -426,6 +446,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsRoute: NotificationsRoute,
   PlaybookRoute: PlaybookRoute,
   PrivacyRoute: PrivacyRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
   ReportsRoute: ReportsRoute,
   ScreenshotReaderRoute: ScreenshotReaderRoute,
   StrategyDiscoveryRoute: StrategyDiscoveryRoute,
