@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { OnboardingModal } from "@/components/onboarding-modal";
 import { Panel, Pill, Stat } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { currency, equityCurve, stats, trades, weekdayPerf } from "@/lib/mock-data";
