@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Paperclip } from "lucide-react";
+import { Paperclip, RotateCcw } from "lucide-react";
 
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
 import { openPaywall } from "@/components/paywall-dialog";
 import { useSubscription } from "@/hooks/useSubscription";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,6 +51,36 @@ const TAGS = [
   "Experimental",
 ];
 
+const DRAFT_KEY = "chartfusionx.trade-draft.v1";
+
+type Draft = {
+  fields: Record<string, string>;
+  tags: string[];
+  confidence: number;
+};
+
+const EMPTY_DRAFT: Draft = { fields: {}, tags: ["A+ Setup"], confidence: 7 };
+
+function readDraft(): Draft {
+  if (typeof window === "undefined") return EMPTY_DRAFT;
+  try {
+    const raw = window.localStorage.getItem(DRAFT_KEY);
+    if (!raw) return EMPTY_DRAFT;
+    const parsed = JSON.parse(raw) as Partial<Draft>;
+    return {
+      fields: parsed.fields ?? {},
+      tags: parsed.tags ?? EMPTY_DRAFT.tags,
+      confidence: parsed.confidence ?? EMPTY_DRAFT.confidence,
+    };
+  } catch {
+    return EMPTY_DRAFT;
+  }
+}
+
+function hasContent(draft: Draft) {
+  return Object.values(draft.fields).some((v) => v.trim().length > 0);
+}
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
@@ -61,36 +90,50 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Picker({ label, options }: { label: string; options: string[] }) {
-  return (
-    <Field label={label}>
-      <Select>
-        <SelectTrigger>
-          <SelectValue placeholder="Select" />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((o) => (
-            <SelectItem key={o} value={o}>
-              {o}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </Field>
-  );
-}
-
 function NewTrade() {
-  const [selected, setSelected] = useState<string[]>(["A+ Setup"]);
-  const [confidence, setConfidence] = useState([7]);
+  const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
+  const [restored, setRestored] = useState(false);
+  const hydrated = useRef(false);
   const { isActive, loading: subLoading } = useSubscription();
+
+  // Restore whatever was typed before the paywall / upgrade detour.
+  useEffect(() => {
+    const saved = readDraft();
+    setDraft(saved);
+    if (hasContent(saved)) setRestored(true);
+    hydrated.current = true;
+  }, []);
+
+  // Keep the draft persisted on every keystroke so nothing is lost when the
+  // user leaves for billing (or reloads mid-entry).
+  useEffect(() => {
+    if (!hydrated.current) return;
+    try {
+      window.localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      /* storage unavailable — draft simply isn't persisted */
+    }
+  }, [draft]);
+
+  const setField = (key: string, value: string) =>
+    setDraft((d) => ({ ...d, fields: { ...d.fields, [key]: value } }));
+
+  function clearDraft() {
+    setDraft(EMPTY_DRAFT);
+    setRestored(false);
+    try {
+      window.localStorage.removeItem(DRAFT_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
 
   function requirePlan() {
     if (isActive) return true;
     openPaywall({
       title: "Start your trial to log trades",
       description:
-        "Journaling trades needs an active plan. Both plans include a 7-day free trial — you won't be charged if you cancel before it ends.",
+        "Journaling trades needs an active plan. Your draft is saved on this device, so you can pick up exactly where you left off after choosing a plan.",
     });
     return false;
   }
@@ -98,6 +141,7 @@ function NewTrade() {
   function saveTrade() {
     if (!requirePlan()) return;
     toast.success("Trade saved — AI review queued");
+    clearDraft();
   }
 
   function saveDraft() {
@@ -105,7 +149,68 @@ function NewTrade() {
     toast.success("Draft saved");
   }
 
+  function TextField({
+    label,
+    name,
+    placeholder,
+    decimal,
+  }: {
+    label: string;
+    name: string;
+    placeholder?: string;
+    decimal?: boolean;
+  }) {
+    return (
+      <Field label={label}>
+        <Input
+          {...(placeholder ? { placeholder } : {})}
+          {...(decimal ? { inputMode: "decimal" as const } : {})}
+          value={draft.fields[name] ?? ""}
+          onChange={(e) => setField(name, e.target.value)}
+        />
+      </Field>
+    );
+  }
 
+  function Picker({ label, name, options }: { label: string; name: string; options: string[] }) {
+    return (
+      <Field label={label}>
+        <Select value={draft.fields[name] ?? ""} onValueChange={(v) => setField(name, v)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select" />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((o) => (
+              <SelectItem key={o} value={o}>
+                {o}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Field>
+    );
+  }
+
+  function AreaField({
+    label,
+    name,
+    placeholder,
+  }: {
+    label: string;
+    name: string;
+    placeholder: string;
+  }) {
+    return (
+      <Field label={label}>
+        <Textarea
+          rows={3}
+          placeholder={placeholder}
+          value={draft.fields[name] ?? ""}
+          onChange={(e) => setField(name, e.target.value)}
+        />
+      </Field>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -115,39 +220,47 @@ function NewTrade() {
         description="The more context you capture, the sharper your AI trade review becomes."
       />
 
+      {restored && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm">
+          <span className="text-muted-foreground">
+            We restored your unsaved draft from this device.
+          </span>
+          <Button size="sm" variant="ghost" onClick={clearDraft}>
+            <RotateCcw className="size-3.5" />
+            Start fresh
+          </Button>
+        </div>
+      )}
+
       <Panel title="Basic trade information">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Picker label="Market" options={["Forex", "Crypto", "Stocks", "Futures", "Options"]} />
-          <Field label="Asset">
-            <Input placeholder="EURUSD" />
-          </Field>
-          <Field label="Broker">
-            <Input placeholder="IC Markets" />
-          </Field>
-          <Picker label="Account type" options={["Live", "Demo", "Prop Challenge", "Funded"]} />
-          <Field label="Account size">
-            <Input placeholder="10000" inputMode="decimal" />
-          </Field>
-          <Field label="Setup name">
-            <Input placeholder="London break & retest" />
-          </Field>
-          <Picker label="Strategy" options={["Break & Retest", "Momentum", "Reversal", "Swing Continuation", "News Play"]} />
-          <Picker label="Direction" options={["Long", "Short"]} />
-          <Picker label="Timeframe" options={["1m", "5m", "15m", "30m", "1h", "4h", "1D"]} />
+          <Picker label="Market" name="market" options={["Forex", "Crypto", "Stocks", "Futures", "Options"]} />
+          <TextField label="Asset" name="asset" placeholder="EURUSD" />
+          <TextField label="Broker" name="broker" placeholder="IC Markets" />
+          <Picker label="Account type" name="accountType" options={["Live", "Demo", "Prop Challenge", "Funded"]} />
+          <TextField label="Account size" name="accountSize" placeholder="10000" decimal />
+          <TextField label="Setup name" name="setup" placeholder="London break & retest" />
+          <Picker
+            label="Strategy"
+            name="strategy"
+            options={["Break & Retest", "Momentum", "Reversal", "Swing Continuation", "News Play"]}
+          />
+          <Picker label="Direction" name="direction" options={["Long", "Short"]} />
+          <Picker label="Timeframe" name="timeframe" options={["1m", "5m", "15m", "30m", "1h", "4h", "1D"]} />
         </div>
       </Panel>
 
       <Panel title="Entry & exit data">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Entry price"><Input inputMode="decimal" placeholder="1.0842" /></Field>
-          <Field label="Exit price"><Input inputMode="decimal" placeholder="1.0891" /></Field>
-          <Field label="Stop loss"><Input inputMode="decimal" placeholder="1.0820" /></Field>
-          <Field label="Take profit"><Input inputMode="decimal" placeholder="1.0905" /></Field>
-          <Field label="Position size"><Input inputMode="decimal" placeholder="1.0 lot" /></Field>
-          <Field label="Risk %"><Input inputMode="decimal" placeholder="0.75" /></Field>
-          <Field label="Reward %"><Input inputMode="decimal" placeholder="2.25" /></Field>
-          <Field label="Fees / commissions"><Input inputMode="decimal" placeholder="4.20" /></Field>
-          <Field label="Trade duration"><Input placeholder="1h 40m" /></Field>
+          <TextField label="Entry price" name="entry" placeholder="1.0842" decimal />
+          <TextField label="Exit price" name="exit" placeholder="1.0891" decimal />
+          <TextField label="Stop loss" name="stop" placeholder="1.0820" decimal />
+          <TextField label="Take profit" name="target" placeholder="1.0905" decimal />
+          <TextField label="Position size" name="size" placeholder="1.0 lot" decimal />
+          <TextField label="Risk %" name="risk" placeholder="0.75" decimal />
+          <TextField label="Reward %" name="reward" placeholder="2.25" decimal />
+          <TextField label="Fees / commissions" name="fees" placeholder="4.20" decimal />
+          <TextField label="Trade duration" name="duration" placeholder="1h 40m" />
         </div>
         <EmptyHint>
           P&amp;L, R multiple, risk-reward, expectancy and drawdown are calculated automatically once
@@ -157,9 +270,17 @@ function NewTrade() {
 
       <Panel title="Trading context">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Picker label="Session" options={["Asian", "London", "New York"]} />
-          <Picker label="Day of week" options={["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]} />
-          <Picker label="Market conditions" options={["Trending", "Ranging", "Volatile", "Thin liquidity", "News driven"]} />
+          <Picker label="Session" name="session" options={["Asian", "London", "New York"]} />
+          <Picker
+            label="Day of week"
+            name="day"
+            options={["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]}
+          />
+          <Picker
+            label="Market conditions"
+            name="conditions"
+            options={["Trending", "Ranging", "Volatile", "Thin liquidity", "News driven"]}
+          />
         </div>
       </Panel>
 
@@ -169,26 +290,42 @@ function NewTrade() {
             <div>
               <Label className="text-xs text-muted-foreground">Confidence level</Label>
               <div className="mt-3 flex items-center gap-4">
-                <Slider value={confidence} onValueChange={setConfidence} min={1} max={10} step={1} />
-                <span className="num w-8 text-right text-sm">{confidence[0]}</span>
+                <Slider
+                  value={[draft.confidence]}
+                  onValueChange={(v) => setDraft((d) => ({ ...d, confidence: v[0] ?? d.confidence }))}
+                  min={1}
+                  max={10}
+                  step={1}
+                />
+                <span className="num w-8 text-right text-sm">{draft.confidence}</span>
               </div>
             </div>
-            <Picker label="Emotion" options={["Calm", "Fear", "Greed", "FOMO", "Revenge"]} />
-            <Field label="Reason for entry">
-              <Textarea rows={3} placeholder="What made this a valid setup?" />
-            </Field>
+            <Picker label="Emotion" name="emotionBefore" options={["Calm", "Fear", "Greed", "FOMO", "Revenge"]} />
+            <AreaField
+              label="Reason for entry"
+              name="reason"
+              placeholder="What made this a valid setup?"
+            />
           </div>
         </Panel>
 
         <Panel title="After the trade" subtitle="Psychology at exit">
           <div className="space-y-4">
-            <Picker label="Emotional state" options={["Calm", "Satisfied", "Frustrated", "Angry", "Regretful", "Proud"]} />
-            <Field label="Mistakes made">
-              <Textarea rows={3} placeholder="Entered before confirmation…" />
-            </Field>
-            <Field label="Lessons learned">
-              <Textarea rows={3} placeholder="Wait for the candle close next time." />
-            </Field>
+            <Picker
+              label="Emotional state"
+              name="emotionAfter"
+              options={["Calm", "Satisfied", "Frustrated", "Angry", "Regretful", "Proud"]}
+            />
+            <AreaField
+              label="Mistakes made"
+              name="mistakes"
+              placeholder="Entered before confirmation…"
+            />
+            <AreaField
+              label="Lessons learned"
+              name="lessons"
+              placeholder="Wait for the candle close next time."
+            />
           </div>
         </Panel>
       </div>
@@ -196,13 +333,16 @@ function NewTrade() {
       <Panel title="Tags" subtitle="Categorize the trade for later filtering and AI pattern detection">
         <div className="flex flex-wrap gap-2">
           {TAGS.map((tag) => {
-            const active = selected.includes(tag);
+            const active = draft.tags.includes(tag);
             return (
               <button
                 key={tag}
                 type="button"
                 onClick={() =>
-                  setSelected((s) => (active ? s.filter((x) => x !== tag) : [...s, tag]))
+                  setDraft((d) => ({
+                    ...d,
+                    tags: active ? d.tags.filter((x) => x !== tag) : [...d.tags, tag],
+                  }))
                 }
                 className={
                   active
@@ -234,7 +374,10 @@ function NewTrade() {
         </div>
       </Panel>
 
-      <div className="flex justify-end gap-2 pb-4">
+      <div className="flex flex-wrap items-center justify-end gap-2 pb-4">
+        <span className="mr-auto text-xs text-muted-foreground">
+          Draft autosaves on this device — nothing is lost if you step out to upgrade.
+        </span>
         <Button variant="secondary" onClick={saveDraft}>
           Save draft
         </Button>
@@ -242,7 +385,6 @@ function NewTrade() {
           Save trade
         </Button>
       </div>
-
     </div>
   );
 }
