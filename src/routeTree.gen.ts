@@ -18,6 +18,7 @@ import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PlaybookRouteImport } from './routes/playbook'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ScreenshotReaderRouteImport } from './routes/screenshot-reader'
 import { Route as StrategyDiscoveryRouteImport } from './routes/strategy-discovery'
@@ -72,6 +73,11 @@ const PlaybookRoute = PlaybookRouteImport.update({
   path: '/playbook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/goals': typeof GoalsRoute
   '/notifications': typeof NotificationsRoute
   '/playbook': typeof PlaybookRoute
+  '/privacy': typeof PrivacyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/goals': typeof GoalsRoute
   '/notifications': typeof NotificationsRoute
   '/playbook': typeof PlaybookRoute
+  '/privacy': typeof PrivacyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/goals': typeof GoalsRoute
   '/notifications': typeof NotificationsRoute
   '/playbook': typeof PlaybookRoute
+  '/privacy': typeof PrivacyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/notifications'
     | '/playbook'
+    | '/privacy'
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/notifications'
     | '/playbook'
+    | '/privacy'
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/notifications'
     | '/playbook'
+    | '/privacy'
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
@@ -241,6 +253,7 @@ export interface RootRouteChildren {
   GoalsRoute: typeof GoalsRoute
   NotificationsRoute: typeof NotificationsRoute
   PlaybookRoute: typeof PlaybookRoute
+  PrivacyRoute: typeof PrivacyRoute
   ReportsRoute: typeof ReportsRoute
   ScreenshotReaderRoute: typeof ScreenshotReaderRoute
   StrategyDiscoveryRoute: typeof StrategyDiscoveryRoute
@@ -316,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaybookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reports': {
       id: '/reports'
       path: '/reports'
@@ -385,6 +405,7 @@ const rootRouteChildren: RootRouteChildren = {
   GoalsRoute: GoalsRoute,
   NotificationsRoute: NotificationsRoute,
   PlaybookRoute: PlaybookRoute,
+  PrivacyRoute: PrivacyRoute,
   ReportsRoute: ReportsRoute,
   ScreenshotReaderRoute: ScreenshotReaderRoute,
   StrategyDiscoveryRoute: StrategyDiscoveryRoute,
@@ -397,13 +418,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
