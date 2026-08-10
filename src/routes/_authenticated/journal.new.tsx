@@ -4,6 +4,9 @@ import { toast } from "sonner";
 import { Paperclip } from "lucide-react";
 
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
+import { openPaywall } from "@/components/paywall-dialog";
+import { useSubscription } from "@/hooks/useSubscription";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
