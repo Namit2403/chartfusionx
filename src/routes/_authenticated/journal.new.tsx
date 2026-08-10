@@ -90,6 +90,78 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+function TextField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  decimal,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  decimal?: boolean;
+}) {
+  return (
+    <Field label={label}>
+      <Input
+        {...(placeholder ? { placeholder } : {})}
+        {...(decimal ? { inputMode: "decimal" as const } : {})}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </Field>
+  );
+}
+
+function Picker({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) {
+  return (
+    <Field label={label}>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select" />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((o) => (
+            <SelectItem key={o} value={o}>
+              {o}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
+  );
+}
+
+function AreaField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <Field label={label}>
+      <Textarea rows={3} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
+    </Field>
+  );
+}
+
 function NewTrade() {
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [restored, setRestored] = useState(false);
@@ -149,69 +221,6 @@ function NewTrade() {
     toast.success("Draft saved");
   }
 
-  function TextField({
-    label,
-    name,
-    placeholder,
-    decimal,
-  }: {
-    label: string;
-    name: string;
-    placeholder?: string;
-    decimal?: boolean;
-  }) {
-    return (
-      <Field label={label}>
-        <Input
-          {...(placeholder ? { placeholder } : {})}
-          {...(decimal ? { inputMode: "decimal" as const } : {})}
-          value={draft.fields[name] ?? ""}
-          onChange={(e) => setField(name, e.target.value)}
-        />
-      </Field>
-    );
-  }
-
-  function Picker({ label, name, options }: { label: string; name: string; options: string[] }) {
-    return (
-      <Field label={label}>
-        <Select value={draft.fields[name] ?? ""} onValueChange={(v) => setField(name, v)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select" />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((o) => (
-              <SelectItem key={o} value={o}>
-                {o}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </Field>
-    );
-  }
-
-  function AreaField({
-    label,
-    name,
-    placeholder,
-  }: {
-    label: string;
-    name: string;
-    placeholder: string;
-  }) {
-    return (
-      <Field label={label}>
-        <Textarea
-          rows={3}
-          placeholder={placeholder}
-          value={draft.fields[name] ?? ""}
-          onChange={(e) => setField(name, e.target.value)}
-        />
-      </Field>
-    );
-  }
-
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <PageHeader
@@ -234,33 +243,33 @@ function NewTrade() {
 
       <Panel title="Basic trade information">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Picker label="Market" name="market" options={["Forex", "Crypto", "Stocks", "Futures", "Options"]} />
-          <TextField label="Asset" name="asset" placeholder="EURUSD" />
-          <TextField label="Broker" name="broker" placeholder="IC Markets" />
-          <Picker label="Account type" name="accountType" options={["Live", "Demo", "Prop Challenge", "Funded"]} />
-          <TextField label="Account size" name="accountSize" placeholder="10000" decimal />
-          <TextField label="Setup name" name="setup" placeholder="London break & retest" />
+          <Picker label="Market" value={draft.fields["market"] ?? ""} onChange={(v) => setField("market", v)} options={["Forex", "Crypto", "Stocks", "Futures", "Options"]} />
+          <TextField label="Asset" value={draft.fields["asset"] ?? ""} onChange={(v) => setField("asset", v)} placeholder="EURUSD" />
+          <TextField label="Broker" value={draft.fields["broker"] ?? ""} onChange={(v) => setField("broker", v)} placeholder="IC Markets" />
+          <Picker label="Account type" value={draft.fields["accountType"] ?? ""} onChange={(v) => setField("accountType", v)} options={["Live", "Demo", "Prop Challenge", "Funded"]} />
+          <TextField label="Account size" value={draft.fields["accountSize"] ?? ""} onChange={(v) => setField("accountSize", v)} placeholder="10000" decimal />
+          <TextField label="Setup name" value={draft.fields["setup"] ?? ""} onChange={(v) => setField("setup", v)} placeholder="London break & retest" />
           <Picker
             label="Strategy"
-            name="strategy"
+            value={draft.fields["strategy"] ?? ""} onChange={(v) => setField("strategy", v)}
             options={["Break & Retest", "Momentum", "Reversal", "Swing Continuation", "News Play"]}
           />
-          <Picker label="Direction" name="direction" options={["Long", "Short"]} />
-          <Picker label="Timeframe" name="timeframe" options={["1m", "5m", "15m", "30m", "1h", "4h", "1D"]} />
+          <Picker label="Direction" value={draft.fields["direction"] ?? ""} onChange={(v) => setField("direction", v)} options={["Long", "Short"]} />
+          <Picker label="Timeframe" value={draft.fields["timeframe"] ?? ""} onChange={(v) => setField("timeframe", v)} options={["1m", "5m", "15m", "30m", "1h", "4h", "1D"]} />
         </div>
       </Panel>
 
       <Panel title="Entry & exit data">
         <div className="grid gap-4 sm:grid-cols-3">
-          <TextField label="Entry price" name="entry" placeholder="1.0842" decimal />
-          <TextField label="Exit price" name="exit" placeholder="1.0891" decimal />
-          <TextField label="Stop loss" name="stop" placeholder="1.0820" decimal />
-          <TextField label="Take profit" name="target" placeholder="1.0905" decimal />
-          <TextField label="Position size" name="size" placeholder="1.0 lot" decimal />
-          <TextField label="Risk %" name="risk" placeholder="0.75" decimal />
-          <TextField label="Reward %" name="reward" placeholder="2.25" decimal />
-          <TextField label="Fees / commissions" name="fees" placeholder="4.20" decimal />
-          <TextField label="Trade duration" name="duration" placeholder="1h 40m" />
+          <TextField label="Entry price" value={draft.fields["entry"] ?? ""} onChange={(v) => setField("entry", v)} placeholder="1.0842" decimal />
+          <TextField label="Exit price" value={draft.fields["exit"] ?? ""} onChange={(v) => setField("exit", v)} placeholder="1.0891" decimal />
+          <TextField label="Stop loss" value={draft.fields["stop"] ?? ""} onChange={(v) => setField("stop", v)} placeholder="1.0820" decimal />
+          <TextField label="Take profit" value={draft.fields["target"] ?? ""} onChange={(v) => setField("target", v)} placeholder="1.0905" decimal />
+          <TextField label="Position size" value={draft.fields["size"] ?? ""} onChange={(v) => setField("size", v)} placeholder="1.0 lot" decimal />
+          <TextField label="Risk %" value={draft.fields["risk"] ?? ""} onChange={(v) => setField("risk", v)} placeholder="0.75" decimal />
+          <TextField label="Reward %" value={draft.fields["reward"] ?? ""} onChange={(v) => setField("reward", v)} placeholder="2.25" decimal />
+          <TextField label="Fees / commissions" value={draft.fields["fees"] ?? ""} onChange={(v) => setField("fees", v)} placeholder="4.20" decimal />
+          <TextField label="Trade duration" value={draft.fields["duration"] ?? ""} onChange={(v) => setField("duration", v)} placeholder="1h 40m" />
         </div>
         <EmptyHint>
           P&amp;L, R multiple, risk-reward, expectancy and drawdown are calculated automatically once
@@ -270,15 +279,15 @@ function NewTrade() {
 
       <Panel title="Trading context">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Picker label="Session" name="session" options={["Asian", "London", "New York"]} />
+          <Picker label="Session" value={draft.fields["session"] ?? ""} onChange={(v) => setField("session", v)} options={["Asian", "London", "New York"]} />
           <Picker
             label="Day of week"
-            name="day"
+            value={draft.fields["day"] ?? ""} onChange={(v) => setField("day", v)}
             options={["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]}
           />
           <Picker
             label="Market conditions"
-            name="conditions"
+            value={draft.fields["conditions"] ?? ""} onChange={(v) => setField("conditions", v)}
             options={["Trending", "Ranging", "Volatile", "Thin liquidity", "News driven"]}
           />
         </div>
@@ -300,10 +309,10 @@ function NewTrade() {
                 <span className="num w-8 text-right text-sm">{draft.confidence}</span>
               </div>
             </div>
-            <Picker label="Emotion" name="emotionBefore" options={["Calm", "Fear", "Greed", "FOMO", "Revenge"]} />
+            <Picker label="Emotion" value={draft.fields["emotionBefore"] ?? ""} onChange={(v) => setField("emotionBefore", v)} options={["Calm", "Fear", "Greed", "FOMO", "Revenge"]} />
             <AreaField
               label="Reason for entry"
-              name="reason"
+              value={draft.fields["reason"] ?? ""} onChange={(v) => setField("reason", v)}
               placeholder="What made this a valid setup?"
             />
           </div>
@@ -313,17 +322,17 @@ function NewTrade() {
           <div className="space-y-4">
             <Picker
               label="Emotional state"
-              name="emotionAfter"
+              value={draft.fields["emotionAfter"] ?? ""} onChange={(v) => setField("emotionAfter", v)}
               options={["Calm", "Satisfied", "Frustrated", "Angry", "Regretful", "Proud"]}
             />
             <AreaField
               label="Mistakes made"
-              name="mistakes"
+              value={draft.fields["mistakes"] ?? ""} onChange={(v) => setField("mistakes", v)}
               placeholder="Entered before confirmation…"
             />
             <AreaField
               label="Lessons learned"
-              name="lessons"
+              value={draft.fields["lessons"] ?? ""} onChange={(v) => setField("lessons", v)}
               placeholder="Wait for the candle close next time."
             />
           </div>
