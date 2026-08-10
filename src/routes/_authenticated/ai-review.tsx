@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Check, X } from "lucide-react";
 
+import { useAiAction } from "@/hooks/useAiAction";
 import { PageHeader, Panel, Pill, ScoreBar } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { currency, trades } from "@/lib/mock-data";
@@ -37,13 +38,18 @@ const mistakes = [
 
 export default function AiReview() {
   const trade = trades[0]!;
+  const { run: spendAiAction, checking: reviewing } = useAiAction("ai-review");
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
         eyebrow="Module 03 · Core feature"
         title="AI Trade Review"
         description="After every trade, the AI reads your data, notes, emotions, screenshots, playbook rules and full history — then reviews your execution like a coach would."
-        action={<Button>Review latest trade</Button>}
+        action={
+          <Button onClick={() => void spendAiAction()} disabled={reviewing}>
+            Review latest trade
+          </Button>
+        }
       />
 
       <div className="grid gap-4 lg:grid-cols-3">
