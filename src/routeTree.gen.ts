@@ -18,10 +18,13 @@ import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as PlaybookRouteImport } from './routes/playbook'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ScreenshotReaderRouteImport } from './routes/screenshot-reader'
 import { Route as StrategyDiscoveryRouteImport } from './routes/strategy-discovery'
 import { Route as TeamsRouteImport } from './routes/teams'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TraderDnaRouteImport } from './routes/trader-dna'
 import { Route as VoiceSummaryRouteImport } from './routes/voice-summary'
 import { Route as JournalIndexRouteImport } from './routes/journal.index'
@@ -72,6 +75,16 @@ const PlaybookRoute = PlaybookRouteImport.update({
   path: '/playbook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -90,6 +103,11 @@ const StrategyDiscoveryRoute = StrategyDiscoveryRouteImport.update({
 const TeamsRoute = TeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TraderDnaRoute = TraderDnaRouteImport.update({
@@ -123,10 +141,13 @@ export interface FileRoutesByFullPath {
   '/goals': typeof GoalsRoute
   '/notifications': typeof NotificationsRoute
   '/playbook': typeof PlaybookRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
   '/teams': typeof TeamsRoute
+  '/terms': typeof TermsRoute
   '/trader-dna': typeof TraderDnaRoute
   '/voice-summary': typeof VoiceSummaryRoute
   '/journal/new': typeof JournalNewRoute
@@ -142,10 +163,13 @@ export interface FileRoutesByTo {
   '/goals': typeof GoalsRoute
   '/notifications': typeof NotificationsRoute
   '/playbook': typeof PlaybookRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
   '/teams': typeof TeamsRoute
+  '/terms': typeof TermsRoute
   '/trader-dna': typeof TraderDnaRoute
   '/voice-summary': typeof VoiceSummaryRoute
   '/journal/new': typeof JournalNewRoute
@@ -162,10 +186,13 @@ export interface FileRoutesById {
   '/goals': typeof GoalsRoute
   '/notifications': typeof NotificationsRoute
   '/playbook': typeof PlaybookRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
   '/teams': typeof TeamsRoute
+  '/terms': typeof TermsRoute
   '/trader-dna': typeof TraderDnaRoute
   '/voice-summary': typeof VoiceSummaryRoute
   '/journal/new': typeof JournalNewRoute
@@ -183,10 +210,13 @@ export interface FileRouteTypes {
     | '/goals'
     | '/notifications'
     | '/playbook'
+    | '/privacy'
+    | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
     | '/teams'
+    | '/terms'
     | '/trader-dna'
     | '/voice-summary'
     | '/journal/new'
@@ -202,10 +232,13 @@ export interface FileRouteTypes {
     | '/goals'
     | '/notifications'
     | '/playbook'
+    | '/privacy'
+    | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
     | '/teams'
+    | '/terms'
     | '/trader-dna'
     | '/voice-summary'
     | '/journal/new'
@@ -221,10 +254,13 @@ export interface FileRouteTypes {
     | '/goals'
     | '/notifications'
     | '/playbook'
+    | '/privacy'
+    | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
     | '/teams'
+    | '/terms'
     | '/trader-dna'
     | '/voice-summary'
     | '/journal/new'
@@ -241,10 +277,13 @@ export interface RootRouteChildren {
   GoalsRoute: typeof GoalsRoute
   NotificationsRoute: typeof NotificationsRoute
   PlaybookRoute: typeof PlaybookRoute
+  PrivacyRoute: typeof PrivacyRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
   ReportsRoute: typeof ReportsRoute
   ScreenshotReaderRoute: typeof ScreenshotReaderRoute
   StrategyDiscoveryRoute: typeof StrategyDiscoveryRoute
   TeamsRoute: typeof TeamsRoute
+  TermsRoute: typeof TermsRoute
   TraderDnaRoute: typeof TraderDnaRoute
   VoiceSummaryRoute: typeof VoiceSummaryRoute
   JournalNewRoute: typeof JournalNewRoute
@@ -316,6 +355,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaybookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reports': {
       id: '/reports'
       path: '/reports'
@@ -342,6 +395,13 @@ declare module '@tanstack/react-router' {
       path: '/teams'
       fullPath: '/teams'
       preLoaderRoute: typeof TeamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/trader-dna': {
@@ -385,10 +445,13 @@ const rootRouteChildren: RootRouteChildren = {
   GoalsRoute: GoalsRoute,
   NotificationsRoute: NotificationsRoute,
   PlaybookRoute: PlaybookRoute,
+  PrivacyRoute: PrivacyRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
   ReportsRoute: ReportsRoute,
   ScreenshotReaderRoute: ScreenshotReaderRoute,
   StrategyDiscoveryRoute: StrategyDiscoveryRoute,
   TeamsRoute: TeamsRoute,
+  TermsRoute: TermsRoute,
   TraderDnaRoute: TraderDnaRoute,
   VoiceSummaryRoute: VoiceSummaryRoute,
   JournalNewRoute: JournalNewRoute,
@@ -397,13 +460,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

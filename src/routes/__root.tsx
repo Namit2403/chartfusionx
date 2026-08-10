@@ -149,9 +149,23 @@ function RootComponent() {
                 <AccountMenu />
               </div>
             </header>
-            <main className="flex-1 px-4 py-6 pb-24 sm:px-6 lg:px-8 md:pb-6">
+            <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
               <Outlet />
             </main>
+            <footer className="border-t border-border px-4 py-6 pb-24 text-xs text-muted-foreground sm:px-6 lg:px-8 md:pb-6">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <span>© {new Date().getFullYear()} ChartFusionX</span>
+                <Link to="/privacy" className="hover:text-foreground">
+                  Privacy Policy
+                </Link>
+                <Link to="/terms" className="hover:text-foreground">
+                  Terms of Service
+                </Link>
+                <Link to="/refund-policy" className="hover:text-foreground">
+                  Refund Policy
+                </Link>
+              </div>
+            </footer>
           </div>
           <MobileBottomNav />
         </div>
