@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
-type Search = { redirect?: string };
+type Search = { redirect?: string | undefined };
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>): Search => ({
     redirect: typeof search["redirect"] === "string" ? search["redirect"] : undefined,
   }),
+
   head: () => ({
     meta: [
       { title: "Sign in — ChartFusionX" },
