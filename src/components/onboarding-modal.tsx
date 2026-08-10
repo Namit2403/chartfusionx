@@ -59,6 +59,14 @@ export function OnboardingModal() {
   };
 
   const current = steps[step]!;
+  const isLegalStep = step === 0;
+  const blocked = isLegalStep && !accepted;
+
+  const advance = () => {
+    if (isLegalStep) recordLegalAcceptance();
+    if (step === steps.length - 1) close();
+    else setStep(step + 1);
+  };
 
   return (
     <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : close())}>
@@ -80,13 +88,39 @@ export function OnboardingModal() {
         <h2 className="mt-5 text-xl font-semibold tracking-tight">{current.headline}</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{current.body}</p>
 
+        {isLegalStep && (
+          <label className="mt-5 flex cursor-pointer items-start gap-2.5 rounded-lg border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+            <Checkbox
+              checked={accepted}
+              onCheckedChange={(v) => setAccepted(v === true)}
+              className="mt-0.5"
+              aria-label="Accept legal documents"
+            />
+            <span>
+              I have read and accept the{" "}
+              <Link to="/privacy" className="text-foreground underline underline-offset-4">
+                Privacy Policy
+              </Link>
+              ,{" "}
+              <Link to="/terms" className="text-foreground underline underline-offset-4">
+                Terms of Service
+              </Link>
+              , and{" "}
+              <Link to="/refund-policy" className="text-foreground underline underline-offset-4">
+                Refund Policy
+              </Link>
+              .
+            </span>
+          </label>
+        )}
+
         <div className="mt-6 flex flex-col gap-2">
           {"to" in current && current.to ? (
             <Button asChild onClick={close}>
               <Link to={current.to}>{current.cta}</Link>
             </Button>
           ) : (
-            <Button onClick={() => (step === steps.length - 1 ? close() : setStep(step + 1))}>
+            <Button onClick={advance} disabled={blocked}>
               {current.cta}
             </Button>
           )}
