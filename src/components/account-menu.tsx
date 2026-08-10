@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { readProfile } from "@/lib/profile";
+import { getLegalAcceptance } from "@/utils/profile.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export function AccountMenu() {
@@ -24,6 +25,13 @@ export function AccountMenu() {
 
   useEffect(() => {
     setAcceptedAt(readProfile().legalAcceptedAt ?? null);
+    void getLegalAcceptance()
+      .then((result) => {
+        if (result.acceptedAt) setAcceptedAt(result.acceptedAt);
+      })
+      .catch(() => {
+        /* signed out — fall back to the local record */
+      });
     void supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
