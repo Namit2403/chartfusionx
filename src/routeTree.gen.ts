@@ -9,73 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AiReviewRouteImport } from './routes/ai-review'
-import { Route as AnalyticsRouteImport } from './routes/analytics'
-import { Route as ChartCritiqueRouteImport } from './routes/chart-critique'
-import { Route as CoachRouteImport } from './routes/coach'
-import { Route as GalleryRouteImport } from './routes/gallery'
-import { Route as GoalsRouteImport } from './routes/goals'
-import { Route as NotificationsRouteImport } from './routes/notifications'
-import { Route as PlaybookRouteImport } from './routes/playbook'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
-import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as ScreenshotReaderRouteImport } from './routes/screenshot-reader'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as StrategyDiscoveryRouteImport } from './routes/strategy-discovery'
-import { Route as TeamsRouteImport } from './routes/teams'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as TraderDnaRouteImport } from './routes/trader-dna'
-import { Route as VoiceSummaryRouteImport } from './routes/voice-summary'
-import { Route as JournalIndexRouteImport } from './routes/journal.index'
-import { Route as JournalNewRouteImport } from './routes/journal.new'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedAiReviewRouteImport } from './routes/_authenticated/ai-review'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedChartCritiqueRouteImport } from './routes/_authenticated/chart-critique'
+import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
+import { Route as AuthenticatedGalleryRouteImport } from './routes/_authenticated/gallery'
+import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedPlaybookRouteImport } from './routes/_authenticated/playbook'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedScreenshotReaderRouteImport } from './routes/_authenticated/screenshot-reader'
+import { Route as AuthenticatedStrategyDiscoveryRouteImport } from './routes/_authenticated/strategy-discovery'
+import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
+import { Route as AuthenticatedTraderDnaRouteImport } from './routes/_authenticated/trader-dna'
+import { Route as AuthenticatedVoiceSummaryRouteImport } from './routes/_authenticated/voice-summary'
+import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal.index'
+import { Route as AuthenticatedJournalNewRouteImport } from './routes/_authenticated/journal.new'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AiReviewRoute = AiReviewRouteImport.update({
-  id: '/ai-review',
-  path: '/ai-review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnalyticsRoute = AnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChartCritiqueRoute = ChartCritiqueRouteImport.update({
-  id: '/chart-critique',
-  path: '/chart-critique',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CoachRoute = CoachRouteImport.update({
-  id: '/coach',
-  path: '/coach',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GalleryRoute = GalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GoalsRoute = GoalsRouteImport.update({
-  id: '/goals',
-  path: '/goals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificationsRoute = NotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaybookRoute = PlaybookRouteImport.update({
-  id: '/playbook',
-  path: '/playbook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -86,29 +41,9 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
   path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ScreenshotReaderRoute = ScreenshotReaderRouteImport.update({
-  id: '/screenshot-reader',
-  path: '/screenshot-reader',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StrategyDiscoveryRoute = StrategyDiscoveryRouteImport.update({
-  id: '/strategy-discovery',
-  path: '/strategy-discovery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TeamsRoute = TeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -116,101 +51,175 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TraderDnaRoute = TraderDnaRouteImport.update({
-  id: '/trader-dna',
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/_authenticated/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAiReviewRoute = AuthenticatedAiReviewRouteImport.update({
+  id: '/_authenticated/ai-review',
+  path: '/ai-review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/_authenticated/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedChartCritiqueRoute =
+  AuthenticatedChartCritiqueRouteImport.update({
+    id: '/_authenticated/chart-critique',
+    path: '/chart-critique',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
+  id: '/_authenticated/coach',
+  path: '/coach',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedGalleryRoute = AuthenticatedGalleryRouteImport.update({
+  id: '/_authenticated/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
+  id: '/_authenticated/goals',
+  path: '/goals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/_authenticated/notifications',
+    path: '/notifications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedPlaybookRoute = AuthenticatedPlaybookRouteImport.update({
+  id: '/_authenticated/playbook',
+  path: '/playbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/_authenticated/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedScreenshotReaderRoute =
+  AuthenticatedScreenshotReaderRouteImport.update({
+    id: '/_authenticated/screenshot-reader',
+    path: '/screenshot-reader',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedStrategyDiscoveryRoute =
+  AuthenticatedStrategyDiscoveryRouteImport.update({
+    id: '/_authenticated/strategy-discovery',
+    path: '/strategy-discovery',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
+  id: '/_authenticated/teams',
+  path: '/teams',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTraderDnaRoute = AuthenticatedTraderDnaRouteImport.update({
+  id: '/_authenticated/trader-dna',
   path: '/trader-dna',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VoiceSummaryRoute = VoiceSummaryRouteImport.update({
-  id: '/voice-summary',
-  path: '/voice-summary',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JournalIndexRoute = JournalIndexRouteImport.update({
-  id: '/journal/',
-  path: '/journal/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JournalNewRoute = JournalNewRouteImport.update({
-  id: '/journal/new',
+const AuthenticatedVoiceSummaryRoute =
+  AuthenticatedVoiceSummaryRouteImport.update({
+    id: '/_authenticated/voice-summary',
+    path: '/voice-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedJournalIndexRoute =
+  AuthenticatedJournalIndexRouteImport.update({
+    id: '/_authenticated/journal/',
+    path: '/journal/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedJournalNewRoute = AuthenticatedJournalNewRouteImport.update({
+  id: '/_authenticated/journal/new',
   path: '/journal/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/ai-review': typeof AiReviewRoute
-  '/analytics': typeof AnalyticsRoute
-  '/chart-critique': typeof ChartCritiqueRoute
-  '/coach': typeof CoachRoute
-  '/gallery': typeof GalleryRoute
-  '/goals': typeof GoalsRoute
-  '/notifications': typeof NotificationsRoute
-  '/playbook': typeof PlaybookRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
-  '/reports': typeof ReportsRoute
-  '/screenshot-reader': typeof ScreenshotReaderRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/strategy-discovery': typeof StrategyDiscoveryRoute
-  '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
-  '/trader-dna': typeof TraderDnaRoute
-  '/voice-summary': typeof VoiceSummaryRoute
-  '/journal/new': typeof JournalNewRoute
-  '/journal/': typeof JournalIndexRoute
+  '/ai-review': typeof AuthenticatedAiReviewRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/chart-critique': typeof AuthenticatedChartCritiqueRoute
+  '/coach': typeof AuthenticatedCoachRoute
+  '/gallery': typeof AuthenticatedGalleryRoute
+  '/goals': typeof AuthenticatedGoalsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/playbook': typeof AuthenticatedPlaybookRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/screenshot-reader': typeof AuthenticatedScreenshotReaderRoute
+  '/strategy-discovery': typeof AuthenticatedStrategyDiscoveryRoute
+  '/teams': typeof AuthenticatedTeamsRoute
+  '/trader-dna': typeof AuthenticatedTraderDnaRoute
+  '/voice-summary': typeof AuthenticatedVoiceSummaryRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/journal/new': typeof AuthenticatedJournalNewRoute
+  '/journal/': typeof AuthenticatedJournalIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/ai-review': typeof AiReviewRoute
-  '/analytics': typeof AnalyticsRoute
-  '/chart-critique': typeof ChartCritiqueRoute
-  '/coach': typeof CoachRoute
-  '/gallery': typeof GalleryRoute
-  '/goals': typeof GoalsRoute
-  '/notifications': typeof NotificationsRoute
-  '/playbook': typeof PlaybookRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
-  '/reports': typeof ReportsRoute
-  '/screenshot-reader': typeof ScreenshotReaderRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/strategy-discovery': typeof StrategyDiscoveryRoute
-  '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
-  '/trader-dna': typeof TraderDnaRoute
-  '/voice-summary': typeof VoiceSummaryRoute
-  '/journal/new': typeof JournalNewRoute
-  '/journal': typeof JournalIndexRoute
+  '/ai-review': typeof AuthenticatedAiReviewRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/chart-critique': typeof AuthenticatedChartCritiqueRoute
+  '/coach': typeof AuthenticatedCoachRoute
+  '/gallery': typeof AuthenticatedGalleryRoute
+  '/goals': typeof AuthenticatedGoalsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/playbook': typeof AuthenticatedPlaybookRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/screenshot-reader': typeof AuthenticatedScreenshotReaderRoute
+  '/strategy-discovery': typeof AuthenticatedStrategyDiscoveryRoute
+  '/teams': typeof AuthenticatedTeamsRoute
+  '/trader-dna': typeof AuthenticatedTraderDnaRoute
+  '/voice-summary': typeof AuthenticatedVoiceSummaryRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/journal/new': typeof AuthenticatedJournalNewRoute
+  '/journal': typeof AuthenticatedJournalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/ai-review': typeof AiReviewRoute
-  '/analytics': typeof AnalyticsRoute
-  '/chart-critique': typeof ChartCritiqueRoute
-  '/coach': typeof CoachRoute
-  '/gallery': typeof GalleryRoute
-  '/goals': typeof GoalsRoute
-  '/notifications': typeof NotificationsRoute
-  '/playbook': typeof PlaybookRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
-  '/reports': typeof ReportsRoute
-  '/screenshot-reader': typeof ScreenshotReaderRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/strategy-discovery': typeof StrategyDiscoveryRoute
-  '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
-  '/trader-dna': typeof TraderDnaRoute
-  '/voice-summary': typeof VoiceSummaryRoute
-  '/journal/new': typeof JournalNewRoute
-  '/journal/': typeof JournalIndexRoute
+  '/_authenticated/ai-review': typeof AuthenticatedAiReviewRoute
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/chart-critique': typeof AuthenticatedChartCritiqueRoute
+  '/_authenticated/coach': typeof AuthenticatedCoachRoute
+  '/_authenticated/gallery': typeof AuthenticatedGalleryRoute
+  '/_authenticated/goals': typeof AuthenticatedGoalsRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/playbook': typeof AuthenticatedPlaybookRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/screenshot-reader': typeof AuthenticatedScreenshotReaderRoute
+  '/_authenticated/strategy-discovery': typeof AuthenticatedStrategyDiscoveryRoute
+  '/_authenticated/teams': typeof AuthenticatedTeamsRoute
+  '/_authenticated/trader-dna': typeof AuthenticatedTraderDnaRoute
+  '/_authenticated/voice-summary': typeof AuthenticatedVoiceSummaryRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/journal/new': typeof AuthenticatedJournalNewRoute
+  '/_authenticated/journal/': typeof AuthenticatedJournalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
+    | '/privacy'
+    | '/refund-policy'
+    | '/sitemap.xml'
+    | '/terms'
     | '/ai-review'
     | '/analytics'
     | '/chart-critique'
@@ -219,21 +228,21 @@ export interface FileRouteTypes {
     | '/goals'
     | '/notifications'
     | '/playbook'
-    | '/privacy'
-    | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
-    | '/sitemap.xml'
     | '/strategy-discovery'
     | '/teams'
-    | '/terms'
     | '/trader-dna'
     | '/voice-summary'
+    | '/'
     | '/journal/new'
     | '/journal/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/privacy'
+    | '/refund-policy'
+    | '/sitemap.xml'
+    | '/terms'
     | '/ai-review'
     | '/analytics'
     | '/chart-critique'
@@ -242,132 +251,66 @@ export interface FileRouteTypes {
     | '/goals'
     | '/notifications'
     | '/playbook'
-    | '/privacy'
-    | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
-    | '/sitemap.xml'
     | '/strategy-discovery'
     | '/teams'
-    | '/terms'
     | '/trader-dna'
     | '/voice-summary'
+    | '/'
     | '/journal/new'
     | '/journal'
   id:
     | '__root__'
-    | '/'
-    | '/ai-review'
-    | '/analytics'
-    | '/chart-critique'
-    | '/coach'
-    | '/gallery'
-    | '/goals'
-    | '/notifications'
-    | '/playbook'
     | '/privacy'
     | '/refund-policy'
-    | '/reports'
-    | '/screenshot-reader'
     | '/sitemap.xml'
-    | '/strategy-discovery'
-    | '/teams'
     | '/terms'
-    | '/trader-dna'
-    | '/voice-summary'
-    | '/journal/new'
-    | '/journal/'
+    | '/_authenticated/ai-review'
+    | '/_authenticated/analytics'
+    | '/_authenticated/chart-critique'
+    | '/_authenticated/coach'
+    | '/_authenticated/gallery'
+    | '/_authenticated/goals'
+    | '/_authenticated/notifications'
+    | '/_authenticated/playbook'
+    | '/_authenticated/reports'
+    | '/_authenticated/screenshot-reader'
+    | '/_authenticated/strategy-discovery'
+    | '/_authenticated/teams'
+    | '/_authenticated/trader-dna'
+    | '/_authenticated/voice-summary'
+    | '/_authenticated/'
+    | '/_authenticated/journal/new'
+    | '/_authenticated/journal/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AiReviewRoute: typeof AiReviewRoute
-  AnalyticsRoute: typeof AnalyticsRoute
-  ChartCritiqueRoute: typeof ChartCritiqueRoute
-  CoachRoute: typeof CoachRoute
-  GalleryRoute: typeof GalleryRoute
-  GoalsRoute: typeof GoalsRoute
-  NotificationsRoute: typeof NotificationsRoute
-  PlaybookRoute: typeof PlaybookRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
-  ReportsRoute: typeof ReportsRoute
-  ScreenshotReaderRoute: typeof ScreenshotReaderRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  StrategyDiscoveryRoute: typeof StrategyDiscoveryRoute
-  TeamsRoute: typeof TeamsRoute
   TermsRoute: typeof TermsRoute
-  TraderDnaRoute: typeof TraderDnaRoute
-  VoiceSummaryRoute: typeof VoiceSummaryRoute
-  JournalNewRoute: typeof JournalNewRoute
-  JournalIndexRoute: typeof JournalIndexRoute
+  AuthenticatedAiReviewRoute: typeof AuthenticatedAiReviewRoute
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedChartCritiqueRoute: typeof AuthenticatedChartCritiqueRoute
+  AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
+  AuthenticatedGalleryRoute: typeof AuthenticatedGalleryRoute
+  AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedPlaybookRoute: typeof AuthenticatedPlaybookRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedScreenshotReaderRoute: typeof AuthenticatedScreenshotReaderRoute
+  AuthenticatedStrategyDiscoveryRoute: typeof AuthenticatedStrategyDiscoveryRoute
+  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
+  AuthenticatedTraderDnaRoute: typeof AuthenticatedTraderDnaRoute
+  AuthenticatedVoiceSummaryRoute: typeof AuthenticatedVoiceSummaryRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedJournalNewRoute: typeof AuthenticatedJournalNewRoute
+  AuthenticatedJournalIndexRoute: typeof AuthenticatedJournalIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ai-review': {
-      id: '/ai-review'
-      path: '/ai-review'
-      fullPath: '/ai-review'
-      preLoaderRoute: typeof AiReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/analytics': {
-      id: '/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chart-critique': {
-      id: '/chart-critique'
-      path: '/chart-critique'
-      fullPath: '/chart-critique'
-      preLoaderRoute: typeof ChartCritiqueRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/coach': {
-      id: '/coach'
-      path: '/coach'
-      fullPath: '/coach'
-      preLoaderRoute: typeof CoachRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gallery': {
-      id: '/gallery'
-      path: '/gallery'
-      fullPath: '/gallery'
-      preLoaderRoute: typeof GalleryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/goals': {
-      id: '/goals'
-      path: '/goals'
-      fullPath: '/goals'
-      preLoaderRoute: typeof GoalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notifications': {
-      id: '/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof NotificationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/playbook': {
-      id: '/playbook'
-      path: '/playbook'
-      fullPath: '/playbook'
-      preLoaderRoute: typeof PlaybookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -382,39 +325,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/screenshot-reader': {
-      id: '/screenshot-reader'
-      path: '/screenshot-reader'
-      fullPath: '/screenshot-reader'
-      preLoaderRoute: typeof ScreenshotReaderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/strategy-discovery': {
-      id: '/strategy-discovery'
-      path: '/strategy-discovery'
-      fullPath: '/strategy-discovery'
-      preLoaderRoute: typeof StrategyDiscoveryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/teams': {
-      id: '/teams'
-      path: '/teams'
-      fullPath: '/teams'
-      preLoaderRoute: typeof TeamsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -424,70 +339,151 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/trader-dna': {
-      id: '/trader-dna'
+    '/_authenticated/': {
+      id: '/_authenticated/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/ai-review': {
+      id: '/_authenticated/ai-review'
+      path: '/ai-review'
+      fullPath: '/ai-review'
+      preLoaderRoute: typeof AuthenticatedAiReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/chart-critique': {
+      id: '/_authenticated/chart-critique'
+      path: '/chart-critique'
+      fullPath: '/chart-critique'
+      preLoaderRoute: typeof AuthenticatedChartCritiqueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/coach': {
+      id: '/_authenticated/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof AuthenticatedCoachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/gallery': {
+      id: '/_authenticated/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof AuthenticatedGalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/goals': {
+      id: '/_authenticated/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof AuthenticatedGoalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/playbook': {
+      id: '/_authenticated/playbook'
+      path: '/playbook'
+      fullPath: '/playbook'
+      preLoaderRoute: typeof AuthenticatedPlaybookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/screenshot-reader': {
+      id: '/_authenticated/screenshot-reader'
+      path: '/screenshot-reader'
+      fullPath: '/screenshot-reader'
+      preLoaderRoute: typeof AuthenticatedScreenshotReaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/strategy-discovery': {
+      id: '/_authenticated/strategy-discovery'
+      path: '/strategy-discovery'
+      fullPath: '/strategy-discovery'
+      preLoaderRoute: typeof AuthenticatedStrategyDiscoveryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/teams': {
+      id: '/_authenticated/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof AuthenticatedTeamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/trader-dna': {
+      id: '/_authenticated/trader-dna'
       path: '/trader-dna'
       fullPath: '/trader-dna'
-      preLoaderRoute: typeof TraderDnaRouteImport
+      preLoaderRoute: typeof AuthenticatedTraderDnaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/voice-summary': {
-      id: '/voice-summary'
+    '/_authenticated/voice-summary': {
+      id: '/_authenticated/voice-summary'
       path: '/voice-summary'
       fullPath: '/voice-summary'
-      preLoaderRoute: typeof VoiceSummaryRouteImport
+      preLoaderRoute: typeof AuthenticatedVoiceSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/journal/': {
-      id: '/journal/'
+    '/_authenticated/journal/': {
+      id: '/_authenticated/journal/'
       path: '/journal'
       fullPath: '/journal/'
-      preLoaderRoute: typeof JournalIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedJournalIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/journal/new': {
-      id: '/journal/new'
+    '/_authenticated/journal/new': {
+      id: '/_authenticated/journal/new'
       path: '/journal/new'
       fullPath: '/journal/new'
-      preLoaderRoute: typeof JournalNewRouteImport
+      preLoaderRoute: typeof AuthenticatedJournalNewRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AiReviewRoute: AiReviewRoute,
-  AnalyticsRoute: AnalyticsRoute,
-  ChartCritiqueRoute: ChartCritiqueRoute,
-  CoachRoute: CoachRoute,
-  GalleryRoute: GalleryRoute,
-  GoalsRoute: GoalsRoute,
-  NotificationsRoute: NotificationsRoute,
-  PlaybookRoute: PlaybookRoute,
   PrivacyRoute: PrivacyRoute,
   RefundPolicyRoute: RefundPolicyRoute,
-  ReportsRoute: ReportsRoute,
-  ScreenshotReaderRoute: ScreenshotReaderRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  StrategyDiscoveryRoute: StrategyDiscoveryRoute,
-  TeamsRoute: TeamsRoute,
   TermsRoute: TermsRoute,
-  TraderDnaRoute: TraderDnaRoute,
-  VoiceSummaryRoute: VoiceSummaryRoute,
-  JournalNewRoute: JournalNewRoute,
-  JournalIndexRoute: JournalIndexRoute,
+  AuthenticatedAiReviewRoute: AuthenticatedAiReviewRoute,
+  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedChartCritiqueRoute: AuthenticatedChartCritiqueRoute,
+  AuthenticatedCoachRoute: AuthenticatedCoachRoute,
+  AuthenticatedGalleryRoute: AuthenticatedGalleryRoute,
+  AuthenticatedGoalsRoute: AuthenticatedGoalsRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedPlaybookRoute: AuthenticatedPlaybookRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedScreenshotReaderRoute: AuthenticatedScreenshotReaderRoute,
+  AuthenticatedStrategyDiscoveryRoute: AuthenticatedStrategyDiscoveryRoute,
+  AuthenticatedTeamsRoute: AuthenticatedTeamsRoute,
+  AuthenticatedTraderDnaRoute: AuthenticatedTraderDnaRoute,
+  AuthenticatedVoiceSummaryRoute: AuthenticatedVoiceSummaryRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedJournalNewRoute: AuthenticatedJournalNewRoute,
+  AuthenticatedJournalIndexRoute: AuthenticatedJournalIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
