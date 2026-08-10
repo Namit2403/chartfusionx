@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { hasAcceptedLegal, recordLegalAcceptance } from "@/lib/profile";
+import { acceptLegal } from "@/utils/profile.functions";
 
 const STORAGE_KEY = "cfx-onboarded";
 
@@ -70,7 +71,13 @@ export function OnboardingModal() {
   const blocked = isLegalStep && !accepted;
 
   const advance = () => {
-    if (isLegalStep) recordLegalAcceptance();
+    if (isLegalStep) {
+      recordLegalAcceptance();
+      // Persist to the profile so acceptance survives devices and browsers.
+      void acceptLegal().catch(() => {
+        /* offline or signed out — the local record still applies */
+      });
+    }
     if (step === steps.length - 1) close();
     else setStep(step + 1);
   };

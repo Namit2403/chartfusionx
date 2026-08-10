@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Download, Pause, Play, RotateCcw, Sparkles, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useAiAction } from "@/hooks/useAiAction";
 import { PageHeader, Panel, Pill } from "@/components/shell";
 import { VoiceOrb } from "@/components/voice-orb";
 import { Button } from "@/components/ui/button";
@@ -180,7 +181,10 @@ function VoiceSummary() {
     URL.revokeObjectURL(url);
   };
 
-  const regenerate = () => {
+  const { run: spendAiAction, checking: regenerating } = useAiAction("voice-summary");
+
+  const regenerate = async () => {
+    if (!(await spendAiAction())) return;
     setPlaying(false);
     setElapsed(0);
     spokenRef.current = "";
@@ -340,7 +344,7 @@ function VoiceSummary() {
           <Button variant="secondary" size="sm" onClick={download}>
             <Download className="size-4" /> Download transcript
           </Button>
-          <Button variant="ghost" size="sm" onClick={regenerate}>
+          <Button variant="ghost" size="sm" onClick={() => void regenerate()} disabled={regenerating}>
             <Sparkles className="size-4" /> Regenerate
           </Button>
         </div>
