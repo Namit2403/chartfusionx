@@ -17,6 +17,8 @@ import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+
 
 function NotFoundComponent() {
   return (
