@@ -209,11 +209,14 @@ function NewTrade() {
       </Panel>
 
       <div className="flex justify-end gap-2 pb-4">
-        <Button variant="secondary">Save draft</Button>
-        <Button onClick={() => toast.success("Trade saved — AI review queued")}>
+        <Button variant="secondary" onClick={saveDraft}>
+          Save draft
+        </Button>
+        <Button onClick={saveTrade} disabled={subLoading}>
           Save trade
         </Button>
       </div>
+
     </div>
   );
 }
