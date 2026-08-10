@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -31,6 +32,10 @@ import { Route as AuthenticatedVoiceSummaryRouteImport } from './routes/_authent
 import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal.index'
 import { Route as AuthenticatedJournalNewRouteImport } from './routes/_authenticated/journal.new'
 
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -52,98 +57,99 @@ const TermsRoute = TermsRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/_authenticated/',
+  id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAiReviewRoute = AuthenticatedAiReviewRouteImport.update({
-  id: '/_authenticated/ai-review',
+  id: '/ai-review',
   path: '/ai-review',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
-  id: '/_authenticated/analytics',
+  id: '/analytics',
   path: '/analytics',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedChartCritiqueRoute =
   AuthenticatedChartCritiqueRouteImport.update({
-    id: '/_authenticated/chart-critique',
+    id: '/chart-critique',
     path: '/chart-critique',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
-  id: '/_authenticated/coach',
+  id: '/coach',
   path: '/coach',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedGalleryRoute = AuthenticatedGalleryRouteImport.update({
-  id: '/_authenticated/gallery',
+  id: '/gallery',
   path: '/gallery',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
-  id: '/_authenticated/goals',
+  id: '/goals',
   path: '/goals',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNotificationsRoute =
   AuthenticatedNotificationsRouteImport.update({
-    id: '/_authenticated/notifications',
+    id: '/notifications',
     path: '/notifications',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedPlaybookRoute = AuthenticatedPlaybookRouteImport.update({
-  id: '/_authenticated/playbook',
+  id: '/playbook',
   path: '/playbook',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
-  id: '/_authenticated/reports',
+  id: '/reports',
   path: '/reports',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedScreenshotReaderRoute =
   AuthenticatedScreenshotReaderRouteImport.update({
-    id: '/_authenticated/screenshot-reader',
+    id: '/screenshot-reader',
     path: '/screenshot-reader',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedStrategyDiscoveryRoute =
   AuthenticatedStrategyDiscoveryRouteImport.update({
-    id: '/_authenticated/strategy-discovery',
+    id: '/strategy-discovery',
     path: '/strategy-discovery',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
-  id: '/_authenticated/teams',
+  id: '/teams',
   path: '/teams',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTraderDnaRoute = AuthenticatedTraderDnaRouteImport.update({
-  id: '/_authenticated/trader-dna',
+  id: '/trader-dna',
   path: '/trader-dna',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedVoiceSummaryRoute =
   AuthenticatedVoiceSummaryRouteImport.update({
-    id: '/_authenticated/voice-summary',
+    id: '/voice-summary',
     path: '/voice-summary',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedJournalIndexRoute =
   AuthenticatedJournalIndexRouteImport.update({
-    id: '/_authenticated/journal/',
+    id: '/journal/',
     path: '/journal/',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedJournalNewRoute = AuthenticatedJournalNewRouteImport.update({
-  id: '/_authenticated/journal/new',
+  id: '/journal/new',
   path: '/journal/new',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthenticatedIndexRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -162,7 +168,6 @@ export interface FileRoutesByFullPath {
   '/teams': typeof AuthenticatedTeamsRoute
   '/trader-dna': typeof AuthenticatedTraderDnaRoute
   '/voice-summary': typeof AuthenticatedVoiceSummaryRoute
-  '/': typeof AuthenticatedIndexRoute
   '/journal/new': typeof AuthenticatedJournalNewRoute
   '/journal/': typeof AuthenticatedJournalIndexRoute
 }
@@ -191,6 +196,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -216,6 +222,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/privacy'
     | '/refund-policy'
     | '/sitemap.xml'
@@ -234,7 +241,6 @@ export interface FileRouteTypes {
     | '/teams'
     | '/trader-dna'
     | '/voice-summary'
-    | '/'
     | '/journal/new'
     | '/journal/'
   fileRoutesByTo: FileRoutesByTo
@@ -262,6 +268,7 @@ export interface FileRouteTypes {
     | '/journal'
   id:
     | '__root__'
+    | '/_authenticated'
     | '/privacy'
     | '/refund-policy'
     | '/sitemap.xml'
@@ -286,31 +293,22 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
-  AuthenticatedAiReviewRoute: typeof AuthenticatedAiReviewRoute
-  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
-  AuthenticatedChartCritiqueRoute: typeof AuthenticatedChartCritiqueRoute
-  AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
-  AuthenticatedGalleryRoute: typeof AuthenticatedGalleryRoute
-  AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
-  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
-  AuthenticatedPlaybookRoute: typeof AuthenticatedPlaybookRoute
-  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
-  AuthenticatedScreenshotReaderRoute: typeof AuthenticatedScreenshotReaderRoute
-  AuthenticatedStrategyDiscoveryRoute: typeof AuthenticatedStrategyDiscoveryRoute
-  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
-  AuthenticatedTraderDnaRoute: typeof AuthenticatedTraderDnaRoute
-  AuthenticatedVoiceSummaryRoute: typeof AuthenticatedVoiceSummaryRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedJournalNewRoute: typeof AuthenticatedJournalNewRoute
-  AuthenticatedJournalIndexRoute: typeof AuthenticatedJournalIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -344,128 +342,144 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/ai-review': {
       id: '/_authenticated/ai-review'
       path: '/ai-review'
       fullPath: '/ai-review'
       preLoaderRoute: typeof AuthenticatedAiReviewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/analytics': {
       id: '/_authenticated/analytics'
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chart-critique': {
       id: '/_authenticated/chart-critique'
       path: '/chart-critique'
       fullPath: '/chart-critique'
       preLoaderRoute: typeof AuthenticatedChartCritiqueRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/coach': {
       id: '/_authenticated/coach'
       path: '/coach'
       fullPath: '/coach'
       preLoaderRoute: typeof AuthenticatedCoachRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/gallery': {
       id: '/_authenticated/gallery'
       path: '/gallery'
       fullPath: '/gallery'
       preLoaderRoute: typeof AuthenticatedGalleryRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/goals': {
       id: '/_authenticated/goals'
       path: '/goals'
       fullPath: '/goals'
       preLoaderRoute: typeof AuthenticatedGoalsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/notifications': {
       id: '/_authenticated/notifications'
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/playbook': {
       id: '/_authenticated/playbook'
       path: '/playbook'
       fullPath: '/playbook'
       preLoaderRoute: typeof AuthenticatedPlaybookRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/screenshot-reader': {
       id: '/_authenticated/screenshot-reader'
       path: '/screenshot-reader'
       fullPath: '/screenshot-reader'
       preLoaderRoute: typeof AuthenticatedScreenshotReaderRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/strategy-discovery': {
       id: '/_authenticated/strategy-discovery'
       path: '/strategy-discovery'
       fullPath: '/strategy-discovery'
       preLoaderRoute: typeof AuthenticatedStrategyDiscoveryRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/teams': {
       id: '/_authenticated/teams'
       path: '/teams'
       fullPath: '/teams'
       preLoaderRoute: typeof AuthenticatedTeamsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/trader-dna': {
       id: '/_authenticated/trader-dna'
       path: '/trader-dna'
       fullPath: '/trader-dna'
       preLoaderRoute: typeof AuthenticatedTraderDnaRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/voice-summary': {
       id: '/_authenticated/voice-summary'
       path: '/voice-summary'
       fullPath: '/voice-summary'
       preLoaderRoute: typeof AuthenticatedVoiceSummaryRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/journal/': {
       id: '/_authenticated/journal/'
       path: '/journal'
       fullPath: '/journal/'
       preLoaderRoute: typeof AuthenticatedJournalIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/journal/new': {
       id: '/_authenticated/journal/new'
       path: '/journal/new'
       fullPath: '/journal/new'
       preLoaderRoute: typeof AuthenticatedJournalNewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  PrivacyRoute: PrivacyRoute,
-  RefundPolicyRoute: RefundPolicyRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
-  TermsRoute: TermsRoute,
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAiReviewRoute: typeof AuthenticatedAiReviewRoute
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedChartCritiqueRoute: typeof AuthenticatedChartCritiqueRoute
+  AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
+  AuthenticatedGalleryRoute: typeof AuthenticatedGalleryRoute
+  AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedPlaybookRoute: typeof AuthenticatedPlaybookRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedScreenshotReaderRoute: typeof AuthenticatedScreenshotReaderRoute
+  AuthenticatedStrategyDiscoveryRoute: typeof AuthenticatedStrategyDiscoveryRoute
+  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
+  AuthenticatedTraderDnaRoute: typeof AuthenticatedTraderDnaRoute
+  AuthenticatedVoiceSummaryRoute: typeof AuthenticatedVoiceSummaryRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedJournalNewRoute: typeof AuthenticatedJournalNewRoute
+  AuthenticatedJournalIndexRoute: typeof AuthenticatedJournalIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiReviewRoute: AuthenticatedAiReviewRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedChartCritiqueRoute: AuthenticatedChartCritiqueRoute,
@@ -483,6 +497,17 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedJournalNewRoute: AuthenticatedJournalNewRoute,
   AuthenticatedJournalIndexRoute: AuthenticatedJournalIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  PrivacyRoute: PrivacyRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
