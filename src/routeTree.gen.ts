@@ -23,6 +23,7 @@ import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ScreenshotReaderRouteImport } from './routes/screenshot-reader'
 import { Route as StrategyDiscoveryRouteImport } from './routes/strategy-discovery'
 import { Route as TeamsRouteImport } from './routes/teams'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TraderDnaRouteImport } from './routes/trader-dna'
 import { Route as VoiceSummaryRouteImport } from './routes/voice-summary'
 import { Route as JournalIndexRouteImport } from './routes/journal.index'
@@ -98,6 +99,11 @@ const TeamsRoute = TeamsRouteImport.update({
   path: '/teams',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TraderDnaRoute = TraderDnaRouteImport.update({
   id: '/trader-dna',
   path: '/trader-dna',
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
   '/teams': typeof TeamsRoute
+  '/terms': typeof TermsRoute
   '/trader-dna': typeof TraderDnaRoute
   '/voice-summary': typeof VoiceSummaryRoute
   '/journal/new': typeof JournalNewRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
   '/teams': typeof TeamsRoute
+  '/terms': typeof TermsRoute
   '/trader-dna': typeof TraderDnaRoute
   '/voice-summary': typeof VoiceSummaryRoute
   '/journal/new': typeof JournalNewRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/screenshot-reader': typeof ScreenshotReaderRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
   '/teams': typeof TeamsRoute
+  '/terms': typeof TermsRoute
   '/trader-dna': typeof TraderDnaRoute
   '/voice-summary': typeof VoiceSummaryRoute
   '/journal/new': typeof JournalNewRoute
@@ -197,6 +206,7 @@ export interface FileRouteTypes {
     | '/screenshot-reader'
     | '/strategy-discovery'
     | '/teams'
+    | '/terms'
     | '/trader-dna'
     | '/voice-summary'
     | '/journal/new'
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/screenshot-reader'
     | '/strategy-discovery'
     | '/teams'
+    | '/terms'
     | '/trader-dna'
     | '/voice-summary'
     | '/journal/new'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/screenshot-reader'
     | '/strategy-discovery'
     | '/teams'
+    | '/terms'
     | '/trader-dna'
     | '/voice-summary'
     | '/journal/new'
@@ -258,6 +270,7 @@ export interface RootRouteChildren {
   ScreenshotReaderRoute: typeof ScreenshotReaderRoute
   StrategyDiscoveryRoute: typeof StrategyDiscoveryRoute
   TeamsRoute: typeof TeamsRoute
+  TermsRoute: typeof TermsRoute
   TraderDnaRoute: typeof TraderDnaRoute
   VoiceSummaryRoute: typeof VoiceSummaryRoute
   JournalNewRoute: typeof JournalNewRoute
@@ -364,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeamsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trader-dna': {
       id: '/trader-dna'
       path: '/trader-dna'
@@ -410,6 +430,7 @@ const rootRouteChildren: RootRouteChildren = {
   ScreenshotReaderRoute: ScreenshotReaderRoute,
   StrategyDiscoveryRoute: StrategyDiscoveryRoute,
   TeamsRoute: TeamsRoute,
+  TermsRoute: TermsRoute,
   TraderDnaRoute: TraderDnaRoute,
   VoiceSummaryRoute: VoiceSummaryRoute,
   JournalNewRoute: JournalNewRoute,
