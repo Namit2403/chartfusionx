@@ -22,6 +22,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ScreenshotReaderRouteImport } from './routes/screenshot-reader'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StrategyDiscoveryRouteImport } from './routes/strategy-discovery'
 import { Route as TeamsRouteImport } from './routes/teams'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -95,6 +96,11 @@ const ScreenshotReaderRoute = ScreenshotReaderRouteImport.update({
   path: '/screenshot-reader',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StrategyDiscoveryRoute = StrategyDiscoveryRouteImport.update({
   id: '/strategy-discovery',
   path: '/strategy-discovery',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/refund-policy': typeof RefundPolicyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
   '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/refund-policy': typeof RefundPolicyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
   '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/refund-policy': typeof RefundPolicyRoute
   '/reports': typeof ReportsRoute
   '/screenshot-reader': typeof ScreenshotReaderRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/strategy-discovery': typeof StrategyDiscoveryRoute
   '/teams': typeof TeamsRoute
   '/terms': typeof TermsRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
+    | '/sitemap.xml'
     | '/strategy-discovery'
     | '/teams'
     | '/terms'
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
+    | '/sitemap.xml'
     | '/strategy-discovery'
     | '/teams'
     | '/terms'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '/refund-policy'
     | '/reports'
     | '/screenshot-reader'
+    | '/sitemap.xml'
     | '/strategy-discovery'
     | '/teams'
     | '/terms'
@@ -281,6 +293,7 @@ export interface RootRouteChildren {
   RefundPolicyRoute: typeof RefundPolicyRoute
   ReportsRoute: typeof ReportsRoute
   ScreenshotReaderRoute: typeof ScreenshotReaderRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StrategyDiscoveryRoute: typeof StrategyDiscoveryRoute
   TeamsRoute: typeof TeamsRoute
   TermsRoute: typeof TermsRoute
@@ -383,6 +396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScreenshotReaderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/strategy-discovery': {
       id: '/strategy-discovery'
       path: '/strategy-discovery'
@@ -449,6 +469,7 @@ const rootRouteChildren: RootRouteChildren = {
   RefundPolicyRoute: RefundPolicyRoute,
   ReportsRoute: ReportsRoute,
   ScreenshotReaderRoute: ScreenshotReaderRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   StrategyDiscoveryRoute: StrategyDiscoveryRoute,
   TeamsRoute: TeamsRoute,
   TermsRoute: TermsRoute,
