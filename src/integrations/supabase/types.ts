@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_usage_events: {
+        Row: {
+          created_at: string
+          feature: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feature?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_transactions: {
+        Row: {
+          amount_cents: number
+          billed_at: string
+          created_at: string
+          currency: string
+          description: string | null
+          environment: string
+          id: string
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
+          paddle_transaction_id: string
+          price_id: string | null
+          product_id: string | null
+          refunded_cents: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents?: number
+          billed_at?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          environment?: string
+          id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          paddle_transaction_id: string
+          price_id?: string | null
+          product_id?: string | null
+          refunded_cents?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          billed_at?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          environment?: string
+          id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          paddle_transaction_id?: string
+          price_id?: string | null
+          product_id?: string | null
+          refunded_cents?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -21,6 +99,8 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          legal_accepted_at: string | null
+          legal_accepted_version: string | null
           updated_at: string
         }
         Insert: {
@@ -29,6 +109,8 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id: string
+          legal_accepted_at?: string | null
+          legal_accepted_version?: string | null
           updated_at?: string
         }
         Update: {
@@ -37,6 +119,8 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          legal_accepted_at?: string | null
+          legal_accepted_version?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -115,6 +199,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ai_usage_this_period: {
+        Args: { _since: string; _user_id: string }
+        Returns: number
+      }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
