@@ -19,12 +19,13 @@ export function usePaddleCheckout() {
 
       window.Paddle.Checkout.open({
         items: [{ priceId: paddlePriceId, quantity: options.quantity ?? 1 }],
-        customer: options.customerEmail ? { email: options.customerEmail } : undefined,
+        ...(options.customerEmail ? { customer: { email: options.customerEmail } } : {}),
         customData: options.customData,
         settings: {
           displayMode: "overlay",
           successUrl: options.successUrl || `${window.location.origin}/billing?checkout=success`,
-          allowLogout: false,
+          // allowLogout may only be false when a customer is supplied.
+          allowLogout: !options.customerEmail,
           variant: "one-page",
         },
       });
