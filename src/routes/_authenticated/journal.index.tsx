@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
+import { NoTradesYet } from "@/components/no-trades-yet";
 import { PageHeader, Panel, Pill } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { currency, trades } from "@/lib/mock-data";
+import { useTradeData } from "@/hooks/useTradeData";
+import { currency } from "@/lib/mock-data";
+
 
 export const Route = createFileRoute("/_authenticated/journal/")({
   head: () => ({
@@ -26,6 +29,7 @@ export const Route = createFileRoute("/_authenticated/journal/")({
 });
 
 function Journal() {
+  const { trades, isEmpty } = useTradeData();
   const [q, setQ] = useState("");
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -36,7 +40,8 @@ function Journal() {
         .toLowerCase()
         .includes(s),
     );
-  }, [q]);
+  }, [q, trades]);
+
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -51,7 +56,15 @@ function Journal() {
         }
       />
 
-      <div className="flex flex-wrap items-center gap-3">
+      {isEmpty && (
+        <NoTradesYet
+          title="Your journal is empty"
+          description="Log your first trade to start building the history every AI feature learns from."
+        />
+      )}
+
+      <div className={isEmpty ? "hidden" : "flex flex-wrap items-center gap-3"}>
+
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -63,7 +76,7 @@ function Journal() {
         </div>
       </div>
 
-      <Panel className="overflow-x-auto p-0">
+      <Panel className={isEmpty ? "hidden" : "overflow-x-auto p-0"}>
         <table className="w-full min-w-[880px] text-sm">
           <thead>
             <tr className="border-b border-border text-left text-[11px] uppercase tracking-[0.12em] text-muted-foreground">

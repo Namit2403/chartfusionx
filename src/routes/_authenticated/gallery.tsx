@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
-import { PageHeader, Panel, Pill } from "@/components/shell";
-import { currency, trades } from "@/lib/mock-data";
+import { NoTradesYet } from "@/components/no-trades-yet";
+import { PageHeader, Pill } from "@/components/shell";
+import { useTradeData } from "@/hooks/useTradeData";
+import { currency } from "@/lib/mock-data";
+
 
 export const Route = createFileRoute("/_authenticated/gallery")({
   head: () => ({
@@ -23,6 +26,7 @@ export const Route = createFileRoute("/_authenticated/gallery")({
 const filters = ["All", "Wins", "Losses", "A+ Setup", "FOMO", "London", "Asian", "New York"] as const;
 
 function Gallery() {
+  const { trades, isEmpty } = useTradeData();
   const [active, setActive] = useState<(typeof filters)[number]>("All");
 
   const shown = useMemo(() => {
@@ -36,7 +40,8 @@ function Gallery() {
       default:
         return trades.filter((t) => t.session === active || t.tags.includes(active));
     }
-  }, [active]);
+  }, [active, trades]);
+
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -46,7 +51,15 @@ function Gallery() {
         description="Every trade with its charts, notes and AI grade — filterable the way you actually think about your trading."
       />
 
-      <div className="flex flex-wrap gap-2">
+      {isEmpty && (
+        <NoTradesYet
+          title="Your gallery is empty"
+          description="Every trade you log — with its chart screenshots, notes and grade — shows up here."
+        />
+      )}
+
+      <div className={isEmpty ? "hidden" : "flex flex-wrap gap-2"}>
+
         {filters.map((f) => (
           <button
             key={f}
