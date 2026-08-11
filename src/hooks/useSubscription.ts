@@ -85,7 +85,7 @@ export function useSubscription() {
       void load();
 
       channel = supabase
-        .channel(`subscriptions:${user.id}`)
+        .channel(`subscriptions:${user.id}:${Math.random().toString(36).slice(2)}`)
         .on(
           "postgres_changes",
           {
