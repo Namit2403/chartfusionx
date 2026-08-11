@@ -2,7 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { getPaddleEnvironment } from "@/lib/paddle";
-import { getBillingOverview, recordAiUsage } from "@/utils/payments.functions";
+import {
+  getBillingOverview,
+  recordAiUsage,
+  recordTradeLog,
+} from "@/utils/payments.functions";
 
 export type SubscriptionRow = {
   id: string;
@@ -38,6 +42,9 @@ export type BillingOverview = {
   aiUsed: number;
   aiLimit: number | null;
   aiRemaining: number | null;
+  tradesUsed: number;
+  tradeLimit: number | null;
+  tradesRemaining: number | null;
   transactions: PaymentTransaction[];
 };
 
@@ -49,6 +56,9 @@ const EMPTY: BillingOverview = {
   aiUsed: 0,
   aiLimit: null,
   aiRemaining: null,
+  tradesUsed: 0,
+  tradeLimit: null,
+  tradesRemaining: null,
   transactions: [],
 };
 
