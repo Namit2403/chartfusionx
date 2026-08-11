@@ -11,7 +11,7 @@ import { loadEnv } from "vite";
 
 // Load all (non-VITE_) env vars into process.env for server-side routes only.
 // Never expose these to the client bundle.
-Object.assign(process.env, loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), ""));
+Object.assign(process.env, loadEnv(process.env["NODE_ENV"] ?? "development", process.cwd(), ""));
 
 export default defineConfig({
   tanstackStart: {
