@@ -30,7 +30,6 @@ import { Route as AuthenticatedPlaybookRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedScreenshotReaderRouteImport } from './routes/_authenticated/screenshot-reader'
 import { Route as AuthenticatedStrategyDiscoveryRouteImport } from './routes/_authenticated/strategy-discovery'
-import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
 import { Route as AuthenticatedTraderDnaRouteImport } from './routes/_authenticated/trader-dna'
 import { Route as AuthenticatedVoiceSummaryRouteImport } from './routes/_authenticated/voice-summary'
 import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal.index'
@@ -145,11 +144,6 @@ const AuthenticatedStrategyDiscoveryRoute =
     path: '/strategy-discovery',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedTraderDnaRoute = AuthenticatedTraderDnaRouteImport.update({
   id: '/trader-dna',
   path: '/trader-dna',
@@ -200,7 +194,6 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/screenshot-reader': typeof AuthenticatedScreenshotReaderRoute
   '/strategy-discovery': typeof AuthenticatedStrategyDiscoveryRoute
-  '/teams': typeof AuthenticatedTeamsRoute
   '/trader-dna': typeof AuthenticatedTraderDnaRoute
   '/voice-summary': typeof AuthenticatedVoiceSummaryRoute
   '/journal/new': typeof AuthenticatedJournalNewRoute
@@ -227,7 +220,6 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/screenshot-reader': typeof AuthenticatedScreenshotReaderRoute
   '/strategy-discovery': typeof AuthenticatedStrategyDiscoveryRoute
-  '/teams': typeof AuthenticatedTeamsRoute
   '/trader-dna': typeof AuthenticatedTraderDnaRoute
   '/voice-summary': typeof AuthenticatedVoiceSummaryRoute
   '/': typeof AuthenticatedIndexRoute
@@ -257,7 +249,6 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/screenshot-reader': typeof AuthenticatedScreenshotReaderRoute
   '/_authenticated/strategy-discovery': typeof AuthenticatedStrategyDiscoveryRoute
-  '/_authenticated/teams': typeof AuthenticatedTeamsRoute
   '/_authenticated/trader-dna': typeof AuthenticatedTraderDnaRoute
   '/_authenticated/voice-summary': typeof AuthenticatedVoiceSummaryRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -288,7 +279,6 @@ export interface FileRouteTypes {
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
-    | '/teams'
     | '/trader-dna'
     | '/voice-summary'
     | '/journal/new'
@@ -315,7 +305,6 @@ export interface FileRouteTypes {
     | '/reports'
     | '/screenshot-reader'
     | '/strategy-discovery'
-    | '/teams'
     | '/trader-dna'
     | '/voice-summary'
     | '/'
@@ -344,7 +333,6 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/screenshot-reader'
     | '/_authenticated/strategy-discovery'
-    | '/_authenticated/teams'
     | '/_authenticated/trader-dna'
     | '/_authenticated/voice-summary'
     | '/_authenticated/'
@@ -515,13 +503,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStrategyDiscoveryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/teams': {
-      id: '/_authenticated/teams'
-      path: '/teams'
-      fullPath: '/teams'
-      preLoaderRoute: typeof AuthenticatedTeamsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/trader-dna': {
       id: '/_authenticated/trader-dna'
       path: '/trader-dna'
@@ -572,7 +553,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedScreenshotReaderRoute: typeof AuthenticatedScreenshotReaderRoute
   AuthenticatedStrategyDiscoveryRoute: typeof AuthenticatedStrategyDiscoveryRoute
-  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
   AuthenticatedTraderDnaRoute: typeof AuthenticatedTraderDnaRoute
   AuthenticatedVoiceSummaryRoute: typeof AuthenticatedVoiceSummaryRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -592,7 +572,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedScreenshotReaderRoute: AuthenticatedScreenshotReaderRoute,
   AuthenticatedStrategyDiscoveryRoute: AuthenticatedStrategyDiscoveryRoute,
-  AuthenticatedTeamsRoute: AuthenticatedTeamsRoute,
   AuthenticatedTraderDnaRoute: AuthenticatedTraderDnaRoute,
   AuthenticatedVoiceSummaryRoute: AuthenticatedVoiceSummaryRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
