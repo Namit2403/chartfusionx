@@ -185,7 +185,11 @@ function Dashboard() {
             <li>Revenge trades this month: <span className="num text-negative">1</span></li>
           </ul>
           <Button asChild className="mt-5 w-full" variant="secondary">
-            <Link to="/strategy-discovery">See strategy discovery</Link>
+            {user ? (
+              <Link to="/strategy-discovery">See strategy discovery</Link>
+            ) : (
+              <Link to="/signup">Unlock strategy discovery</Link>
+            )}
           </Button>
         </Panel>
       </div>
