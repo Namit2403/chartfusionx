@@ -36,9 +36,22 @@ function TermsPage() {
     <LegalPage
       title="Terms of Service"
       updated="10 August 2026"
-      intro="These terms form an agreement between you and ChartFusionX, operated by Antonio Hernandez. By creating an account or using the app, you agree to them."
+      intro="These terms form an agreement between you and Antonio Hernandez, a sole trader trading as ChartFusionX. By creating an account or using the app, you agree to them."
     >
-      <LegalSection heading="1. The service">
+      <LegalSection heading="1. Who you are contracting with">
+        <p>
+          ChartFusionX is owned and operated by{" "}
+          <span className="text-foreground">Antonio Hernandez</span>, a sole trader trading as
+          "ChartFusionX" ("we", "us", "our"). By creating an account, purchasing a subscription, or
+          continuing to use the service, you enter into a binding agreement with Antonio Hernandez
+          and accept these terms. If you are using ChartFusionX on behalf of an organisation, you
+          confirm you have authority to bind it; otherwise you confirm you are at least 18 years
+          old. You can reach us at{" "}
+          <span className="text-foreground">support@chartfusionx.com</span>.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="2. The service">
         <p>
           ChartFusionX is a software tool for logging trades, reviewing performance, and receiving
           AI-generated feedback. It is a journaling and analytics product, not a broker, and it does
