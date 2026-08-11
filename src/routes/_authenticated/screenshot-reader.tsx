@@ -39,6 +39,15 @@ const detections = [
 ];
 
 function ScreenshotReader() {
+  const [chart, setChart] = useState<UploadedChart | null>(null);
+  const [analyzed, setAnalyzed] = useState(false);
+  const { run, checking } = useAiAction("screenshot-reader");
+
+  async function analyze() {
+    const ok = await run();
+    if (ok) setAnalyzed(true);
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
@@ -49,11 +58,16 @@ function ScreenshotReader() {
 
       <div className="grid gap-4 lg:grid-cols-5">
         <Panel className="lg:col-span-2" title="Upload chart">
-          <div className="flex h-56 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-background/40 text-center">
-            <Upload className="size-5 text-muted-foreground" />
-            <div className="text-sm text-muted-foreground">Drop a screenshot or click to browse</div>
-            <Button size="sm" variant="secondary">Choose file</Button>
-          </div>
+          <ChartUpload
+            value={chart}
+            onChange={(c) => {
+              setChart(c);
+              setAnalyzed(false);
+            }}
+          />
+          <Button className="mt-3 w-full" disabled={!chart || checking} onClick={() => void analyze()}>
+            {checking ? "Checking…" : "Read this chart"}
+          </Button>
           <div className="mt-3 flex flex-wrap gap-2">
             <Pill>TradingView</Pill>
             <Pill>MetaTrader</Pill>
@@ -62,30 +76,40 @@ function ScreenshotReader() {
           </div>
         </Panel>
 
-        <Panel className="lg:col-span-3" title="Detected on chart" subtitle="Sample output from your last upload">
-          <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
-            {detections.map(([k, v]) => (
-              <div key={k} className="border-b border-border pb-2">
-                <div className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">{k}</div>
-                <div className="mt-0.5 text-sm">{v}</div>
-              </div>
-            ))}
-          </div>
+        <Panel className="lg:col-span-3" title="Detected on chart" subtitle={analyzed ? "From your upload" : "Upload a chart to run the reader"}>
+          {analyzed ? (
+            <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+              {detections.map(([k, v]) => (
+                <div key={k} className="border-b border-border pb-2">
+                  <div className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">{k}</div>
+                  <div className="mt-0.5 text-sm">{v}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyHint>
+              Nothing read yet. Drop in a chart screenshot and run the reader to see structure,
+              liquidity, entry and target detection.
+            </EmptyHint>
+          )}
         </Panel>
       </div>
 
-      <Panel title="AI explanation">
-        <p className="text-sm leading-relaxed">
-          Price broke the London range high, retraced into the demand base and held. The structure
-          matches your <span className="text-accent">Break &amp; Retest</span> playbook entry
-          criteria, but equal highs sit directly above your target — the same condition present in 3
-          of your last 5 trades that gave back more than 1R before reaching target.
-        </p>
-        <EmptyHint>
-          Historical similarity: 82% match with T-1006 (XAUUSD, London, +2.4R) and 71% match with
-          T-1010 (EURUSD, London, -1.0R).
-        </EmptyHint>
-      </Panel>
+      {analyzed && (
+        <Panel title="AI explanation">
+          <p className="text-sm leading-relaxed">
+            Price broke the London range high, retraced into the demand base and held. The structure
+            matches your <span className="text-accent">Break &amp; Retest</span> playbook entry
+            criteria, but equal highs sit directly above your target — the same condition present in 3
+            of your last 5 trades that gave back more than 1R before reaching target.
+          </p>
+          <EmptyHint>
+            Historical similarity: 82% match with T-1006 (XAUUSD, London, +2.4R) and 71% match with
+            T-1010 (EURUSD, London, -1.0R).
+          </EmptyHint>
+        </Panel>
+      )}
     </div>
   );
+
 }
