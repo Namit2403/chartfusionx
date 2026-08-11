@@ -12,6 +12,7 @@ import {
 } from "recharts";
 
 import { OnboardingModal } from "@/components/onboarding-modal";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { Panel, Pill, Stat } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { currency, equityCurve, stats, trades, weekdayPerf } from "@/lib/mock-data";
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 function Dashboard() {
+  const { user } = useAuthUser();
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <OnboardingModal />
