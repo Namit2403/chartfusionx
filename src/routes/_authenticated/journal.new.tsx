@@ -415,13 +415,15 @@ function NewTrade() {
 
       <div className="flex flex-wrap items-center justify-end gap-2 pb-4">
         <span className="mr-auto text-xs text-muted-foreground">
-          Draft autosaves on this device — nothing is lost if you step out to upgrade.
+          {userId && !isActive && tradesRemaining !== null
+            ? `Free plan · ${tradesUsed} of ${FREE_TRADE_LIMIT} trades logged — ${tradesRemaining} left.`
+            : "Draft autosaves on this device — nothing is lost if you step out to upgrade."}
         </span>
         <Button variant="secondary" onClick={saveDraft}>
           Save draft
         </Button>
-        <Button onClick={saveTrade} disabled={subLoading}>
-          Save trade
+        <Button onClick={() => void saveTrade()} disabled={subLoading || saving}>
+          {saving ? "Saving…" : "Save trade"}
         </Button>
       </div>
     </div>
