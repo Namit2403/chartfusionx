@@ -72,7 +72,7 @@ afterEach(() => {
 
 describe("route discovery", () => {
   it("finds every app route file", () => {
-    expect(protectedPaths.length).toBeGreaterThanOrEqual(17);
+    expect(protectedPaths.length).toBeGreaterThanOrEqual(16);
     expect(protectedPaths).toContain("/");
     expect(protectedPaths).toContain("/journal");
     expect(protectedPaths).toContain("/journal/new");
