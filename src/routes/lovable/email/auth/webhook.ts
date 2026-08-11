@@ -9,7 +9,7 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 // Configuration
-const SITE_NAME = "chartfusionx"
+const SITE_NAME = "ChartFusionX"
 const SENDER_DOMAIN = "notify.chartfusionx.app"
 const ROOT_DOMAIN = "chartfusionx.app"
 const FROM_DOMAIN = "notify.chartfusionx.app"

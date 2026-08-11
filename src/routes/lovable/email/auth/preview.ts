@@ -18,7 +18,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "chartfusionx"
+const SITE_NAME = "ChartFusionX"
 const ROOT_DOMAIN = "chartfusionx.app"
 
 // Sample data for preview mode ONLY (not used in actual email sending).
