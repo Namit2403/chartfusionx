@@ -134,3 +134,18 @@ export async function consumeAiAction(feature: string) {
     data: { feature, environment: getPaddleEnvironment() },
   }) as Promise<{ ok: boolean; reason: string; aiUsed: number; aiLimit: number | null }>;
 }
+
+/**
+ * Records a logged trade against the free allowance / plan.
+ * Returns ok=false with reason "limit-reached" once the free trades run out.
+ */
+export async function consumeTradeLog() {
+  return recordTradeLog({
+    data: { environment: getPaddleEnvironment() },
+  }) as Promise<{
+    ok: boolean;
+    reason: string;
+    tradesUsed: number;
+    tradeLimit: number | null;
+  }>;
+}
