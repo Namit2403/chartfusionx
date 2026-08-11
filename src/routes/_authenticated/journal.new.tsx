@@ -165,8 +165,16 @@ function AreaField({
 function NewTrade() {
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [restored, setRestored] = useState(false);
+  const [saving, setSaving] = useState(false);
   const hydrated = useRef(false);
-  const { isActive, loading: subLoading } = useSubscription();
+  const {
+    isActive,
+    tradesUsed,
+    tradesRemaining,
+    userId,
+    loading: subLoading,
+    refresh,
+  } = useSubscription();
 
   // Restore whatever was typed before the paywall / upgrade detour.
   useEffect(() => {
@@ -200,26 +208,47 @@ function NewTrade() {
     }
   }
 
-  function requirePlan() {
-    if (isActive) return true;
-    openPaywall({
-      title: "Start your trial to log trades",
-      description:
-        "Journaling trades needs an active plan. Your draft is saved on this device, so you can pick up exactly where you left off after choosing a plan.",
+  function requireAccount() {
+    if (userId) return true;
+    openSignInPrompt({
+      title: "Sign in to save this trade",
+      description: `Your draft is safe on this device. Create a free account to keep it — free accounts can log ${FREE_TRADE_LIMIT} trades.`,
     });
     return false;
   }
 
-  function saveTrade() {
-    if (!requirePlan()) return;
-    toast.success("Trade saved — AI review queued");
-    clearDraft();
+  async function saveTrade() {
+    if (!requireAccount()) return;
+    setSaving(true);
+    try {
+      const result = await consumeTradeLog();
+      if (!result.ok) {
+        openPaywall({
+          title: `You've logged all ${FREE_TRADE_LIMIT} free trades`,
+          description:
+            "Start a plan to keep journaling without limits. Your draft is saved on this device, so you can pick up exactly where you left off.",
+        });
+        return;
+      }
+      toast.success(
+        isActive
+          ? "Trade saved — AI review queued"
+          : `Trade saved — ${Math.max(0, FREE_TRADE_LIMIT - result.tradesUsed)} free trades left`,
+      );
+      clearDraft();
+      void refresh();
+    } catch {
+      toast.error("We couldn't save that trade. Try again in a moment.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   function saveDraft() {
-    if (!requirePlan()) return;
+    if (!requireAccount()) return;
     toast.success("Draft saved");
   }
+
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
