@@ -199,3 +199,46 @@ export function computeDnaScores(trades: Trade[]) {
     { label: "Adaptability", value: pct(new Set(trades.map((t) => t.strategy)).size * 20), delta: 0 },
   ];
 }
+
+export type RuleAdherence = { name: string; progress: number; detail: string };
+
+/** Rule compliance derived purely from the trades the user actually logged. */
+export function computeRuleAdherence(trades: Trade[]): RuleAdherence[] {
+  if (trades.length === 0) return [];
+  const pct = (n: number) => Math.round(n * 100);
+  const byDay = groupBy(trades, (t) => t.date);
+  const days = [...byDay.values()];
+  const okDays = days.filter((d) => d.length <= 3).length;
+  const lowRisk = trades.filter((t) => t.riskPct > 0 && t.riskPct <= 2).length;
+  const journaled = trades.filter((t) => t.note.trim().length > 0).length;
+  const calm = trades.filter((t) => !["FOMO", "Revenge", "Greed"].includes(t.emotionBefore)).length;
+  const planned = trades.filter((t) => t.strategy && t.strategy !== "Unspecified").length;
+
+  return [
+    {
+      name: "Maximum 3 trades per day",
+      progress: pct(okDays / days.length),
+      detail: `${okDays}/${days.length} trading days`,
+    },
+    {
+      name: "Maximum 2% risk per trade",
+      progress: pct(lowRisk / trades.length),
+      detail: `${lowRisk}/${trades.length} trades`,
+    },
+    {
+      name: "Journal notes on every trade",
+      progress: pct(journaled / trades.length),
+      detail: `${journaled}/${trades.length} trades`,
+    },
+    {
+      name: "No revenge / FOMO entries",
+      progress: pct(calm / trades.length),
+      detail: `${calm}/${trades.length} trades`,
+    },
+    {
+      name: "Trade tied to a playbook strategy",
+      progress: pct(planned / trades.length),
+      detail: `${planned}/${trades.length} trades`,
+    },
+  ];
+}
