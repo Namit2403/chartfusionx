@@ -36,7 +36,7 @@ function PrivacyPage() {
     <LegalPage
       title="Privacy Policy"
       updated="10 August 2026"
-      intro="ChartFusionX is a SaaS trading journal and AI review platform. This policy explains what we collect, why we collect it, and the choices you have."
+      intro="ChartFusionX is a SaaS trading journal and AI review platform operated by Antonio Hernandez. This policy explains what we collect, why we collect it, and the choices you have."
     >
       <LegalSection heading="1. Information we collect">
         <ul className="space-y-1">
