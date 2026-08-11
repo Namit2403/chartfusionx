@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Paperclip, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
+import { AttachmentSlot, type AttachmentSlotValue } from "@/components/attachment-slot";
+import { supabase } from "@/integrations/supabase/client";
 import { openPaywall, openSignInPrompt } from "@/components/paywall-dialog";
 import { FREE_TRADE_LIMIT } from "@/lib/entitlements";
 import { consumeTradeLog, useSubscription } from "@/hooks/useSubscription";
@@ -12,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
+
 import {
   Select,
   SelectContent,
@@ -61,6 +64,20 @@ type Draft = {
 };
 
 const EMPTY_DRAFT: Draft = { fields: {}, tags: ["A+ Setup"], confidence: 7 };
+
+const ATTACHMENT_SLOTS = [
+  { key: "before", label: "Before-trade chart", accept: "image/*" },
+  { key: "after", label: "After-trade chart", accept: "image/*" },
+  { key: "extra", label: "Voice note / video / PDF", accept: "audio/*,video/*,application/pdf" },
+] as const;
+
+type AttachmentKey = (typeof ATTACHMENT_SLOTS)[number]["key"];
+
+const num = (v: string | undefined) => {
+  const n = Number.parseFloat((v ?? "").replace(/[^0-9.-]/g, ""));
+  return Number.isFinite(n) ? n : null;
+};
+
 
 function readDraft(): Draft {
   if (typeof window === "undefined") return EMPTY_DRAFT;
@@ -167,7 +184,14 @@ function NewTrade() {
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [restored, setRestored] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [attachments, setAttachments] = useState<Record<AttachmentKey, AttachmentSlotValue>>({
+    before: null,
+    after: null,
+    extra: null,
+  });
   const hydrated = useRef(false);
+
+
   const {
     isActive,
     tradesUsed,
@@ -218,6 +242,22 @@ function NewTrade() {
     return false;
   }
 
+  async function uploadAttachments(uid: string) {
+    const uploaded: Array<{ slot: string; path: string; name: string; type: string }> = [];
+    for (const slot of ATTACHMENT_SLOTS) {
+      const item = attachments[slot.key];
+      if (!item) continue;
+      const ext = item.file.name.split(".").pop() ?? "bin";
+      const path = `${uid}/${Date.now()}-${slot.key}.${ext}`;
+      const { error } = await supabase.storage
+        .from("trade-attachments")
+        .upload(path, item.file, { contentType: item.file.type, upsert: false });
+      if (error) throw error;
+      uploaded.push({ slot: slot.key, path, name: item.file.name, type: item.file.type });
+    }
+    return uploaded;
+  }
+
   async function saveTrade() {
     if (!requireAccount()) return;
     setSaving(true);
@@ -231,19 +271,79 @@ function NewTrade() {
         });
         return;
       }
+
+      const uid = userId!;
+      const uploaded = await uploadAttachments(uid);
+
+      const f = draft.fields;
+      const entry = num(f["entry"]);
+      const exit = num(f["exit"]);
+      const stop = num(f["stop"]);
+      const size = num(f["size"]);
+      const fees = num(f["fees"]) ?? 0;
+      const dir = (f["direction"] ?? "Long") === "Short" ? -1 : 1;
+
+      let pnl = 0;
+      if (entry !== null && exit !== null) {
+        pnl = (exit - entry) * dir * (size ?? 1) - fees;
+      }
+      let rMultiple = 0;
+      if (entry !== null && exit !== null && stop !== null && entry !== stop) {
+        rMultiple = ((exit - entry) * dir) / Math.abs(entry - stop);
+      }
+
+      const { error } = await supabase.from("trades").insert({
+        user_id: uid,
+        market: f["market"] ?? null,
+        asset: f["asset"] ?? null,
+        broker: f["broker"] ?? null,
+        account_type: f["accountType"] ?? null,
+        account_size: num(f["accountSize"]),
+        setup: f["setup"] ?? null,
+        strategy: f["strategy"] ?? null,
+        direction: f["direction"] ?? null,
+        timeframe: f["timeframe"] ?? null,
+        entry_price: entry,
+        exit_price: exit,
+        stop_price: stop,
+        target_price: num(f["target"]),
+        position_size: size,
+        risk_pct: num(f["risk"]),
+        reward_pct: num(f["reward"]),
+        fees,
+        duration: f["duration"] ?? null,
+        session: f["session"] ?? null,
+        day_of_week: f["day"] ?? null,
+        market_conditions: f["conditions"] ?? null,
+        confidence: draft.confidence,
+        emotion_before: f["emotionBefore"] ?? null,
+        emotion_after: f["emotionAfter"] ?? null,
+        entry_reason: f["reason"] ?? null,
+        mistakes: f["mistakes"] ?? null,
+        lessons: f["lessons"] ?? null,
+        tags: draft.tags,
+        pnl: Number(pnl.toFixed(2)),
+        r_multiple: Number(rMultiple.toFixed(2)),
+        attachments: uploaded,
+      });
+      if (error) throw error;
+
       toast.success(
         isActive
           ? "Trade saved — AI review queued"
           : `Trade saved — ${Math.max(0, FREE_TRADE_LIMIT - result.tradesUsed)} free trades left`,
       );
       clearDraft();
+      setAttachments({ before: null, after: null, extra: null });
       void refresh();
-    } catch {
+    } catch (err) {
+      console.error("save trade failed", err);
       toast.error("We couldn't save that trade. Try again in a moment.");
     } finally {
       setSaving(false);
     }
   }
+
 
   function saveDraft() {
     if (!requireAccount()) return;
@@ -398,20 +498,21 @@ function NewTrade() {
 
       <Panel title="Attachments" subtitle="Charts, screenshots, videos, voice notes, plans — all searchable by AI">
         <div className="grid gap-3 sm:grid-cols-3">
-          {["Before-trade chart", "After-trade chart", "Voice note / video / PDF"].map((slot) => (
-            <div
-              key={slot}
-              className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background/40 text-center text-xs text-muted-foreground"
-            >
-              <Paperclip className="size-4" />
-              {slot}
-            </div>
+          {ATTACHMENT_SLOTS.map((slot) => (
+            <AttachmentSlot
+              key={slot.key}
+              label={slot.label}
+              accept={slot.accept}
+              value={attachments[slot.key] ?? null}
+              onChange={(v) => setAttachments((a) => ({ ...a, [slot.key]: v }))}
+            />
           ))}
         </div>
         <div className="mt-3">
           <Pill tone="accent">Uploads become AI-readable context</Pill>
         </div>
       </Panel>
+
 
       <div className="flex flex-wrap items-center justify-end gap-2 pb-4">
         <span className="mr-auto text-xs text-muted-foreground">

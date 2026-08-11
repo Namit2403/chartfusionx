@@ -11,11 +11,14 @@ import {
   YAxis,
 } from "recharts";
 
+import { NoTradesYet } from "@/components/no-trades-yet";
 import { OnboardingModal } from "@/components/onboarding-modal";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useTradeData } from "@/hooks/useTradeData";
 import { Panel, Pill, Stat } from "@/components/shell";
 import { Button } from "@/components/ui/button";
-import { currency, equityCurve, stats, trades, weekdayPerf } from "@/lib/mock-data";
+import { currency } from "@/lib/mock-data";
+
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -38,6 +41,10 @@ export const Route = createFileRoute("/_authenticated/")({
 
 function Dashboard() {
   const { user } = useAuthUser();
+  const { trades, stats, equityCurve, weekdayPerf, strategyPerf, isEmpty } = useTradeData();
+  const bestStrategy = [...strategyPerf].sort((a, b) => b.expectancy - a.expectancy)[0];
+  const worstStrategy = [...strategyPerf].sort((a, b) => a.expectancy - b.expectancy)[0];
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <OnboardingModal />
@@ -63,17 +70,30 @@ function Dashboard() {
             <div className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
               Net P&L (month)
             </div>
-            <div className="num mt-1 text-3xl font-semibold text-positive">
+            <div
+              className={`num mt-1 text-3xl font-semibold ${stats.monthlyPnl >= 0 ? "text-positive" : "text-negative"}`}
+            >
               {currency(stats.monthlyPnl)}
             </div>
-            <div className="mt-2 flex gap-2">
-              <Pill tone="positive">+{stats.accountGrowth.toFixed(2)}% growth</Pill>
-              <Pill tone="accent">{stats.streak} win streak</Pill>
-            </div>
+            {!isEmpty && (
+              <div className="mt-2 flex gap-2">
+                <Pill tone="positive">+{stats.accountGrowth.toFixed(2)}% growth</Pill>
+                <Pill tone="accent">{stats.streak} win streak</Pill>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
+      {isEmpty && (
+        <NoTradesYet
+          title="Your dashboard is waiting on your first trade"
+          description="Equity curve, win rate, expectancy and AI insight all come from the trades you log — nothing here is sample data."
+        />
+      )}
+
+      {!isEmpty && (
+        <>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Stat label="Total profit" value={currency(stats.totalPnl)} tone="positive" />
         <Stat label="Win rate" value={`${stats.winRate.toFixed(1)}%`} delta={`${stats.totalTrades} trades`} />
@@ -81,6 +101,8 @@ function Dashboard() {
         <Stat label="Profit factor" value={stats.profitFactor.toFixed(2)} />
         <Stat label="Max drawdown" value={currency(stats.maxDrawdown)} tone="negative" />
       </div>
+
+
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Panel title="Equity curve" subtitle="Cumulative account balance" className="lg:col-span-2">
@@ -175,16 +197,31 @@ function Dashboard() {
           </div>
         </Panel>
 
-        <Panel title="AI insight of the day" subtitle="Generated from your last 40 trades">
+        <Panel
+          title="AI insight of the day"
+          subtitle={`Generated from your ${trades.length} logged ${trades.length === 1 ? "trade" : "trades"}`}
+        >
           <p className="text-sm leading-relaxed text-foreground">
-            Waiting for a confirmation close improves your average result by{" "}
-            <span className="text-accent">0.7R</span>. Every Momentum entry you took without
-            confirmation this month closed negative.
+            {bestStrategy
+              ? `${bestStrategy.name} is currently your highest-expectancy setup at ${bestStrategy.expectancy.toFixed(2)}R over ${bestStrategy.trades} trades.`
+              : "Log a few more trades and the AI will start ranking your setups."}
           </p>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            <li>Break &amp; Retest expectancy: <span className="num text-positive">+2.16R</span></li>
-            <li>Momentum expectancy: <span className="num text-negative">-1.07R</span></li>
-            <li>Revenge trades this month: <span className="num text-negative">1</span></li>
+            {bestStrategy && (
+              <li>
+                {bestStrategy.name} expectancy:{" "}
+                <span className="num text-positive">{bestStrategy.expectancy.toFixed(2)}R</span>
+              </li>
+            )}
+            {worstStrategy && worstStrategy.name !== bestStrategy?.name && (
+              <li>
+                {worstStrategy.name} expectancy:{" "}
+                <span className="num text-negative">{worstStrategy.expectancy.toFixed(2)}R</span>
+              </li>
+            )}
+            <li>
+              Win rate: <span className="num">{stats.winRate.toFixed(1)}%</span>
+            </li>
           </ul>
           <Button asChild className="mt-5 w-full" variant="secondary">
             {user ? (
@@ -195,6 +232,9 @@ function Dashboard() {
           </Button>
         </Panel>
       </div>
+        </>
+      )}
     </div>
+
   );
 }

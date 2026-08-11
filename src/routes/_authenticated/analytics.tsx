@@ -12,8 +12,11 @@ import {
   YAxis,
 } from "recharts";
 
+import { NoTradesYet } from "@/components/no-trades-yet";
 import { PageHeader, Panel, Stat } from "@/components/shell";
-import { currency, sessionPerf, stats, weekdayPerf } from "@/lib/mock-data";
+import { useTradeData } from "@/hooks/useTradeData";
+import { currency } from "@/lib/mock-data";
+
 
 export const Route = createFileRoute("/_authenticated/analytics")({
   head: () => ({
@@ -31,23 +34,41 @@ export const Route = createFileRoute("/_authenticated/analytics")({
   component: Analytics,
 });
 
-const risk = [
-  { name: "0.25–0.5%", value: 4 },
-  { name: "0.5–0.75%", value: 5 },
-  { name: "0.75–1%", value: 2 },
-  { name: "1%+", value: 1 },
-];
 const COLORS = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)"];
 
-const heat = ["Mon", "Tue", "Wed", "Thu", "Fri"].map((d, i) => ({
-  day: d,
-  cells: ["Asian", "London", "New York"].map((s, j) => ({
-    session: s,
-    wr: [70, 82, 44, 61, 90, 35, 55, 76, 48, 68, 88, 40, 72, 66, 52][i * 3 + j]!,
-  })),
-}));
+const RISK_BUCKETS: Array<[string, (r: number) => boolean]> = [
+  ["0.25–0.5%", (r) => r <= 0.5],
+  ["0.5–0.75%", (r) => r > 0.5 && r <= 0.75],
+  ["0.75–1%", (r) => r > 0.75 && r <= 1],
+  ["1%+", (r) => r > 1],
+];
+
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+const SESSIONS = ["Asian", "London", "New York"];
 
 function Analytics() {
+  const { trades, stats, weekdayPerf, sessionPerf, isEmpty } = useTradeData();
+
+  const risk = RISK_BUCKETS.map(([name, test]) => ({
+    name,
+    value: trades.filter((t) => test(t.riskPct)).length,
+  })).filter((b) => b.value > 0);
+
+  const heat = DAYS.map((day, i) => ({
+    day,
+    cells: SESSIONS.map((session) => {
+      const bucket = trades.filter(
+        (t) => new Date(t.date).getDay() === i + 1 && t.session === session,
+      );
+      return {
+        session,
+        wr: bucket.length
+          ? Math.round((bucket.filter((t) => t.pnl > 0).length / bucket.length) * 100)
+          : 0,
+      };
+    }),
+  }));
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <PageHeader
@@ -56,12 +77,22 @@ function Analytics() {
         description="Equity, strategy, asset, session, weekday, timeframe, risk distribution and heatmaps — all derived from your journal."
       />
 
+      {isEmpty && (
+        <NoTradesYet
+          title="No analytics yet"
+          description="Sessions, weekdays, risk buckets and heatmaps all populate once you start logging trades."
+        />
+      )}
+
+      {!isEmpty && (
+        <>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Average winner" value={currency(stats.avgWinner)} tone="positive" />
         <Stat label="Average loser" value={currency(stats.avgLoser)} tone="negative" />
         <Stat label="Average hold" value={stats.avgHold} />
         <Stat label="Average risk" value={`${stats.avgRiskPct.toFixed(2)}%`} />
       </div>
+
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Panel title="Weekday P&L" className="lg:col-span-2">
@@ -156,6 +187,9 @@ function Analytics() {
           </div>
         </Panel>
       </div>
+        </>
+      )}
     </div>
+
   );
 }

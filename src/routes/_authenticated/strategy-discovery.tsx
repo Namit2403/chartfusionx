@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
+import { NoTradesYet } from "@/components/no-trades-yet";
 import { PageHeader, Panel, Pill } from "@/components/shell";
-import { currency, sessionPerf, strategyPerf } from "@/lib/mock-data";
+import { useTradeData } from "@/hooks/useTradeData";
+import { currency } from "@/lib/mock-data";
+
 
 export const Route = createFileRoute("/_authenticated/strategy-discovery")({
   head: () => ({
@@ -21,13 +24,36 @@ export const Route = createFileRoute("/_authenticated/strategy-discovery")({
 });
 
 function StrategyDiscovery() {
+  const { trades, strategyPerf, sessionPerf, stats, isEmpty } = useTradeData();
+
+  const best = [...strategyPerf].sort((a, b) => b.expectancy - a.expectancy)[0];
+  const worst = [...strategyPerf].sort((a, b) => a.expectancy - b.expectancy)[0];
+  const bestSession = [...sessionPerf].sort((a, b) => b.pnl - a.pnl)[0];
+  const mode = (values: string[]) =>
+    values.length
+      ? [...values.reduce((m, v) => m.set(v, (m.get(v) ?? 0) + 1), new Map<string, number>())].sort(
+          (a, b) => b[1] - a[1],
+        )[0]![0]
+      : "—";
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
         eyebrow="Module 04"
         title="AI Strategy Discovery"
-        description="Your Break & Retest strategy has a 100% win rate over 5 trades, while Momentum sits at 0% over 3. The AI keeps recalculating as your sample grows."
+        description="The AI recalculates which of your strategies, sessions and risk levels actually work as your sample grows."
       />
+
+      {isEmpty && (
+        <NoTradesYet
+          title="Nothing to analyse yet"
+          description="Strategy discovery needs logged trades before it can tell you where your edge is."
+        />
+      )}
+
+      {!isEmpty && (
+        <>
+
 
       <Panel title="Strategy performance" subtitle="Expectancy in R, ranked by net P&L">
         <div className="h-64">
@@ -78,12 +104,10 @@ function StrategyDiscovery() {
           <Panel title="Optimal conditions" subtitle="Where your edge concentrates">
             <dl className="grid grid-cols-2 gap-4 text-sm">
               {[
-                ["Best session", "Asian"],
-                ["Best day", "Monday"],
-                ["Best market", "Futures"],
-                ["Best timeframe", "15m"],
-                ["Ideal risk", "0.75%"],
-                ["Best hold time", "1–3 hours"],
+                ["Best session", bestSession?.name ?? "—"],
+                ["Best market", mode(trades.map((t) => t.market))],
+                ["Best timeframe", mode(trades.filter((t) => t.pnl > 0).map((t) => t.timeframe))],
+                ["Average risk", `${stats.avgRiskPct.toFixed(2)}%`],
               ].map(([k, v]) => (
                 <div key={k}>
                   <dt className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">{k}</dt>
@@ -117,18 +141,23 @@ function StrategyDiscovery() {
             <div className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-positive">
               Winning conditions
             </div>
-            Trend-aligned entries taken after a confirmed retest, risked at 0.5–0.75%, held longer
-            than 60 minutes.
+            {best
+              ? `${best.name} is your strongest setup — ${best.winRate}% win rate and ${best.expectancy.toFixed(2)}R expectancy over ${best.trades} trades, best in the ${bestSession?.name ?? "—"} session.`
+              : "Not enough data yet."}
           </div>
           <div className="rounded-xl border border-negative/25 bg-negative/5 p-4 text-sm leading-relaxed">
             <div className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-negative">
               Losing conditions
             </div>
-            5m momentum entries during the New York open, taken within 10 minutes of a prior loss,
-            with confidence logged below 5.
+            {worst
+              ? `${worst.name} is costing you the most — ${worst.winRate}% win rate and ${worst.expectancy.toFixed(2)}R expectancy over ${worst.trades} trades.`
+              : "Not enough data yet."}
           </div>
         </div>
       </Panel>
+        </>
+      )}
     </div>
+
   );
 }

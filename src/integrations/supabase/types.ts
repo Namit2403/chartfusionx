@@ -191,6 +191,123 @@ export type Database = {
         }
         Relationships: []
       }
+      trades: {
+        Row: {
+          account_size: number | null
+          account_type: string | null
+          asset: string | null
+          attachments: Json
+          broker: string | null
+          confidence: number | null
+          created_at: string
+          day_of_week: string | null
+          direction: string | null
+          duration: string | null
+          emotion_after: string | null
+          emotion_before: string | null
+          entry_price: number | null
+          entry_reason: string | null
+          exit_price: number | null
+          fees: number | null
+          id: string
+          lessons: string | null
+          market: string | null
+          market_conditions: string | null
+          mistakes: string | null
+          pnl: number
+          position_size: number | null
+          r_multiple: number
+          reward_pct: number | null
+          risk_pct: number | null
+          session: string | null
+          setup: string | null
+          stop_price: number | null
+          strategy: string | null
+          tags: string[]
+          target_price: number | null
+          timeframe: string | null
+          traded_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_size?: number | null
+          account_type?: string | null
+          asset?: string | null
+          attachments?: Json
+          broker?: string | null
+          confidence?: number | null
+          created_at?: string
+          day_of_week?: string | null
+          direction?: string | null
+          duration?: string | null
+          emotion_after?: string | null
+          emotion_before?: string | null
+          entry_price?: number | null
+          entry_reason?: string | null
+          exit_price?: number | null
+          fees?: number | null
+          id?: string
+          lessons?: string | null
+          market?: string | null
+          market_conditions?: string | null
+          mistakes?: string | null
+          pnl?: number
+          position_size?: number | null
+          r_multiple?: number
+          reward_pct?: number | null
+          risk_pct?: number | null
+          session?: string | null
+          setup?: string | null
+          stop_price?: number | null
+          strategy?: string | null
+          tags?: string[]
+          target_price?: number | null
+          timeframe?: string | null
+          traded_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_size?: number | null
+          account_type?: string | null
+          asset?: string | null
+          attachments?: Json
+          broker?: string | null
+          confidence?: number | null
+          created_at?: string
+          day_of_week?: string | null
+          direction?: string | null
+          duration?: string | null
+          emotion_after?: string | null
+          emotion_before?: string | null
+          entry_price?: number | null
+          entry_reason?: string | null
+          exit_price?: number | null
+          fees?: number | null
+          id?: string
+          lessons?: string | null
+          market?: string | null
+          market_conditions?: string | null
+          mistakes?: string | null
+          pnl?: number
+          position_size?: number | null
+          r_multiple?: number
+          reward_pct?: number | null
+          risk_pct?: number | null
+          session?: string | null
+          setup?: string | null
+          stop_price?: number | null
+          strategy?: string | null
+          tags?: string[]
+          target_price?: number | null
+          timeframe?: string | null
+          traded_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
