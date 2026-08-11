@@ -12,6 +12,7 @@ import {
 } from "recharts";
 
 import { OnboardingModal } from "@/components/onboarding-modal";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { Panel, Pill, Stat } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { currency, equityCurve, stats, trades, weekdayPerf } from "@/lib/mock-data";
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 function Dashboard() {
+  const { user } = useAuthUser();
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <OnboardingModal />
@@ -185,7 +187,11 @@ function Dashboard() {
             <li>Revenge trades this month: <span className="num text-negative">1</span></li>
           </ul>
           <Button asChild className="mt-5 w-full" variant="secondary">
-            <Link to="/strategy-discovery">See strategy discovery</Link>
+            {user ? (
+              <Link to="/strategy-discovery">See strategy discovery</Link>
+            ) : (
+              <Link to="/signup">Unlock strategy discovery</Link>
+            )}
           </Button>
         </Panel>
       </div>

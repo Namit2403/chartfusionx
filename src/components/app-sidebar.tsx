@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Activity,
@@ -6,8 +5,6 @@ import {
   BellRing,
   BookOpen,
   CreditCard,
-  Bot,
-  ChevronDown,
   Dna,
   FileText,
   Gauge,
@@ -35,6 +32,41 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+export const navGroups = [
+  {
+    label: "Journal",
+    items: [
+      { title: "Dashboard", url: "/", icon: LayoutDashboard },
+      { title: "Trade Journal", url: "/journal", icon: NotebookPen },
+      { title: "Trade Gallery", url: "/gallery", icon: ImageIcon },
+      { title: "Playbook", url: "/playbook", icon: BookOpen },
+    ],
+  },
+  {
+    label: "AI Systems",
+    items: [
+      { title: "AI Trade Review", url: "/ai-review", icon: Sparkles },
+      { title: "Strategy Discovery", url: "/strategy-discovery", icon: LineChart },
+      { title: "Screenshot Reader", url: "/screenshot-reader", icon: Activity },
+      { title: "Chart Critique", url: "/chart-critique", icon: Gauge },
+      { title: "Voice Summary", url: "/voice-summary", icon: Mic },
+      { title: "Trading Coach", url: "/coach", icon: MessageCircle },
+    ],
+  },
+  {
+    label: "Growth",
+    items: [
+      { title: "Trader DNA", url: "/trader-dna", icon: Dna },
+      { title: "Goals & Habits", url: "/goals", icon: Target },
+      { title: "Reports", url: "/reports", icon: FileText },
+      { title: "Analytics", url: "/analytics", icon: BarChart3 },
+      { title: "Teams", url: "/teams", icon: Users },
+      { title: "Notifications", url: "/notifications", icon: BellRing },
+      { title: "Plans & Billing", url: "/billing", icon: CreditCard },
+    ],
+  },
+] as const;
+
 export const coreItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Trade Journal", url: "/journal", icon: NotebookPen },
@@ -43,28 +75,10 @@ export const coreItems = [
   { title: "Coach", url: "/coach", icon: MessageCircle },
 ];
 
-const moreItems = [
-  { title: "Trade Gallery", url: "/gallery", icon: ImageIcon },
-  { title: "Playbook", url: "/playbook", icon: BookOpen },
-  { title: "Strategy Discovery", url: "/strategy-discovery", icon: LineChart },
-  { title: "Screenshot Reader", url: "/screenshot-reader", icon: Activity },
-  { title: "Chart Critique", url: "/chart-critique", icon: Gauge },
-  { title: "Voice Summary", url: "/voice-summary", icon: Mic },
-  { title: "Goals & Habits", url: "/goals", icon: Target },
-  { title: "Reports", url: "/reports", icon: FileText },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
-  { title: "Teams", url: "/teams", icon: Users },
-  { title: "Notifications", url: "/notifications", icon: BellRing },
-  { title: "Plans & billing", url: "/billing", icon: CreditCard },
-];
-
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const [moreOpen, setMoreOpen] = useState(() =>
-    moreItems.some((i) => pathname === i.url),
-  );
 
   return (
     <Sidebar collapsible="icon">
@@ -81,43 +95,18 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {coreItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url} tooltip={item.title}>
-                    <Link to={item.url} className="flex items-center gap-2">
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup className="mt-auto">
-          {!collapsed && <SidebarGroupLabel>More</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={() => setMoreOpen((v) => !v)}
-                  tooltip="More"
-                  className="flex items-center gap-2"
-                >
-                  <ChevronDown
-                    className={`size-4 transition-transform ${moreOpen ? "" : "-rotate-90"}`}
-                  />
-                  <span>More tools</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              {moreOpen &&
-                moreItems.map((item) => (
+        {navGroups.map((group) => (
+          <SidebarGroup key={group.label}>
+            {!collapsed && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => (
                   <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild isActive={pathname === item.url} tooltip={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.url}
+                      tooltip={item.title}
+                    >
                       <Link to={item.url} className="flex items-center gap-2">
                         <item.icon className="size-4" />
                         <span>{item.title}</span>
@@ -125,9 +114,10 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
     </Sidebar>
   );

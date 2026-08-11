@@ -157,7 +157,7 @@ function RootComponent() {
                 <Button asChild size="sm" variant="secondary" className="hidden sm:inline-flex">
                   <Link to="/coach">Ask coach</Link>
                 </Button>
-                <Button asChild size="sm">
+                <Button asChild size="sm" variant="secondary" className="hidden sm:inline-flex">
                   <Link to="/journal/new">Log trade</Link>
                 </Button>
                 <AccountMenu />
