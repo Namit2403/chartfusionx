@@ -176,7 +176,7 @@ function EligibilityPanel() {
                             ? "Yes"
                             : isFirst
                               ? "Window closed"
-                              : "No — renewal"}
+                              : "Case by case"}
                       </span>
                     </td>
                   </tr>
