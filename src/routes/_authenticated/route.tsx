@@ -15,7 +15,7 @@ const PAGE_NAMES: Record<string, string> = {
   "/screenshot-reader": "Screenshot Reader",
   "/chart-critique": "Chart Critique",
   "/voice-summary": "Voice Summary",
-  "/coach": "your Trading Coach",
+  
   "/trader-dna": "your Trader DNA",
   "/goals": "Goals & Habits",
   "/reports": "Reports",

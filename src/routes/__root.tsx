@@ -155,8 +155,9 @@ function RootComponent() {
               <SidebarTrigger />
               <div className="ml-auto flex items-center gap-2">
                 <Button asChild size="sm" variant="secondary" className="hidden sm:inline-flex">
-                  <Link to="/coach">Ask coach</Link>
+                  <Link to="/ai-review">AI review</Link>
                 </Button>
+
                 <Button asChild size="sm" variant="secondary" className="hidden sm:inline-flex">
                   <Link to="/journal/new">Log trade</Link>
                 </Button>

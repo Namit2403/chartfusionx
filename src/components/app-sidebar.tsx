@@ -50,7 +50,7 @@ export const navGroups = [
       { title: "Screenshot Reader", url: "/screenshot-reader", icon: Activity },
       { title: "Chart Critique", url: "/chart-critique", icon: Gauge },
       { title: "Voice Summary", url: "/voice-summary", icon: Mic },
-      { title: "Trading Coach", url: "/coach", icon: MessageCircle },
+      
     ],
   },
   {
