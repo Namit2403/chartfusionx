@@ -23,7 +23,6 @@ import { Route as AuthenticatedAiReviewRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as AuthenticatedChartCritiqueRouteImport } from './routes/_authenticated/chart-critique'
-import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedGalleryRouteImport } from './routes/_authenticated/gallery'
 import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
@@ -108,11 +107,6 @@ const AuthenticatedChartCritiqueRoute =
     path: '/chart-critique',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
-  id: '/coach',
-  path: '/coach',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedGalleryRoute = AuthenticatedGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -199,7 +193,6 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/billing': typeof AuthenticatedBillingRoute
   '/chart-critique': typeof AuthenticatedChartCritiqueRoute
-  '/coach': typeof AuthenticatedCoachRoute
   '/gallery': typeof AuthenticatedGalleryRoute
   '/goals': typeof AuthenticatedGoalsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -227,7 +220,6 @@ export interface FileRoutesByTo {
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/billing': typeof AuthenticatedBillingRoute
   '/chart-critique': typeof AuthenticatedChartCritiqueRoute
-  '/coach': typeof AuthenticatedCoachRoute
   '/gallery': typeof AuthenticatedGalleryRoute
   '/goals': typeof AuthenticatedGoalsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -258,7 +250,6 @@ export interface FileRoutesById {
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/chart-critique': typeof AuthenticatedChartCritiqueRoute
-  '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/gallery': typeof AuthenticatedGalleryRoute
   '/_authenticated/goals': typeof AuthenticatedGoalsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
@@ -290,7 +281,6 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/billing'
     | '/chart-critique'
-    | '/coach'
     | '/gallery'
     | '/goals'
     | '/notifications'
@@ -318,7 +308,6 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/billing'
     | '/chart-critique'
-    | '/coach'
     | '/gallery'
     | '/goals'
     | '/notifications'
@@ -348,7 +337,6 @@ export interface FileRouteTypes {
     | '/_authenticated/analytics'
     | '/_authenticated/billing'
     | '/_authenticated/chart-critique'
-    | '/_authenticated/coach'
     | '/_authenticated/gallery'
     | '/_authenticated/goals'
     | '/_authenticated/notifications'
@@ -478,13 +466,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChartCritiqueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/coach': {
-      id: '/_authenticated/coach'
-      path: '/coach'
-      fullPath: '/coach'
-      preLoaderRoute: typeof AuthenticatedCoachRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/gallery': {
       id: '/_authenticated/gallery'
       path: '/gallery'
@@ -584,7 +565,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedChartCritiqueRoute: typeof AuthenticatedChartCritiqueRoute
-  AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedGalleryRoute: typeof AuthenticatedGalleryRoute
   AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
@@ -605,7 +585,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedChartCritiqueRoute: AuthenticatedChartCritiqueRoute,
-  AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedGalleryRoute: AuthenticatedGalleryRoute,
   AuthenticatedGoalsRoute: AuthenticatedGoalsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
