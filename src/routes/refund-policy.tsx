@@ -5,7 +5,7 @@ import { LegalPage, LegalSection } from "@/components/legal-page";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useSubscription, type PaymentTransaction } from "@/hooks/useSubscription";
 
-const REFUND_WINDOW_DAYS = 7;
+const REFUND_WINDOW_DAYS = 30;
 
 export const Route = createFileRoute("/refund-policy")({
   head: () => ({
@@ -14,13 +14,13 @@ export const Route = createFileRoute("/refund-policy")({
       {
         name: "description",
         content:
-          "ChartFusionX offers a 7-day refund on your first payment only. Check your eligibility and see how refund requests are processed.",
+          "ChartFusionX offers a 30-day refund on your first payment only. Check your eligibility and see how refund requests are processed.",
       },
       { property: "og:title", content: "Refund Policy — ChartFusionX" },
       {
         property: "og:description",
         content:
-          "7-day refund on your first payment only — check your eligibility and how to request one.",
+          "30-day refund on your first payment only — check your eligibility and how to request one.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ChartFusionX" },
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/refund-policy")({
       { name: "twitter:title", content: "Refund Policy — ChartFusionX" },
       {
         name: "twitter:description",
-        content: "7-day refund on your first payment only at ChartFusionX.",
+        content: "30-day refund on your first payment only at ChartFusionX.",
       },
     ],
     links: [{ rel: "canonical", href: "https://chartfusionx.lovable.app/refund-policy" }],
@@ -66,7 +66,7 @@ function evaluate(transactions: PaymentTransaction[]): Eligibility {
       eligible: false,
       firstPaymentId: null,
       message:
-        "No payments on file yet. Your 7-day window starts the day your first charge is taken, after the free trial ends.",
+        "No payments on file yet. Your 30-day window starts the day your first charge is taken, after the free trial ends.",
     };
   }
 
@@ -87,7 +87,7 @@ function evaluate(transactions: PaymentTransaction[]): Eligibility {
     return {
       eligible: false,
       firstPaymentId: first.id,
-      message: `Your ${REFUND_WINDOW_DAYS}-day window closed on ${formatDate(deadline.toISOString())}, 7 days after your first payment on ${formatDate(first.billed_at)}.`,
+      message: `Your ${REFUND_WINDOW_DAYS}-day window closed on ${formatDate(deadline.toISOString())}, 30 days after your first payment on ${formatDate(first.billed_at)}.`,
     };
   }
 
@@ -207,15 +207,15 @@ function RefundPage() {
     <LegalPage
       title="Refund Policy"
       updated="10 August 2026"
-      intro="We want you to try ChartFusionX with confidence, so your first payment is covered by a 7-day refund window."
+      intro="We want you to try ChartFusionX with confidence, so your first payment is covered by a 30-day refund window."
     >
       <LegalSection heading="Your eligibility">
         <EligibilityPanel />
       </LegalSection>
 
-      <LegalSection heading="1. The 7-day first-payment refund">
+      <LegalSection heading="1. The 30-day first-payment refund">
         <p>
-          If you are not satisfied with ChartFusionX, you can request a full refund within 7 days of
+          If you are not satisfied with ChartFusionX, you can request a full refund within 30 days of
           your <span className="text-foreground">first</span> payment. This applies once per
           customer and only to the initial charge on your account. Your 7-day free trial is not a
           charge, so the window starts on the first payment taken after the trial ends.
@@ -226,7 +226,7 @@ function RefundPage() {
         <ul className="space-y-1">
           <li>Renewal charges after your first payment, including monthly and annual renewals.</li>
           <li>Plan upgrades, prorated charges, add-ons, and any subsequent purchases.</li>
-          <li>Requests made more than 7 days after the first payment.</li>
+          <li>Requests made more than 30 days after the first payment.</li>
           <li>Accounts terminated for breach of our Terms of Service.</li>
         </ul>
       </LegalSection>
@@ -235,7 +235,7 @@ function RefundPage() {
         <p>
           Email <span className="text-foreground">billing@chartfusionx.com</span> from the address on
           your account with the subject "Refund request" and your account email. No justification is
-          required within the 7-day window.
+          required within the 30-day window.
         </p>
       </LegalSection>
 
@@ -252,7 +252,7 @@ function RefundPage() {
           You can cancel your subscription at any time from Plans & billing. Cancellation takes
           effect immediately: future charges stop and paid features are locked right away, while
           your trades and journal stay saved. Cancelling on its own does not trigger a refund of an
-          already-paid period outside the 7-day first-payment window.
+          already-paid period outside the 30-day first-payment window.
         </p>
       </LegalSection>
 
@@ -260,7 +260,7 @@ function RefundPage() {
         <p>
           Nothing in this policy limits refund rights you may have under the consumer law of your
           country. If a duplicate or clearly erroneous charge occurs, contact us and we will correct
-          it regardless of the 7-day window. Questions? Email{" "}
+          it regardless of the 30-day window. Questions? Email{" "}
           <span className="text-foreground">billing@chartfusionx.com</span>.
         </p>
       </LegalSection>
