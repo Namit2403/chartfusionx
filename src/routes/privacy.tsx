@@ -36,9 +36,24 @@ function PrivacyPage() {
     <LegalPage
       title="Privacy Policy"
       updated="10 August 2026"
-      intro="ChartFusionX is a SaaS trading journal and AI review platform operated by Antonio Hernandez. This policy explains what we collect, why we collect it, and the choices you have."
+      intro="ChartFusionX is a SaaS trading journal and AI review platform owned and operated by Antonio Hernandez, a sole trader trading as ChartFusionX. This policy explains what we collect, why we collect it, and the choices you have."
     >
-      <LegalSection heading="1. Information we collect">
+      <LegalSection heading="1. Who we are and our role">
+        <p>
+          The seller and operator of ChartFusionX is{" "}
+          <span className="text-foreground">Antonio Hernandez</span>, a sole trader trading as
+          "ChartFusionX" (the "Company", "we", "us"). We are the{" "}
+          <span className="text-foreground">data controller</span> for the personal data described
+          in this policy: we decide what personal data is collected through ChartFusionX, and the
+          purposes and means of processing it. Our subprocessors — including hosting, database, email
+          and AI model providers — act as processors on our instructions. Paddle.com acts as our
+          Merchant of Record and is an independent controller for payment and tax data it collects
+          at checkout. Contact:{" "}
+          <span className="text-foreground">privacy@chartfusionx.com</span>.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="2. Information we collect">
         <ul className="space-y-1">
           <li>Account data: name, email address, password hash, and billing identifiers.</li>
           <li>
