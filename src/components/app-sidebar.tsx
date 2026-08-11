@@ -11,7 +11,7 @@ import {
   Image as ImageIcon,
   LayoutDashboard,
   LineChart,
-  MessageCircle,
+  LineChart,
   Mic,
   NotebookPen,
   Sparkles,
@@ -72,7 +72,7 @@ export const coreItems = [
   { title: "Trade Journal", url: "/journal", icon: NotebookPen },
   { title: "AI Trade Review", url: "/ai-review", icon: Sparkles },
   { title: "Trader DNA", url: "/trader-dna", icon: Dna },
-  { title: "Coach", url: "/coach", icon: MessageCircle },
+  { title: "Analytics", url: "/analytics", icon: BarChart3 },
 ];
 
 export function AppSidebar() {
