@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 
 import { LegalPage, LegalSection } from "@/components/legal-page";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { useSubscription, type PaymentTransaction } from "@/hooks/useSubscription";
 
 const REFUND_WINDOW_DAYS = 7;
@@ -100,8 +101,17 @@ function evaluate(transactions: PaymentTransaction[]): Eligibility {
 
 function EligibilityPanel() {
   const { transactions, loading, userId } = useSubscription();
+  const { user, loading: authLoading } = useAuthUser();
 
-  if (loading) {
+  if (!authLoading && !user) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+        Sign in to check whether your account is within the {REFUND_WINDOW_DAYS}-day refund window.
+      </div>
+    );
+  }
+
+  if (authLoading || loading) {
     return (
       <div className="flex items-center gap-2 rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
         <Loader2 className="size-4 animate-spin" /> Checking your payment history…
@@ -112,7 +122,7 @@ function EligibilityPanel() {
   if (!userId) {
     return (
       <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
-        Sign in to see whether your first payment is still inside the {REFUND_WINDOW_DAYS}-day
+        Sign in to check whether your account is within the {REFUND_WINDOW_DAYS}-day
         refund window.
       </div>
     );
