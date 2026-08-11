@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Upload } from "lucide-react";
+import { useState } from "react";
 
+import { ChartUpload, type UploadedChart } from "@/components/chart-upload";
+import { useAiAction } from "@/hooks/useAiAction";
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
 import { Button } from "@/components/ui/button";
+
 
 export const Route = createFileRoute("/_authenticated/screenshot-reader")({
   head: () => ({
