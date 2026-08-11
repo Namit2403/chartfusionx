@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { ACTIVE_STATUSES, getPlan, type AiFeature } from "@/lib/entitlements";
+import {
+  ACTIVE_STATUSES,
+  FREE_TRADE_LIMIT,
+  getPlan,
+  type AiFeature,
+} from "@/lib/entitlements";
 import { gatewayFetch, getPaddleClient, type PaddleEnv } from "@/lib/paddle.server";
 
 type SubscriptionRecord = {
@@ -80,8 +85,14 @@ export const getBillingOverview = createServerFn({ method: "GET" })
       .eq("environment", data.environment)
       .order("billed_at", { ascending: true });
 
+    const { count: tradesLogged } = await supabase
+      .from("trade_log_events")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId);
+
     const aiUsed = count ?? 0;
     const aiLimit = plan?.aiActionsPerPeriod ?? null;
+    const tradesUsed = tradesLogged ?? 0;
 
     return {
       subscription,
@@ -91,7 +102,57 @@ export const getBillingOverview = createServerFn({ method: "GET" })
       aiUsed,
       aiLimit,
       aiRemaining: aiLimit === null ? null : Math.max(0, aiLimit - aiUsed),
+      tradesUsed,
+      tradeLimit: entitled ? null : FREE_TRADE_LIMIT,
+      tradesRemaining: entitled ? null : Math.max(0, FREE_TRADE_LIMIT - tradesUsed),
       transactions: transactions ?? [],
+    };
+  });
+
+/**
+ * Records one logged trade. Free (signed-in) accounts get FREE_TRADE_LIMIT
+ * trades; subscribers are unlimited. This is the real gate.
+ */
+export const recordTradeLog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { environment: PaddleEnv }) => data)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: subRow } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const entitled = subscriptionIsUsable((subRow as SubscriptionRecord | null) ?? null);
+
+    const { count } = await supabase
+      .from("trade_log_events")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId);
+
+    const tradesUsed = count ?? 0;
+    if (!entitled && tradesUsed >= FREE_TRADE_LIMIT) {
+      return {
+        ok: false as const,
+        reason: "limit-reached" as const,
+        tradesUsed,
+        tradeLimit: FREE_TRADE_LIMIT,
+      };
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("trade_log_events").insert({ user_id: userId });
+
+    return {
+      ok: true as const,
+      reason: "ok" as const,
+      tradesUsed: tradesUsed + 1,
+      tradeLimit: entitled ? null : FREE_TRADE_LIMIT,
     };
   });
 

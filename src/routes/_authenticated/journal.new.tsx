@@ -4,8 +4,9 @@ import { toast } from "sonner";
 import { Paperclip, RotateCcw } from "lucide-react";
 
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
-import { openPaywall } from "@/components/paywall-dialog";
-import { useSubscription } from "@/hooks/useSubscription";
+import { openPaywall, openSignInPrompt } from "@/components/paywall-dialog";
+import { FREE_TRADE_LIMIT } from "@/lib/entitlements";
+import { consumeTradeLog, useSubscription } from "@/hooks/useSubscription";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -165,8 +166,16 @@ function AreaField({
 function NewTrade() {
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [restored, setRestored] = useState(false);
+  const [saving, setSaving] = useState(false);
   const hydrated = useRef(false);
-  const { isActive, loading: subLoading } = useSubscription();
+  const {
+    isActive,
+    tradesUsed,
+    tradesRemaining,
+    userId,
+    loading: subLoading,
+    refresh,
+  } = useSubscription();
 
   // Restore whatever was typed before the paywall / upgrade detour.
   useEffect(() => {
@@ -200,26 +209,47 @@ function NewTrade() {
     }
   }
 
-  function requirePlan() {
-    if (isActive) return true;
-    openPaywall({
-      title: "Start your trial to log trades",
-      description:
-        "Journaling trades needs an active plan. Your draft is saved on this device, so you can pick up exactly where you left off after choosing a plan.",
+  function requireAccount() {
+    if (userId) return true;
+    openSignInPrompt({
+      title: "Sign in to save this trade",
+      description: `Your draft is safe on this device. Create a free account to keep it — free accounts can log ${FREE_TRADE_LIMIT} trades.`,
     });
     return false;
   }
 
-  function saveTrade() {
-    if (!requirePlan()) return;
-    toast.success("Trade saved — AI review queued");
-    clearDraft();
+  async function saveTrade() {
+    if (!requireAccount()) return;
+    setSaving(true);
+    try {
+      const result = await consumeTradeLog();
+      if (!result.ok) {
+        openPaywall({
+          title: `You've logged all ${FREE_TRADE_LIMIT} free trades`,
+          description:
+            "Start a plan to keep journaling without limits. Your draft is saved on this device, so you can pick up exactly where you left off.",
+        });
+        return;
+      }
+      toast.success(
+        isActive
+          ? "Trade saved — AI review queued"
+          : `Trade saved — ${Math.max(0, FREE_TRADE_LIMIT - result.tradesUsed)} free trades left`,
+      );
+      clearDraft();
+      void refresh();
+    } catch {
+      toast.error("We couldn't save that trade. Try again in a moment.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   function saveDraft() {
-    if (!requirePlan()) return;
+    if (!requireAccount()) return;
     toast.success("Draft saved");
   }
+
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -385,13 +415,15 @@ function NewTrade() {
 
       <div className="flex flex-wrap items-center justify-end gap-2 pb-4">
         <span className="mr-auto text-xs text-muted-foreground">
-          Draft autosaves on this device — nothing is lost if you step out to upgrade.
+          {userId && !isActive && tradesRemaining !== null
+            ? `Free plan · ${tradesUsed} of ${FREE_TRADE_LIMIT} trades logged — ${tradesRemaining} left.`
+            : "Draft autosaves on this device — nothing is lost if you step out to upgrade."}
         </span>
         <Button variant="secondary" onClick={saveDraft}>
           Save draft
         </Button>
-        <Button onClick={saveTrade} disabled={subLoading}>
-          Save trade
+        <Button onClick={() => void saveTrade()} disabled={subLoading || saving}>
+          {saving ? "Saving…" : "Save trade"}
         </Button>
       </div>
     </div>

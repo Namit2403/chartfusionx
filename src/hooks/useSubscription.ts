@@ -2,7 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { getPaddleEnvironment } from "@/lib/paddle";
-import { getBillingOverview, recordAiUsage } from "@/utils/payments.functions";
+import {
+  getBillingOverview,
+  recordAiUsage,
+  recordTradeLog,
+} from "@/utils/payments.functions";
 
 export type SubscriptionRow = {
   id: string;
@@ -38,6 +42,9 @@ export type BillingOverview = {
   aiUsed: number;
   aiLimit: number | null;
   aiRemaining: number | null;
+  tradesUsed: number;
+  tradeLimit: number | null;
+  tradesRemaining: number | null;
   transactions: PaymentTransaction[];
 };
 
@@ -49,6 +56,9 @@ const EMPTY: BillingOverview = {
   aiUsed: 0,
   aiLimit: null,
   aiRemaining: null,
+  tradesUsed: 0,
+  tradeLimit: null,
+  tradesRemaining: null,
   transactions: [],
 };
 
@@ -123,4 +133,19 @@ export async function consumeAiAction(feature: string) {
   return recordAiUsage({
     data: { feature, environment: getPaddleEnvironment() },
   }) as Promise<{ ok: boolean; reason: string; aiUsed: number; aiLimit: number | null }>;
+}
+
+/**
+ * Records a logged trade against the free allowance / plan.
+ * Returns ok=false with reason "limit-reached" once the free trades run out.
+ */
+export async function consumeTradeLog() {
+  return recordTradeLog({
+    data: { environment: getPaddleEnvironment() },
+  }) as Promise<{
+    ok: boolean;
+    reason: string;
+    tradesUsed: number;
+    tradeLimit: number | null;
+  }>;
 }
