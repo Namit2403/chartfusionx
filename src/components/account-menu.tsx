@@ -63,9 +63,19 @@ export function AccountMenu() {
 
   if (!user) {
     return (
-      <Button size="sm" variant="secondary" onClick={() => navigate({ to: "/auth" })}>
-        Sign in
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="hidden sm:inline-flex"
+          onClick={() => navigate({ to: "/auth" })}
+        >
+          Sign in
+        </Button>
+        <Button size="sm" onClick={() => navigate({ to: "/signup" })}>
+          Get started free
+        </Button>
+      </div>
     );
   }
 
@@ -95,13 +105,9 @@ export function AccountMenu() {
             <span className="text-muted-foreground">Email</span>
             <span className="truncate text-xs">{user.email}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Type</span>
-            <span className="text-positive">Live</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Balance</span>
-            <span className="num font-semibold">$12,405.99</span>
+          <div className="flex justify-between gap-2">
+            <span className="text-muted-foreground">Account ID</span>
+            <span className="num truncate text-xs">{user.id.slice(0, 8)}</span>
           </div>
           {acceptedAt && (
             <div className="flex justify-between gap-2">
