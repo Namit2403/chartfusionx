@@ -233,11 +233,23 @@ function RefundPage() {
 
       <LegalSection heading="3. How to request a refund">
         <p>
-          Email <span className="text-foreground">billing@chartfusionx.com</span> from the address on
-          your account with the subject "Refund request" and your account email. No justification is
-          required within the 30-day window.
+          Our order process is conducted by our online reseller Paddle.com, which is the Merchant of
+          Record for all our orders. You can request a refund directly from Paddle at{" "}
+          <a
+            href="https://paddle.net"
+            target="_blank"
+            rel="noreferrer"
+            className="text-foreground underline underline-offset-4"
+          >
+            paddle.net
+          </a>{" "}
+          using your order email, or email{" "}
+          <span className="text-foreground">billing@chartfusionx.com</span> from the address on your
+          account with the subject "Refund request". No justification is required within the 30-day
+          window.
         </p>
       </LegalSection>
+
 
       <LegalSection heading="4. Processing">
         <p>
