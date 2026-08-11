@@ -305,17 +305,40 @@ export const createPortalSession = createServerFn({ method: "POST" })
       .limit(1)
       .maybeSingle();
 
-    if (error) throw new Error(error.message);
-    if (!subscription) throw new Error("No subscription found for this account");
+    if (error) return { ok: false as const, message: error.message, overviewUrl: null };
+    if (!subscription) {
+      return {
+        ok: false as const,
+        message: "No subscription found for this account",
+        overviewUrl: null,
+      };
+    }
 
-    const paddle = getPaddleClient(subscription.environment as PaddleEnv);
-    const session = await paddle.customerPortalSessions.create(
-      subscription.paddle_customer_id,
-      [subscription.paddle_subscription_id],
-    );
-
-    return {
-      overviewUrl: session.urls.general.overview,
-      subscriptionUrls: session.urls.subscriptions ?? [],
-    };
+    try {
+      const paddle = getPaddleClient(subscription.environment as PaddleEnv);
+      const session = await paddle.customerPortalSessions.create(
+        subscription.paddle_customer_id,
+        [subscription.paddle_subscription_id],
+      );
+      const overviewUrl = session.urls?.general?.overview ?? null;
+      if (!overviewUrl) {
+        return {
+          ok: false as const,
+          message: "The billing portal is unavailable right now. Please try again shortly.",
+          overviewUrl: null,
+        };
+      }
+      return { ok: true as const, message: null, overviewUrl };
+    } catch (err) {
+      // Paddle SDK errors are class instances and cannot cross the RPC boundary.
+      const message =
+        err && typeof err === "object" && "detail" in err
+          ? String((err as { detail: unknown }).detail)
+          : err instanceof Error
+            ? err.message
+            : "Could not open the billing portal";
+      console.error("createPortalSession failed:", message);
+      return { ok: false as const, message, overviewUrl: null };
+    }
   });
+

@@ -153,6 +153,10 @@ function BillingPage() {
     setBusy("portal");
     try {
       const result = await openPortal({ data: { environment: getPaddleEnvironment() } });
+      if (!result.ok || !result.overviewUrl) {
+        toast.error(result.message ?? "Could not open the billing portal");
+        return;
+      }
       window.open(result.overviewUrl, "_blank", "noopener,noreferrer");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not open the billing portal");
@@ -160,6 +164,7 @@ function BillingPage() {
       setBusy(null);
     }
   };
+
 
   const usagePct = aiLimit ? Math.min(100, Math.round((aiUsed / aiLimit) * 100)) : 0;
 
