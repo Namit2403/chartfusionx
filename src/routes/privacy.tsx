@@ -36,7 +36,7 @@ function PrivacyPage() {
     <LegalPage
       title="Privacy Policy"
       updated="10 August 2026"
-      intro="ChartFusionX is a SaaS trading journal and AI review platform. This policy explains what we collect, why we collect it, and the choices you have."
+      intro="ChartFusionX is a SaaS trading journal and AI review platform operated by Antonio Hernandez. This policy explains what we collect, why we collect it, and the choices you have."
     >
       <LegalSection heading="1. Information we collect">
         <ul className="space-y-1">
@@ -118,8 +118,9 @@ function PrivacyPage() {
 
       <LegalSection heading="9. Changes and contact">
         <p>
-          We will post any material changes to this policy on this page and update the date above.
-          Questions? Email <span className="text-foreground">privacy@chartfusionx.com</span>.
+          ChartFusionX is operated by Antonio Hernandez. We will post any material changes to this
+          policy on this page and update the date above. Questions? Email{" "}
+          <span className="text-foreground">privacy@chartfusionx.com</span>.
         </p>
       </LegalSection>
     </LegalPage>

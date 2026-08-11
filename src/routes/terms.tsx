@@ -36,7 +36,7 @@ function TermsPage() {
     <LegalPage
       title="Terms of Service"
       updated="10 August 2026"
-      intro="These terms form an agreement between you and ChartFusionX. By creating an account or using the app, you agree to them."
+      intro="These terms form an agreement between you and ChartFusionX, operated by Antonio Hernandez. By creating an account or using the app, you agree to them."
     >
       <LegalSection heading="1. The service">
         <p>
@@ -130,8 +130,9 @@ function TermsPage() {
 
       <LegalSection heading="10. Changes and contact">
         <p>
-          We may update these terms; material changes will be posted here with a new date. Questions?
-          Email <span className="text-foreground">support@chartfusionx.com</span>.
+          ChartFusionX is operated by Antonio Hernandez. We may update these terms; material changes
+          will be posted here with a new date. Questions? Email{" "}
+          <span className="text-foreground">support@chartfusionx.com</span>.
         </p>
       </LegalSection>
     </LegalPage>
