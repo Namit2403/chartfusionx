@@ -33,8 +33,6 @@ vi.mock("@/integrations/supabase/client", () => ({
   },
 }));
 
-const { default: layoutModule } = await import("@/routes/_authenticated/route");
-void layoutModule;
 const routeModule = await import("@/routes/_authenticated/route");
 const AuthenticatedLayout = (routeModule.Route as unknown as { component: () => ReactNode })
   .component;
