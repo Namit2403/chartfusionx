@@ -11,7 +11,6 @@ import {
   Image as ImageIcon,
   LayoutDashboard,
   LineChart,
-  LineChart,
   Mic,
   NotebookPen,
   Sparkles,
