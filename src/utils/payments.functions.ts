@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { ACTIVE_STATUSES, getPlan, type AiFeature } from "@/lib/entitlements";
+import {
+  ACTIVE_STATUSES,
+  FREE_TRADE_LIMIT,
+  getPlan,
+  type AiFeature,
+} from "@/lib/entitlements";
 import { gatewayFetch, getPaddleClient, type PaddleEnv } from "@/lib/paddle.server";
 
 type SubscriptionRecord = {
