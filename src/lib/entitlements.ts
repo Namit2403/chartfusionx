@@ -59,7 +59,7 @@ export const PLANS: PlanConfig[] = [
       "Unlimited AI actions",
       "AI coach, voice summaries & strategy discovery",
       "Advanced reports, analytics & exports",
-      "Teams & mentorship workspaces",
+      "Full trade gallery & attachments",
       "Priority AI processing",
     ],
   },

@@ -59,7 +59,7 @@ export const navGroups = [
       { title: "Goals & Habits", url: "/goals", icon: Target },
       { title: "Reports", url: "/reports", icon: FileText },
       { title: "Analytics", url: "/analytics", icon: BarChart3 },
-      { title: "Teams", url: "/teams", icon: Users },
+      
       { title: "Notifications", url: "/notifications", icon: BellRing },
       { title: "Plans & Billing", url: "/billing", icon: CreditCard },
     ],

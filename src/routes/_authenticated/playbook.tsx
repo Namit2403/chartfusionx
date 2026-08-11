@@ -94,7 +94,7 @@ function Playbook() {
       ) : (
         <>
           <Panel className="p-2">
-            <Accordion type="single" collapsible defaultValue={plays[0]?.name}>
+            <Accordion type="single" collapsible defaultValue={plays[0]?.name ?? ""}>
               {plays.map((p) => (
                 <AccordionItem key={p.name} value={p.name} className="border-border px-3">
                   <AccordionTrigger className="hover:no-underline">
