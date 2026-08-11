@@ -15,7 +15,7 @@ import {
   NotebookPen,
   Sparkles,
   Target,
-  Users,
+  
 } from "lucide-react";
 
 import {
