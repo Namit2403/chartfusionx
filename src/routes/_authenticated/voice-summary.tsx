@@ -1,8 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, Pause, Play, RotateCcw, Sparkles, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Download, Loader2, Pause, Play, RotateCcw, Sparkles, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 
 import { useAiAction } from "@/hooks/useAiAction";
+import { useTradeData } from "@/hooks/useTradeData";
+import { NoTradesYet } from "@/components/no-trades-yet";
+import { synthesizeSummary } from "@/lib/tts.functions";
 import { PageHeader, Panel, Pill } from "@/components/shell";
 import { VoiceOrb } from "@/components/voice-orb";
 import { Button } from "@/components/ui/button";
@@ -27,144 +32,191 @@ export const Route = createFileRoute("/_authenticated/voice-summary")({
 });
 
 type Segment = { label: string; text: string };
+type Period = "weekly" | "monthly";
 
-const scripts: Record<"weekly" | "monthly", { range: string; segments: Segment[] }> = {
-  weekly: {
-    range: "Week of Aug 3 – Aug 9, 2026",
-    segments: [
-      { label: "Trades completed", text: "This week you completed 27 trades, six more than last week." },
-      { label: "Performance change", text: "You finished up 614 dollars and 75 cents, a 5.2 percent account gain." },
-      { label: "Biggest improvement", text: "Your biggest improvement was discipline. Zero revenge trades, down from four." },
-      { label: "Biggest mistake", text: "Your biggest mistake was entering breakouts before a confirmation close." },
-      { label: "Strategy performance", text: "Break and Retest carried the week with a 2.16 R expectancy across five trades." },
-      { label: "Psychology", text: "Your confidence drops sharply after two consecutive losses, and size creeps up after wins." },
-      { label: "Next period goal", text: "For next week, cap daily trades at three and log every entry reason before you click buy." },
-    ],
-  },
-  monthly: {
-    range: "August 2026 · month to date",
-    segments: [
-      { label: "Trades completed", text: "This month you completed 96 trades across five markets." },
-      { label: "Performance change", text: "You are up 2,404 dollars and 99 cents, a 24 percent account gain." },
-      { label: "Biggest improvement", text: "Risk management is your strongest trait this month, scoring 88 out of 100." },
-      { label: "Biggest mistake", text: "Momentum trades in the New York session cost you 596 dollars with a zero percent win rate." },
-      { label: "Strategy performance", text: "Break and Retest and Swing Continuation produced the entire month's edge." },
-      { label: "Psychology", text: "Emotional control slipped four points, driven by trades logged as FOMO or revenge." },
-      { label: "Next period goal", text: "Next month, retire the momentum playbook until it is back tested and cut 5 minute entries." },
-    ],
-  },
-};
+const money = (n: number) =>
+  `${n < 0 ? "down " : "up "}${Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: 2 })} dollars`;
 
-const estimate = (text: string, rate: number) => (text.split(/\s+/).length / 2.7 / rate) * 1000;
-
-const fmt = (ms: number) => {
-  const s = Math.max(0, Math.round(ms / 1000));
-  return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
+const fmt = (s: number) => {
+  const total = Math.max(0, Math.round(s));
+  return `${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, "0")}`;
 };
 
 function VoiceSummary() {
-  const [period, setPeriod] = useState<"weekly" | "monthly">("weekly");
+  const { trades, stats, strategyPerf, sessionPerf, isEmpty, loading } = useTradeData();
+  const [period, setPeriod] = useState<Period>("weekly");
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const [rate, setRate] = useState(1);
   const [elapsed, setElapsed] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [level, setLevel] = useState(0);
-  const [generatedAt, setGeneratedAt] = useState("generated this morning");
+  const [audioSrc, setAudioSrc] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [generatedAt, setGeneratedAt] = useState("not generated yet");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const speak = useServerFn(synthesizeSummary);
+  const { run: spendAiAction, checking } = useAiAction("voice-summary");
 
-  const script = scripts[period];
-  const durations = useMemo(
-    () => script.segments.map((s) => estimate(s.text, rate)),
-    [script, rate],
-  );
-  const total = useMemo(() => durations.reduce((a, b) => a + b, 0), [durations]);
+  const script = useMemo(() => {
+    const windowDays = period === "weekly" ? 7 : 30;
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - windowDays);
+    const scoped = trades.filter((t) => new Date(t.date) >= cutoff);
+    const pnl = scoped.reduce((s, t) => s + t.pnl, 0);
+    const wins = scoped.filter((t) => t.pnl > 0).length;
+    const winRate = scoped.length ? Math.round((wins / scoped.length) * 100) : 0;
+    const bestStrategy = [...strategyPerf].sort((a, b) => b.expectancy - a.expectancy)[0];
+    const worstStrategy = [...strategyPerf].sort((a, b) => a.pnl - b.pnl)[0];
+    const bestSession = [...sessionPerf].sort((a, b) => b.pnl - a.pnl)[0];
+    const lessons = scoped.find((t) => t.note)?.note;
 
+    const segments: Segment[] = [
+      {
+        label: "Trades completed",
+        text: `In the last ${windowDays} days you completed ${scoped.length} trade${scoped.length === 1 ? "" : "s"}, with a ${winRate} percent win rate.`,
+      },
+      {
+        label: "Performance change",
+        text: `Across that window you finished ${money(pnl)}, and your all time logged result stands ${money(stats.totalPnl)}.`,
+      },
+      {
+        label: "Risk profile",
+        text: `Your average risk per trade is ${stats.avgRiskPct.toFixed(2)} percent, with an average return of ${stats.avgR.toFixed(2)} R and a profit factor of ${stats.profitFactor.toFixed(2)}.`,
+      },
+      {
+        label: "Strategy performance",
+        text: bestStrategy
+          ? `Your strongest strategy is ${bestStrategy.name}, averaging ${bestStrategy.expectancy.toFixed(2)} R across ${bestStrategy.trades} trades.`
+          : "You have not logged enough trades yet for a strategy breakdown.",
+      },
+      {
+        label: "Biggest drag",
+        text:
+          worstStrategy && worstStrategy.pnl < 0
+            ? `${worstStrategy.name} is your biggest drag, costing you ${Math.abs(worstStrategy.pnl).toFixed(2)} dollars so far.`
+            : "No strategy is currently losing money for you, which is a good place to build from.",
+      },
+      {
+        label: "Best session",
+        text: bestSession
+          ? `The ${bestSession.name} session is your most profitable window, with a ${Math.round(bestSession.winRate)} percent win rate.`
+          : "Log the session for each trade and I will tell you when you trade best.",
+      },
+      {
+        label: "Next period goal",
+        text: lessons
+          ? `Your own note to yourself was: ${lessons}. Carry that into the coming week.`
+          : `Keep your risk near ${Math.max(0.25, stats.avgRiskPct).toFixed(2)} percent and write a lesson on every trade so the next summary is sharper.`,
+      },
+    ];
+
+    const rangeLabel =
+      period === "weekly"
+        ? `Last 7 days · ${scoped.length} trades`
+        : `Last 30 days · ${scoped.length} trades`;
+
+    return { range: rangeLabel, segments };
+  }, [period, trades, stats, strategyPerf, sessionPerf]);
+
+  const fullText = useMemo(() => script.segments.map((s) => s.text).join(" "), [script]);
+
+  // Character offsets let us map audio position onto the transcript.
   const offsets = useMemo(() => {
     let acc = 0;
-    return durations.map((d) => {
-      const o = acc;
-      acc += d;
-      return o;
+    const total = fullText.length || 1;
+    return script.segments.map((s) => {
+      const start = acc / total;
+      acc += s.text.length + 1;
+      return start;
     });
-  }, [durations]);
+  }, [script, fullText]);
 
+  const progressRatio = duration ? elapsed / duration : 0;
   const activeIndex = useMemo(() => {
     let idx = 0;
-    for (let i = 0; i < offsets.length; i++) if (elapsed >= offsets[i]!) idx = i;
+    offsets.forEach((o, i) => {
+      if (progressRatio >= o) idx = i;
+    });
     return idx;
-  }, [elapsed, offsets]);
+  }, [offsets, progressRatio]);
 
-  const speak = useCallback(
-    (text: string, r: number) => {
-      if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      if (muted) return;
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = r;
-      u.pitch = 0.95;
-      window.speechSynthesis.speak(u);
-    },
-    [muted],
-  );
-
-  const stopSpeech = useCallback(() => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
-  }, []);
-
-  // master clock
+  // Any change to the script invalidates the rendered audio.
   useEffect(() => {
-    if (!playing) return;
+    setAudioSrc(null);
+    setPlaying(false);
+    setElapsed(0);
+    setDuration(0);
+  }, [fullText]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.playbackRate = rate;
+  }, [rate, audioSrc]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.muted = muted;
+  }, [muted, audioSrc]);
+
+  // Orb animation while audio plays.
+  useEffect(() => {
+    if (!playing) {
+      setLevel(0);
+      return;
+    }
     let raf = 0;
-    let last = performance.now();
     const tick = (now: number) => {
-      const dt = now - last;
-      last = now;
-      setElapsed((e) => {
-        const next = e + dt;
-        if (next >= total) {
-          setPlaying(false);
-          return total;
-        }
-        return next;
-      });
       setLevel(0.35 + Math.abs(Math.sin(now / 190)) * 0.4 + Math.sin(now / 70) * 0.12);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [playing, total]);
+  }, [playing]);
 
-  // speak whichever segment is active
-  const spokenRef = useRef<string>("");
-  useEffect(() => {
-    if (!playing) return;
-    const key = `${period}-${activeIndex}-${rate}-${muted}`;
-    if (spokenRef.current === key) return;
-    spokenRef.current = key;
-    speak(script.segments[activeIndex]!.text, rate);
-  }, [playing, activeIndex, period, rate, muted, script, speak]);
-
-  useEffect(() => {
-    if (!playing) {
-      stopSpeech();
-      spokenRef.current = "";
-      setLevel(0);
+  async function generate(): Promise<string | null> {
+    if (!(await spendAiAction())) return null;
+    setGenerating(true);
+    try {
+      const { audio, mimeType } = await speak({ data: { text: fullText } });
+      const src = `data:${mimeType};base64,${audio}`;
+      setAudioSrc(src);
+      setGeneratedAt(
+        `generated ${new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`,
+      );
+      return src;
+    } catch (err) {
+      console.error("voice summary generation failed", err);
+      toast.error("We couldn't generate the narration. Try again in a moment.");
+      return null;
+    } finally {
+      setGenerating(false);
     }
-  }, [playing, stopSpeech]);
+  }
 
-  useEffect(() => () => stopSpeech(), [stopSpeech]);
+  async function togglePlay() {
+    const el = audioRef.current;
+    if (playing) {
+      el?.pause();
+      setPlaying(false);
+      return;
+    }
+    if (!audioSrc) {
+      const src = await generate();
+      if (!src) return;
+      // wait for the element to pick up the new source
+      requestAnimationFrame(() => {
+        void audioRef.current?.play();
+      });
+      return;
+    }
+    void el?.play();
+  }
 
-  const seekTo = (index: number) => {
+  function seekToSegment(index: number) {
+    const el = audioRef.current;
     const clamped = Math.min(script.segments.length - 1, Math.max(0, index));
-    spokenRef.current = "";
-    setElapsed(offsets[clamped]! + 1);
-  };
-
-  const switchPeriod = (p: "weekly" | "monthly") => {
-    setPeriod(p);
-    setElapsed(0);
-    setPlaying(false);
-    spokenRef.current = "";
-  };
+    if (!el || !duration) return;
+    el.currentTime = (offsets[clamped] ?? 0) * duration;
+  }
 
   const download = () => {
     const body = [
@@ -181,35 +233,59 @@ function VoiceSummary() {
     URL.revokeObjectURL(url);
   };
 
-  const { run: spendAiAction, checking: regenerating } = useAiAction("voice-summary");
+  const header = (
+    <PageHeader
+      eyebrow="Module 07"
+      title="AI Voice Trading Summary"
+      description="A personal assistant that narrates your weekly and monthly performance so you can review on the move."
+      action={
+        <div className="flex gap-2">
+          {(["weekly", "monthly"] as const).map((p) => (
+            <button key={p} onClick={() => setPeriod(p)} className="capitalize">
+              <Pill tone={period === p ? "accent" : "neutral"}>{p}</Pill>
+            </button>
+          ))}
+        </div>
+      }
+    />
+  );
 
-  const regenerate = async () => {
-    if (!(await spendAiAction())) return;
-    setPlaying(false);
-    setElapsed(0);
-    spokenRef.current = "";
-    setGeneratedAt(
-      `regenerated ${new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`,
+  if (!loading && isEmpty) {
+    return (
+      <div className="mx-auto max-w-5xl space-y-6">
+        {header}
+        <NoTradesYet
+          title="Nothing to narrate yet"
+          description="Your voice summary is built from your own logged trades. Log a few and come back to hear the recap."
+        />
+      </div>
     );
-  };
+  }
 
-  const progress = total ? Math.min(100, (elapsed / total) * 100) : 0;
+  const busy = generating || checking;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <PageHeader
-        eyebrow="Module 07"
-        title="AI Voice Trading Summary"
-        description="A personal assistant that narrates your weekly and monthly performance so you can review on the move."
-        action={
-          <div className="flex gap-2">
-            {(["weekly", "monthly"] as const).map((p) => (
-              <button key={p} onClick={() => switchPeriod(p)} className="capitalize">
-                <Pill tone={period === p ? "accent" : "neutral"}>{p}</Pill>
-              </button>
-            ))}
-          </div>
-        }
+      {header}
+
+      <audio
+        ref={audioRef}
+        {...(audioSrc ? { src: audioSrc } : {})}
+        onLoadedMetadata={(e) => {
+          const el = e.currentTarget;
+          el.playbackRate = rate;
+          el.muted = muted;
+          if (Number.isFinite(el.duration)) setDuration(el.duration);
+        }}
+        onTimeUpdate={(e) => {
+          const el = e.currentTarget;
+          setElapsed(el.currentTime);
+          if (Number.isFinite(el.duration) && el.duration !== duration) setDuration(el.duration);
+        }}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+        className="hidden"
       />
 
       <Panel className="relative overflow-hidden border-viz/20 bg-[radial-gradient(120%_100%_at_50%_0%,color-mix(in_oklab,var(--viz)_9%,transparent),transparent_70%)] p-8">
@@ -219,13 +295,13 @@ function VoiceSummary() {
               active={playing}
               level={level}
               playing={playing}
-              onToggle={() => setPlaying((p) => !p)}
+              onToggle={() => void togglePlay()}
             />
           </div>
 
           <div className="min-w-0">
             <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-viz">
-              {playing ? "Now speaking" : "Ready to play"}
+              {generating ? "Generating narration" : playing ? "Now speaking" : "Ready to play"}
             </div>
             <h2 className="mt-2 text-xl font-semibold">{script.range}</h2>
             <p className="mt-4 min-h-[4.5rem] text-sm leading-relaxed text-foreground/90">
@@ -237,61 +313,66 @@ function VoiceSummary() {
               role="slider"
               tabIndex={0}
               aria-label="Seek summary"
-              aria-valuenow={Math.round(progress)}
+              aria-valuenow={Math.round(progressRatio * 100)}
               aria-valuemin={0}
               aria-valuemax={100}
               onKeyDown={(e) => {
-                if (e.key === "ArrowRight") seekTo(activeIndex + 1);
-                if (e.key === "ArrowLeft") seekTo(activeIndex - 1);
+                if (e.key === "ArrowRight") seekToSegment(activeIndex + 1);
+                if (e.key === "ArrowLeft") seekToSegment(activeIndex - 1);
               }}
               onClick={(e) => {
+                const el = audioRef.current;
+                if (!el || !duration) return;
                 const r = e.currentTarget.getBoundingClientRect();
-                const ratio = (e.clientX - r.left) / r.width;
-                spokenRef.current = "";
-                setElapsed(Math.max(0, Math.min(total - 1, ratio * total)));
+                el.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * duration;
               }}
               className="mt-5 cursor-pointer py-2"
             >
               <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full rounded-full bg-viz transition-[width] duration-100"
-                  style={{ width: `${progress}%` }}
+                  style={{ width: `${Math.min(100, progressRatio * 100)}%` }}
                 />
               </div>
               <div className="mt-2 flex justify-between text-xs text-muted-foreground">
                 <span className="num">{fmt(elapsed)}</span>
                 <span>{generatedAt}</span>
-                <span className="num">{fmt(total)}</span>
+                <span className="num">{fmt(duration)}</span>
               </div>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
-              <Button variant="ghost" size="icon" aria-label="Previous section" onClick={() => seekTo(activeIndex - 1)}>
+              <Button variant="ghost" size="icon" aria-label="Previous section" onClick={() => seekToSegment(activeIndex - 1)}>
                 <SkipBack className="size-4" />
               </Button>
-              <Button
-                size="lg"
-                className="rounded-full px-6"
-                onClick={() => setPlaying((p) => !p)}
-              >
-                {playing ? <Pause className="size-4" /> : <Play className="size-4" />}
-                {playing ? "Pause" : "Play summary"}
+              <Button size="lg" className="rounded-full px-6" onClick={() => void togglePlay()} disabled={busy}>
+                {busy ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : playing ? (
+                  <Pause className="size-4" />
+                ) : (
+                  <Play className="size-4" />
+                )}
+                {busy ? "Generating…" : playing ? "Pause" : audioSrc ? "Play summary" : "Generate & play"}
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Next section" onClick={() => seekTo(activeIndex + 1)}>
+              <Button variant="ghost" size="icon" aria-label="Next section" onClick={() => seekToSegment(activeIndex + 1)}>
                 <SkipForward className="size-4" />
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Restart" onClick={() => { setElapsed(0); spokenRef.current = ""; }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Restart"
+                onClick={() => {
+                  if (audioRef.current) audioRef.current.currentTime = 0;
+                }}
+              >
                 <RotateCcw className="size-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 aria-label={muted ? "Unmute voice" : "Mute voice"}
-                onClick={() => {
-                  setMuted((m) => !m);
-                  stopSpeech();
-                  spokenRef.current = "";
-                }}
+                onClick={() => setMuted((m) => !m)}
               >
                 {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
               </Button>
@@ -299,10 +380,7 @@ function VoiceSummary() {
                 {[1, 1.25, 1.5].map((r) => (
                   <button
                     key={r}
-                    onClick={() => {
-                      setRate(r);
-                      spokenRef.current = "";
-                    }}
+                    onClick={() => setRate(r)}
                     className={cn(
                       "px-3 py-1.5 text-xs transition-colors",
                       rate === r ? "bg-viz/15 text-viz" : "text-muted-foreground hover:text-foreground",
@@ -322,7 +400,7 @@ function VoiceSummary() {
           {script.segments.map((s, i) => (
             <button
               key={s.label}
-              onClick={() => seekTo(i)}
+              onClick={() => seekToSegment(i)}
               className={cn(
                 "flex w-full flex-wrap gap-2 py-3 text-left text-sm transition-colors",
                 i === activeIndex ? "text-foreground" : "text-muted-foreground hover:text-foreground",
@@ -344,7 +422,15 @@ function VoiceSummary() {
           <Button variant="secondary" size="sm" onClick={download}>
             <Download className="size-4" /> Download transcript
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => void regenerate()} disabled={regenerating}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setAudioSrc(null);
+              void generate();
+            }}
+            disabled={busy}
+          >
             <Sparkles className="size-4" /> Regenerate
           </Button>
         </div>
