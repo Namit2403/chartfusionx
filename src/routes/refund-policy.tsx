@@ -176,7 +176,7 @@ function EligibilityPanel() {
                             ? "Yes"
                             : isFirst
                               ? "Window closed"
-                              : "No — renewal"}
+                              : "Case by case"}
                       </span>
                     </td>
                   </tr>
@@ -207,28 +207,28 @@ function RefundPage() {
     <LegalPage
       title="Refund Policy"
       updated="10 August 2026"
-      intro="We want you to try ChartFusionX with confidence, so your first payment is covered by a 30-day refund window."
+      intro="ChartFusionX, operated by Antonio Hernandez, offers a 30-day money-back guarantee on your first payment, and reviews renewal charges case by case."
     >
       <LegalSection heading="Your eligibility">
         <EligibilityPanel />
       </LegalSection>
 
-      <LegalSection heading="1. The 30-day first-payment refund">
+      <LegalSection heading="1. The 30-day money-back guarantee">
         <p>
           If you are not satisfied with ChartFusionX, you can request a full refund within 30 days of
-          your <span className="text-foreground">first</span> payment. This applies once per
-          customer and only to the initial charge on your account. Your 7-day free trial is not a
-          charge, so the window starts on the first payment taken after the trial ends.
+          your <span className="text-foreground">first</span> payment — no justification required.
+          Your 7-day free trial is not a charge, so the window starts on the first payment taken
+          after the trial ends.
         </p>
       </LegalSection>
 
-      <LegalSection heading="2. What is not refundable">
-        <ul className="space-y-1">
-          <li>Renewal charges after your first payment, including monthly and annual renewals.</li>
-          <li>Plan upgrades, prorated charges, add-ons, and any subsequent purchases.</li>
-          <li>Requests made more than 30 days after the first payment.</li>
-          <li>Accounts terminated for breach of our Terms of Service.</li>
-        </ul>
+      <LegalSection heading="2. Renewals and other charges">
+        <p>
+          Renewal charges, plan upgrades, prorated amounts and add-ons fall outside the 30-day
+          guarantee, but they are not automatically excluded: we and Paddle review these requests
+          case by case, and duplicate charges, accidental renewals and billing errors are refunded.
+          Refunds are not available for accounts terminated for breach of our Terms of Service.
+        </p>
       </LegalSection>
 
       <LegalSection heading="3. How to request a refund">
