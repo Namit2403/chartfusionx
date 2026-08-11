@@ -76,13 +76,16 @@ function PrivacyPage() {
 
       <LegalSection heading="4. Sharing">
         <p>
-          We share data only with service providers who help us operate ChartFusionX — hosting,
-          database, payment processing, analytics, email delivery, and AI model providers — under
-          contracts that limit their use of your data. We may disclose data when legally required.
-          If you join a Team or mentorship workspace, the data you explicitly share is visible to
-          the members of that workspace.
+          We share data only with the following categories of recipients, under contracts that limit
+          their use of your data: service providers and subprocessors (hosting, database, analytics,
+          email delivery and AI model providers); Paddle.com, our online reseller and Merchant of
+          Record, which handles the sale of our subscriptions, payments, subscription management,
+          invoicing and tax compliance; and professional advisers such as our legal and accounting
+          partners. We may also disclose data to authorities when legally required. We do not sell
+          your personal data.
         </p>
       </LegalSection>
+
 
       <LegalSection heading="5. Retention and deletion">
         <p>

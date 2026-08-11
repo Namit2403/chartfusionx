@@ -63,14 +63,30 @@ function TermsPage() {
         </ul>
       </LegalSection>
 
-      <LegalSection heading="4. Subscriptions and billing">
+      <LegalSection heading="4. Subscriptions, billing and reseller">
+        <p>
+          Our order process is conducted by our online reseller Paddle.com. Paddle.com is the
+          Merchant of Record for all our orders. Paddle provides all customer service inquiries and
+          handles returns. Payment, billing, tax, invoicing, cancellation and refund mechanics are
+          governed by{" "}
+          <a
+            href="https://www.paddle.com/legal/checkout-buyer-terms"
+            target="_blank"
+            rel="noreferrer"
+            className="text-foreground underline underline-offset-4"
+          >
+            Paddle's Buyer Terms
+          </a>
+          .
+        </p>
         <p>
           Paid plans are billed in advance on a recurring monthly or annual basis and renew
           automatically until cancelled. You can cancel at any time from your account settings;
-          cancellation stops future charges and access continues until the end of the current billing
-          period. Refunds are governed by our Refund Policy.
+          cancellation stops future charges and access continues until the end of the current
+          billing period. Refunds are governed by our Refund Policy.
         </p>
       </LegalSection>
+
 
       <LegalSection heading="5. Acceptable use">
         <ul className="space-y-1">
