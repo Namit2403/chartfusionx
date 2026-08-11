@@ -118,8 +118,9 @@ function PrivacyPage() {
 
       <LegalSection heading="9. Changes and contact">
         <p>
-          We will post any material changes to this policy on this page and update the date above.
-          Questions? Email <span className="text-foreground">privacy@chartfusionx.com</span>.
+          ChartFusionX is operated by Antonio Hernandez. We will post any material changes to this
+          policy on this page and update the date above. Questions? Email{" "}
+          <span className="text-foreground">privacy@chartfusionx.com</span>.
         </p>
       </LegalSection>
     </LegalPage>

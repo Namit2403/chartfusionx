@@ -130,8 +130,9 @@ function TermsPage() {
 
       <LegalSection heading="10. Changes and contact">
         <p>
-          We may update these terms; material changes will be posted here with a new date. Questions?
-          Email <span className="text-foreground">support@chartfusionx.com</span>.
+          ChartFusionX is operated by Antonio Hernandez. We may update these terms; material changes
+          will be posted here with a new date. Questions? Email{" "}
+          <span className="text-foreground">support@chartfusionx.com</span>.
         </p>
       </LegalSection>
     </LegalPage>
