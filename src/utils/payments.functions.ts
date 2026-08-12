@@ -7,7 +7,12 @@ import {
   getPlan,
   type AiFeature,
 } from "@/lib/entitlements";
-import { gatewayFetch, getPaddleClient, type PaddleEnv } from "@/lib/paddle.server";
+import {
+  gatewayFetch,
+  getPaddleClient,
+  paddleErrorMessage,
+  type PaddleEnv,
+} from "@/lib/paddle.server";
 
 type SubscriptionRecord = {
   paddle_subscription_id: string;
@@ -85,10 +90,13 @@ export const getBillingOverview = createServerFn({ method: "GET" })
       .eq("environment", data.environment)
       .order("billed_at", { ascending: true });
 
+    // Count real trades (not log events) so deleting a trade gives the
+    // allowance back on the free plan.
     const { count: tradesLogged } = await supabase
-      .from("trade_log_events")
+      .from("trades")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId);
+
 
     const aiUsed = count ?? 0;
     const aiLimit = plan?.aiActionsPerPeriod ?? null;
@@ -131,9 +139,10 @@ export const recordTradeLog = createServerFn({ method: "POST" })
     const entitled = subscriptionIsUsable((subRow as SubscriptionRecord | null) ?? null);
 
     const { count } = await supabase
-      .from("trade_log_events")
+      .from("trades")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId);
+
 
     const tradesUsed = count ?? 0;
     if (!entitled && tradesUsed >= FREE_TRADE_LIMIT) {
@@ -251,8 +260,54 @@ export const changePlan = createServerFn({ method: "POST" })
     return { ok: true, unchanged: false };
   });
 
-/** Cancels immediately — access ends as soon as this returns. */
+/**
+ * Cancels at the end of the paid period — the member keeps everything they
+ * already paid for and simply isn't billed again.
+ */
 export const cancelSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { environment: PaddleEnv }) => data)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: subscription } = await supabase
+      .from("subscriptions")
+      .select("paddle_subscription_id, environment, status, current_period_end")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!subscription) {
+      return { ok: false as const, message: "No subscription to cancel", endsAt: null };
+    }
+    if (subscription.status === "canceled") {
+      return { ok: true as const, message: null, endsAt: subscription.current_period_end };
+    }
+
+    try {
+      const paddle = getPaddleClient(subscription.environment as PaddleEnv);
+      await paddle.subscriptions.cancel(subscription.paddle_subscription_id, {
+        effectiveFrom: "next_billing_period",
+      });
+    } catch (err) {
+      const message = paddleErrorMessage(err, "Could not cancel your subscription");
+      console.error("cancelSubscription failed:", message);
+      return { ok: false as const, message, endsAt: null };
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("subscriptions")
+      .update({ cancel_at_period_end: true, updated_at: new Date().toISOString() })
+      .eq("paddle_subscription_id", subscription.paddle_subscription_id);
+
+    return { ok: true as const, message: null, endsAt: subscription.current_period_end };
+  });
+
+/** Undoes a scheduled cancellation while the plan is still running. */
+export const resumeSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
@@ -267,27 +322,154 @@ export const cancelSubscription = createServerFn({ method: "POST" })
       .limit(1)
       .maybeSingle();
 
-    if (!subscription) throw new Error("No subscription to cancel");
-    if (subscription.status === "canceled") return { ok: true };
+    if (!subscription) {
+      return { ok: false as const, message: "No subscription found" };
+    }
 
-    const paddle = getPaddleClient(subscription.environment as PaddleEnv);
-    await paddle.subscriptions.cancel(subscription.paddle_subscription_id, {
-      effectiveFrom: "immediately",
-    });
+    try {
+      const paddle = getPaddleClient(subscription.environment as PaddleEnv);
+      await paddle.subscriptions.update(subscription.paddle_subscription_id, {
+        scheduledChange: null,
+      });
+    } catch (err) {
+      const message = paddleErrorMessage(err, "Could not resume your subscription");
+      console.error("resumeSubscription failed:", message);
+      return { ok: false as const, message };
+    }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin
       .from("subscriptions")
-      .update({
-        status: "canceled",
-        cancel_at_period_end: false,
-        current_period_end: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
+      .update({ cancel_at_period_end: false, updated_at: new Date().toISOString() })
       .eq("paddle_subscription_id", subscription.paddle_subscription_id);
 
-    return { ok: true };
+    return { ok: true as const, message: null };
   });
+
+/**
+ * Works out how checkout should open for this user:
+ *  - first ever plan  → catalog price, 7-day trial applies
+ *  - trial used before → a server-created transaction on an identical price
+ *    without a trial period, so the trial can't be farmed
+ * Also reuses the existing Paddle customer so we don't create duplicates.
+ */
+export const createCheckoutIntent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { priceId: string; environment: PaddleEnv }) => data)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: subRow } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const previous = (subRow as SubscriptionRecord | null) ?? null;
+    if (previous && subscriptionIsUsable(previous) && previous.status !== "canceled") {
+      return {
+        ok: false as const,
+        message: "You already have an active plan. Use 'Switch plan' instead.",
+        mode: null,
+        paddlePriceId: null,
+        transactionId: null,
+        customerId: null,
+        trialApplies: false,
+      };
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("trial_used_at")
+      .eq("id", userId)
+      .maybeSingle();
+
+    const trialUsed = Boolean(profile?.trial_used_at) || Boolean(previous);
+    const customerId = previous?.paddle_customer_id ?? null;
+
+    try {
+      const priceRes = await gatewayFetch(
+        data.environment,
+        `/prices?external_id=${encodeURIComponent(data.priceId)}`,
+      );
+      const priceJson = (await priceRes.json()) as {
+        data?: Array<{
+          id: string;
+          description: string;
+          product_id: string;
+          unit_price: { amount: string; currency_code: string };
+          billing_cycle: { interval: string; frequency: number } | null;
+        }>;
+      };
+      const price = priceJson.data?.[0];
+      if (!price) throw new Error("Price not found");
+
+      if (!trialUsed) {
+        return {
+          ok: true as const,
+          message: null,
+          mode: "price" as const,
+          paddlePriceId: price.id,
+          transactionId: null,
+          customerId,
+          trialApplies: true,
+        };
+      }
+
+      const txRes = await gatewayFetch(data.environment, "/transactions", {
+        method: "POST",
+        body: JSON.stringify({
+          items: [
+            {
+              quantity: 1,
+              price: {
+                description: price.description,
+                product_id: price.product_id,
+                unit_price: price.unit_price,
+                billing_cycle: price.billing_cycle,
+                quantity: { minimum: 1, maximum: 1 },
+              },
+            },
+          ],
+          ...(customerId ? { customer_id: customerId } : {}),
+          custom_data: { userId },
+        }),
+      });
+      const txJson = (await txRes.json()) as {
+        data?: { id: string };
+        error?: { detail?: string };
+      };
+      if (!txJson.data?.id) {
+        throw new Error(txJson.error?.detail ?? "Could not start checkout");
+      }
+
+      return {
+        ok: true as const,
+        message: null,
+        mode: "transaction" as const,
+        paddlePriceId: price.id,
+        transactionId: txJson.data.id,
+        customerId,
+        trialApplies: false,
+      };
+    } catch (err) {
+      const message = paddleErrorMessage(err, "Could not start checkout");
+      console.error("createCheckoutIntent failed:", message);
+      return {
+        ok: false as const,
+        message,
+        mode: null,
+        paddlePriceId: null,
+        transactionId: null,
+        customerId: null,
+        trialApplies: false,
+      };
+    }
+  });
+
 
 /** Creates a Paddle customer portal session for payment methods and invoices. */
 export const createPortalSession = createServerFn({ method: "POST" })
