@@ -12,6 +12,7 @@ import { PageHeader, Panel, Pill } from "@/components/shell";
 import { VoiceOrb } from "@/components/voice-orb";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 export const Route = createFileRoute("/_authenticated/voice-summary")({
   head: () => ({
@@ -250,6 +251,7 @@ function VoiceSummary() {
     />
   );
 
+
   if (!loading && isEmpty) {
     return (
       <div className="mx-auto max-w-5xl space-y-6">
@@ -267,6 +269,8 @@ function VoiceSummary() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       {header}
+
+      <RiskDisclaimer />
 
       <audio
         ref={audioRef}

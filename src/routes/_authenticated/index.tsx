@@ -18,6 +18,7 @@ import { useTradeData } from "@/hooks/useTradeData";
 import { Panel, Pill, Stat } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/mock-data";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 
 export const Route = createFileRoute("/_authenticated/")({
@@ -84,6 +85,10 @@ function Dashboard() {
           </div>
         </div>
       </section>
+
+      <RiskDisclaimer />
+
+
 
       {isEmpty && (
         <NoTradesYet

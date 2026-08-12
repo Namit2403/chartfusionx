@@ -13,6 +13,7 @@ import {
 import { useTradeData } from "@/hooks/useTradeData";
 import { computeRuleAdherence } from "@/lib/trade-stats";
 import type { Trade } from "@/lib/mock-data";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 export const Route = createFileRoute("/_authenticated/playbook")({
   head: () => ({
@@ -81,6 +82,8 @@ function Playbook() {
           </Button>
         }
       />
+
+      <RiskDisclaimer />
 
       {loading ? (
         <Panel>

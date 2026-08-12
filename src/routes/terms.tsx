@@ -59,14 +59,31 @@ function TermsPage() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="3. Not financial advice">
+      <LegalSection heading="3. Not financial advice and no regulated services">
         <p>
-          All AI reviews, coaching, strategy suggestions, scores, and reports are educational
-          information only. They are not financial, investment, tax, or legal advice, and no outcome
-          is guaranteed. Trading involves substantial risk of loss. You are solely responsible for
-          your trading decisions.
+          All AI reviews, coaching prompts, strategy summaries, scores, and reports are educational
+          information generated from data you enter yourself. They are not financial, investment,
+          tax, accounting, or legal advice, not a recommendation, solicitation, or offer to buy,
+          sell, or hold any security, contract, currency, or other instrument, and not personalised
+          advice about the suitability of any transaction for you. No outcome, performance, or
+          profit is guaranteed, and AI output may be incomplete or inaccurate.
+        </p>
+        <p>
+          Antonio Hernandez, trading as ChartFusionX, is not a broker, dealer, investment adviser,
+          financial planner, fund manager, accountant, or lawyer, is not registered or licensed with
+          any financial regulator, and does not provide any service that is subject to professional
+          or regulatory oversight. ChartFusionX is software for recording and reviewing your own
+          past trading activity. Nothing in the service creates a fiduciary, advisory, brokerage, or
+          professional-client relationship.
+        </p>
+        <p>
+          Trading involves substantial risk of loss and is not suitable for everyone. Past
+          performance, including your own historical results shown in the app, does not indicate
+          future results. You are solely responsible for your trading decisions and should seek
+          advice from an appropriately licensed professional in your jurisdiction before acting.
         </p>
       </LegalSection>
+
 
       <LegalSection heading="4. Your account">
         <ul className="space-y-1">

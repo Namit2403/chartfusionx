@@ -5,6 +5,7 @@ import { NoTradesYet } from "@/components/no-trades-yet";
 import { PageHeader, Panel, Pill } from "@/components/shell";
 import { useTradeData } from "@/hooks/useTradeData";
 import { currency } from "@/lib/mock-data";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 
 export const Route = createFileRoute("/_authenticated/strategy-discovery")({
@@ -43,6 +44,8 @@ function StrategyDiscovery() {
         title="AI Strategy Discovery"
         description="The AI recalculates which of your strategies, sessions and risk levels actually work as your sample grows."
       />
+
+      <RiskDisclaimer />
 
       {isEmpty && (
         <NoTradesYet
