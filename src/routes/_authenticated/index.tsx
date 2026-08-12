@@ -86,6 +86,10 @@ function Dashboard() {
         </div>
       </section>
 
+      <RiskDisclaimer />
+
+
+
       {isEmpty && (
         <NoTradesYet
           title="Your dashboard is waiting on your first trade"
