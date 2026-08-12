@@ -249,9 +249,8 @@ function VoiceSummary() {
         </div>
       }
     />
-
-      <RiskDisclaimer />
   );
+
 
   if (!loading && isEmpty) {
     return (
