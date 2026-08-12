@@ -270,6 +270,8 @@ function VoiceSummary() {
     <div className="mx-auto max-w-5xl space-y-6">
       {header}
 
+      <RiskDisclaimer />
+
       <audio
         ref={audioRef}
         {...(audioSrc ? { src: audioSrc } : {})}
