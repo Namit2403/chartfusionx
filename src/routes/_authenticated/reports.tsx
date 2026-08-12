@@ -51,14 +51,15 @@ function Reports() {
           <div className="flex gap-2">
             <Button variant="secondary" size="sm" disabled={isEmpty}>
               <Download className="mr-2 size-4" />
-
-      <RiskDisclaimer /> PDF
+              PDF
             </Button>
             <Button variant="secondary" size="sm" disabled={isEmpty}>CSV</Button>
             <Button variant="secondary" size="sm" disabled={isEmpty}>Excel</Button>
           </div>
         }
       />
+
+      <RiskDisclaimer />
 
       {isEmpty && (
         <NoTradesYet
