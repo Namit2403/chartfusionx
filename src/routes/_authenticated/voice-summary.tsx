@@ -12,6 +12,7 @@ import { PageHeader, Panel, Pill } from "@/components/shell";
 import { VoiceOrb } from "@/components/voice-orb";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 export const Route = createFileRoute("/_authenticated/voice-summary")({
   head: () => ({
@@ -248,6 +249,8 @@ function VoiceSummary() {
         </div>
       }
     />
+
+      <RiskDisclaimer />
   );
 
   if (!loading && isEmpty) {

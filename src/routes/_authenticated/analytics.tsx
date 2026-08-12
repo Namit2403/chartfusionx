@@ -16,6 +16,7 @@ import { NoTradesYet } from "@/components/no-trades-yet";
 import { PageHeader, Panel, Stat } from "@/components/shell";
 import { useTradeData } from "@/hooks/useTradeData";
 import { currency } from "@/lib/mock-data";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 
 export const Route = createFileRoute("/_authenticated/analytics")({
@@ -76,6 +77,8 @@ function Analytics() {
         title="Performance Analytics"
         description="Equity, strategy, asset, session, weekday, timeframe, risk distribution and heatmaps — all derived from your journal."
       />
+
+      <RiskDisclaimer />
 
       {isEmpty && (
         <NoTradesYet

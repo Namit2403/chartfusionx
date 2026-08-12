@@ -18,6 +18,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { RiskDisclaimerLine } from "@/components/risk-disclaimer";
 
 
 function NotFoundComponent() {
@@ -168,7 +169,8 @@ function RootComponent() {
               <Outlet />
             </main>
             <footer className="border-t border-border px-4 py-6 pb-24 text-xs text-muted-foreground sm:px-6 lg:px-8 md:pb-6">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <RiskDisclaimerLine />
+              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                 <span>© {new Date().getFullYear()} ChartFusionX</span>
                 <Link to="/privacy" className="hover:text-foreground">
                   Privacy Policy

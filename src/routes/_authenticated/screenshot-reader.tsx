@@ -5,6 +5,7 @@ import { ChartUpload, type UploadedChart } from "@/components/chart-upload";
 import { useAiAction } from "@/hooks/useAiAction";
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
 import { Button } from "@/components/ui/button";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 
 export const Route = createFileRoute("/_authenticated/screenshot-reader")({
@@ -55,6 +56,8 @@ function ScreenshotReader() {
         title="AI Screenshot Reader"
         description="ChartFusionX doesn't replace your charting platform. Upload a screenshot from TradingView, MetaTrader or your broker and the AI explains what it sees."
       />
+
+      <RiskDisclaimer />
 
       <div className="grid gap-4 lg:grid-cols-5">
         <Panel className="lg:col-span-2" title="Upload chart">

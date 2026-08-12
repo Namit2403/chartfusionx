@@ -6,6 +6,7 @@ import { ChartUpload, type UploadedChart } from "@/components/chart-upload";
 import { useAiAction } from "@/hooks/useAiAction";
 import { EmptyHint, PageHeader, Panel, ScoreBar } from "@/components/shell";
 import { Button } from "@/components/ui/button";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 
 export const Route = createFileRoute("/_authenticated/chart-critique")({
@@ -47,6 +48,8 @@ function ChartCritique() {
         title="AI Chart Critique"
         description="The AI does not predict the market. It evaluates whether the trade in front of you follows your own strategy and your historical behavior."
       />
+
+      <RiskDisclaimer />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2" title="Pre-trade setup">

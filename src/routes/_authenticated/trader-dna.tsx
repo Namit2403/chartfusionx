@@ -10,6 +10,7 @@ import {
 import { NoTradesYet } from "@/components/no-trades-yet";
 import { PageHeader, Panel, ScoreBar } from "@/components/shell";
 import { useTradeData } from "@/hooks/useTradeData";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 
 export const Route = createFileRoute("/_authenticated/trader-dna")({
@@ -38,6 +39,8 @@ function TraderDna() {
         title="Trader DNA"
         description="A behavioral profile that evolves with every trade you log."
       />
+
+      <RiskDisclaimer />
 
       {isEmpty && (
         <NoTradesYet

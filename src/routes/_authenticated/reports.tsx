@@ -6,6 +6,7 @@ import { PageHeader, Panel, Pill } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { useTradeData } from "@/hooks/useTradeData";
 import { currency } from "@/lib/mock-data";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 
 export const Route = createFileRoute("/_authenticated/reports")({
@@ -49,7 +50,9 @@ function Reports() {
         action={
           <div className="flex gap-2">
             <Button variant="secondary" size="sm" disabled={isEmpty}>
-              <Download className="mr-2 size-4" /> PDF
+              <Download className="mr-2 size-4" />
+
+      <RiskDisclaimer /> PDF
             </Button>
             <Button variant="secondary" size="sm" disabled={isEmpty}>CSV</Button>
             <Button variant="secondary" size="sm" disabled={isEmpty}>Excel</Button>

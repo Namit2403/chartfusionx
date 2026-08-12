@@ -7,6 +7,7 @@ import { useTradeData } from "@/hooks/useTradeData";
 import { PageHeader, Panel, Pill, ScoreBar } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/mock-data";
+import { RiskDisclaimer } from "@/components/risk-disclaimer";
 
 export const Route = createFileRoute("/_authenticated/ai-review")({
   head: () => ({
@@ -76,6 +77,8 @@ export default function AiReview() {
           </Button>
         }
       />
+
+      <RiskDisclaimer />
 
       {isEmpty || !trade ? (
         <NoTradesYet
