@@ -125,7 +125,12 @@ export function AccountMenu() {
         <DropdownMenuSeparator />
         <SubscriptionWidget />
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Switch account</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => void navigate({ to: "/settings" })}>
+          Account settings
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => void navigate({ to: "/billing" })}>
+          Plans & billing
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => void signOut()}>Sign out</DropdownMenuItem>
 
       </DropdownMenuContent>

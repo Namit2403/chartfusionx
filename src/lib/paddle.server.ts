@@ -65,3 +65,11 @@ export async function verifyWebhook(req: Request, env: PaddleEnv) {
   const paddle = getPaddleClient(env);
   return await paddle.webhooks.unmarshal(body, secret, signature);
 }
+
+/** Paddle SDK errors are class instances; flatten to a plain message. */
+export function paddleErrorMessage(err: unknown, fallback: string): string {
+  if (err && typeof err === "object" && "detail" in err) {
+    return String((err as { detail: unknown }).detail);
+  }
+  return err instanceof Error ? err.message : fallback;
+}

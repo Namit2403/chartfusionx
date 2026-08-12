@@ -25,6 +25,7 @@ import {
   cancelSubscription,
   changePlan,
   createPortalSession,
+  resumeSubscription,
 } from "@/utils/payments.functions";
 
 type Search = { checkout?: string | undefined };
@@ -93,7 +94,8 @@ function BillingPage() {
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
   const openPortal = useServerFn(createPortalSession);
   const switchPlan = useServerFn(changePlan);
-  const cancelNow = useServerFn(cancelSubscription);
+  const cancelAtPeriodEnd = useServerFn(cancelSubscription);
+  const resumePlan = useServerFn(resumeSubscription);
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
 
@@ -112,11 +114,14 @@ function BillingPage() {
       return;
     }
     try {
-      await openCheckout({
+      const result = await openCheckout({
         priceId,
         customerEmail: email ?? undefined,
         customData: { userId },
       });
+      if (!result.ok) {
+        toast.error(result.message ?? "Checkout could not be opened. Please try again.");
+      }
     } catch {
       toast.error("Checkout could not be opened. Please try again.");
     }
@@ -138,14 +143,39 @@ function BillingPage() {
   const handleCancel = async () => {
     setBusy("cancel");
     try {
-      await cancelNow({ data: { environment: getPaddleEnvironment() } });
-      toast.success("Your subscription has been canceled.");
+      const result = await cancelAtPeriodEnd({ data: { environment: getPaddleEnvironment() } });
+      if (!result.ok) {
+        toast.error(result.message ?? "Could not cancel your subscription");
+        return;
+      }
+      toast.success(
+        result.endsAt
+          ? `Canceled. You keep full access until ${formatDate(result.endsAt)}.`
+          : "Canceled. You keep access until the end of your paid period.",
+      );
       await refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not cancel your subscription");
     } finally {
       setBusy(null);
       setConfirmCancel(false);
+    }
+  };
+
+  const handleResume = async () => {
+    setBusy("resume");
+    try {
+      const result = await resumePlan({ data: { environment: getPaddleEnvironment() } });
+      if (!result.ok) {
+        toast.error(result.message ?? "Could not resume your subscription");
+        return;
+      }
+      toast.success("Your plan will renew as normal.");
+      await refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not resume your subscription");
+    } finally {
+      setBusy(null);
     }
   };
 
@@ -193,10 +223,12 @@ function BillingPage() {
               <p className="mt-2 text-sm text-muted-foreground">
                 {planName ?? subscription.product_id} plan ·{" "}
                 {subscription.status === "canceled"
-                  ? `Ended ${formatDate(subscription.current_period_end)}`
-                  : `${subscription.status === "trialing" ? "Trial ends" : "Renews"} ${formatDate(
-                      subscription.current_period_end,
-                    )}`}
+                  ? `Access ends ${formatDate(subscription.current_period_end)}`
+                  : subscription.cancel_at_period_end
+                    ? `Cancels ${formatDate(subscription.current_period_end)} — full access until then`
+                    : `${subscription.status === "trialing" ? "Trial ends" : "Renews"} ${formatDate(
+                        subscription.current_period_end,
+                      )}`}
               </p>
               {subscription.status === "past_due" && (
                 <p className="mt-2 flex items-start gap-2 text-sm text-destructive">
@@ -214,7 +246,13 @@ function BillingPage() {
                 )}
                 Payment method & invoices
               </Button>
-              {isActive && (
+              {isActive && subscription.cancel_at_period_end && (
+                <Button onClick={() => void handleResume()} disabled={busy !== null} size="sm">
+                  {busy === "resume" && <Loader2 className="mr-2 size-4 animate-spin" />}
+                  Resume plan
+                </Button>
+              )}
+              {isActive && !subscription.cancel_at_period_end && (
                 <Button
                   onClick={() => setConfirmCancel(true)}
                   disabled={busy !== null}
@@ -335,14 +373,25 @@ function BillingPage() {
                   <tr key={tx.id} className="border-t border-border/60">
                     <td className="num py-2 text-muted-foreground">{formatDate(tx.billed_at)}</td>
                     <td className="py-2">{tx.description ?? "Subscription"}</td>
-                    <td className="num py-2">{money(tx.amount_cents, tx.currency)}</td>
+                    <td className="num py-2">
+                      {money(tx.amount_cents, tx.currency)}
+                      {tx.refunded_cents > 0 && (
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          −{money(tx.refunded_cents, tx.currency)} refunded
+                        </span>
+                      )}
+                    </td>
                     <td className="py-2 text-right">
                       <span
                         className={
-                          tx.status === "completed" ? "text-positive" : "text-destructive"
+                          tx.status === "completed" ? "text-positive" : "text-muted-foreground"
                         }
                       >
-                        {tx.status === "completed" ? "Paid" : "Failed"}
+                        {tx.status === "completed"
+                          ? "Paid"
+                          : tx.status === "refunded"
+                            ? "Refunded"
+                            : "Failed"}
                       </span>
                     </td>
                   </tr>
@@ -358,9 +407,9 @@ function BillingPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Cancel your subscription?</AlertDialogTitle>
             <AlertDialogDescription>
-              Access ends immediately and you'll be signed out of all paid features. Your trades and
-              journal stay saved, and you can restart a plan at any time. This does not
-              automatically issue a refund — see the refund policy.
+              You keep full access until the end of the period you've already paid for, and you
+              won't be billed again. Your trades and journal stay saved, and you can resume or
+              restart a plan at any time.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -372,7 +421,7 @@ function BillingPage() {
               }}
             >
               {busy === "cancel" && <Loader2 className="mr-2 size-4 animate-spin" />}
-              Cancel immediately
+              Cancel at period end
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

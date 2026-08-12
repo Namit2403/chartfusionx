@@ -98,6 +98,15 @@ async function upsertSubscription(data: any, env: PaddleEnv) {
       },
       { onConflict: "paddle_subscription_id" },
     );
+
+  // One free trial per account: stamp it the moment a trial starts.
+  if (status === "trialing") {
+    await getSupabase()
+      .from("profiles")
+      .update({ trial_used_at: new Date().toISOString() })
+      .eq("id", userId)
+      .is("trial_used_at", null);
+  }
 }
 
 async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
@@ -106,12 +115,67 @@ async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
     .update({
       status: "canceled",
       cancel_at_period_end: false,
-      current_period_end: data?.canceledAt ?? new Date().toISOString(),
+      canceled_at: data?.canceledAt ?? new Date().toISOString(),
+      // Keep the paid-for window: access runs to the end of the billing period.
+      current_period_end:
+        data?.currentBillingPeriod?.endsAt ?? data?.canceledAt ?? new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
     .eq("paddle_subscription_id", data.id)
     .eq("environment", env);
 }
+
+/** Refunds and credits: record the amount and revoke access on a full refund. */
+async function handleAdjustment(data: any, env: PaddleEnv) {
+  if (data?.action !== "refund" && data?.action !== "chargeback") return;
+  if (data?.status === "rejected") return;
+
+  const transactionId = data?.transactionId as string | undefined;
+  if (!transactionId) return;
+
+  const refunded = Math.abs(Number(data?.totals?.total ?? 0));
+
+  const { data: tx } = await getSupabase()
+    .from("payment_transactions")
+    .select("id, amount_cents, refunded_cents, paddle_subscription_id")
+    .eq("paddle_transaction_id", transactionId)
+    .eq("environment", env)
+    .maybeSingle();
+
+  if (!tx) {
+    console.warn("Adjustment for an unknown transaction", { transactionId });
+    return;
+  }
+
+  const totalRefunded = data?.status === "approved" ? refunded : tx.refunded_cents;
+
+  await getSupabase()
+    .from("payment_transactions")
+    .update({
+      refunded_cents: totalRefunded,
+      status: totalRefunded >= tx.amount_cents ? "refunded" : "completed",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", tx.id);
+
+  const isFullRefund = data?.status === "approved" && totalRefunded >= tx.amount_cents;
+  const subscriptionId = (data?.subscriptionId ?? tx.paddle_subscription_id) as string | undefined;
+
+  if (isFullRefund && subscriptionId) {
+    await getSupabase()
+      .from("subscriptions")
+      .update({
+        status: "canceled",
+        cancel_at_period_end: false,
+        current_period_end: new Date().toISOString(),
+        canceled_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("paddle_subscription_id", subscriptionId)
+      .eq("environment", env);
+  }
+}
+
 
 async function handleTransaction(data: any, env: PaddleEnv, status: string) {
   const subscriptionId = data?.subscriptionId as string | undefined;
@@ -154,10 +218,19 @@ async function handleWebhook(req: Request, env: PaddleEnv) {
   switch (event.eventType) {
     case EventName.SubscriptionCreated:
     case EventName.SubscriptionUpdated:
+    case EventName.SubscriptionActivated:
+    case EventName.SubscriptionTrialing:
+    case EventName.SubscriptionPaused:
+    case EventName.SubscriptionResumed:
+    case EventName.SubscriptionPastDue:
       await upsertSubscription(event.data, env);
       break;
     case EventName.SubscriptionCanceled:
       await handleSubscriptionCanceled(event.data, env);
+      break;
+    case EventName.AdjustmentCreated:
+    case EventName.AdjustmentUpdated:
+      await handleAdjustment(event.data, env);
       break;
     case EventName.TransactionCompleted:
       await handleTransaction(event.data, env, "completed");
@@ -165,6 +238,7 @@ async function handleWebhook(req: Request, env: PaddleEnv) {
     case EventName.TransactionPaymentFailed:
       await handleTransaction(event.data, env, "failed");
       break;
+
     default:
       console.log("Unhandled event:", event.eventType);
   }
