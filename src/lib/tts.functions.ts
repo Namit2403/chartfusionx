@@ -29,7 +29,7 @@ export const synthesizeSummary = createServerFn({ method: "POST" })
         voice: data.voice ?? "alloy",
         response_format: "mp3",
         instructions:
-          "Read as a calm, confident trading performance coach. Finish every sentence fully.",
+          "Read as a calm, neutral narrator summarising past performance data. Finish every sentence fully.",
       }),
     });
 

@@ -24,7 +24,7 @@ const steps = [
   },
   {
     headline: "Then let the AI review it",
-    body: "Once your trade is logged, the AI will grade your entry, risk, execution, and psychology — like a coach watching over your shoulder.",
+    body: "Once your trade is logged, the AI summarises your entry, risk, execution, and psychology so you can review your own process.",
     cta: "Got it, show me the dashboard",
   },
 ] as const;

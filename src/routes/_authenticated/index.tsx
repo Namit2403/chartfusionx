@@ -57,10 +57,10 @@ function Dashboard() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
-              The AI trading coach built for traders who are still learning.
+              The AI trading journal built for traders who are still learning.
             </div>
             <h1 className="mt-3 max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">
-              Log your trades. Get AI feedback. Understand exactly why you win and lose.
+              Log your trades. Review AI summaries. See exactly what your own data says.
             </h1>
             <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild>
@@ -207,7 +207,7 @@ function Dashboard() {
         </Panel>
 
         <Panel
-          title="AI insight of the day"
+          title="Your data at a glance"
           subtitle={`Generated from your ${trades.length} logged ${trades.length === 1 ? "trade" : "trades"}`}
         >
           <p className="text-sm leading-relaxed text-foreground">

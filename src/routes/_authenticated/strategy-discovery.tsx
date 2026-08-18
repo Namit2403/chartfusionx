@@ -50,7 +50,7 @@ function StrategyDiscovery() {
       {isEmpty && (
         <NoTradesYet
           title="Nothing to analyse yet"
-          description="Strategy discovery needs logged trades before it can tell you where your edge is."
+          description="Strategy discovery needs logged trades before it can summarise your past results."
         />
       )}
 
@@ -104,7 +104,7 @@ function StrategyDiscovery() {
         </Panel>
 
         <div className="space-y-4">
-          <Panel title="Optimal conditions" subtitle="Where your edge concentrates">
+          <Panel title="Optimal conditions" subtitle="Conditions present in your past results">
             <dl className="grid grid-cols-2 gap-4 text-sm">
               {[
                 ["Best session", bestSession?.name ?? "—"],

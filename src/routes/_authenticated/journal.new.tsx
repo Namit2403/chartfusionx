@@ -35,7 +35,7 @@ export const Route = createFileRoute("/_authenticated/journal/new")({
       { property: "og:title", content: "Log a Trade — ChartFusionX" },
       {
         property: "og:description",
-        content: "Capture the full context of every trade so the AI can coach you accurately.",
+        content: "Capture the full context of every trade so your review data stays accurate.",
       },
     ],
   }),
