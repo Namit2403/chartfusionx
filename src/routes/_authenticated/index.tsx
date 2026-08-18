@@ -46,6 +46,9 @@ function Dashboard() {
   const bestStrategy = [...strategyPerf].sort((a, b) => b.expectancy - a.expectancy)[0];
   const worstStrategy = [...strategyPerf].sort((a, b) => a.expectancy - b.expectancy)[0];
 
+  if (!authLoading && !user) return <MarketingLanding />;
+
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <OnboardingModal />
