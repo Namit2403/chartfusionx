@@ -61,6 +61,7 @@ export const navGroups = [
       { title: "Analytics", url: "/analytics", icon: BarChart3 },
       
       { title: "Notifications", url: "/notifications", icon: BellRing },
+      { title: "Pricing", url: "/pricing", icon: CreditCard },
       { title: "Plans & Billing", url: "/billing", icon: CreditCard },
     ],
   },
