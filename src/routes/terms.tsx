@@ -61,7 +61,7 @@ function TermsPage() {
 
       <LegalSection heading="3. Not financial advice and no regulated services">
         <p>
-          All AI reviews, coaching prompts, strategy summaries, scores, and reports are educational
+          All AI reviews, strategy summaries, scores, and reports are educational
           information generated from data you enter yourself. They are not financial, investment,
           tax, accounting, or legal advice, not a recommendation, solicitation, or offer to buy,
           sell, or hold any security, contract, currency, or other instrument, and not personalised
