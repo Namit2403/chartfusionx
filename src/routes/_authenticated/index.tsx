@@ -41,7 +41,7 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 function Dashboard() {
-  const { user } = useAuthUser();
+  const { user, loading: authLoading } = useAuthUser();
   const { trades, stats, equityCurve, weekdayPerf, strategyPerf, isEmpty } = useTradeData();
   const bestStrategy = [...strategyPerf].sort((a, b) => b.expectancy - a.expectancy)[0];
   const worstStrategy = [...strategyPerf].sort((a, b) => a.expectancy - b.expectancy)[0];
