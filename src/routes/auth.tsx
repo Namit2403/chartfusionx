@@ -26,7 +26,7 @@ export const Route = createFileRoute("/auth")({
       { property: "og:title", content: "Sign in — ChartFusionX" },
       {
         property: "og:description",
-        content: "Access your AI trading journal, performance dashboard and coach.",
+        content: "Access your AI trading journal, performance dashboard and analytics.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

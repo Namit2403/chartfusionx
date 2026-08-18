@@ -74,7 +74,7 @@ function PrivacyPage() {
       <LegalSection heading="3. How we use your information">
         <ul className="space-y-1">
           <li>To provide the journal, dashboard, analytics, and AI review features.</li>
-          <li>To generate AI feedback, coaching, Trader DNA scores, and reports.</li>
+          <li>To generate AI feedback, Trader DNA scores, and reports.</li>
           <li>To process subscription payments and send service notifications.</li>
           <li>To improve product reliability, performance, and security.</li>
         </ul>
@@ -109,7 +109,7 @@ function PrivacyPage() {
       <LegalSection heading="5. AI processing">
         <p>
           When you request AI review, strategy discovery, screenshot reading, chart critique, voice
-          summaries, or coaching, the relevant trade content is sent to third-party AI model
+          summaries, or reviews, the relevant trade content is sent to third-party AI model
           providers to generate a response. We do not sell your trading data, and we do not use your
           private journal entries to train public models.
         </p>

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/ai-review")({
       {
         name: "description",
         content:
-          "Your AI trading coach grades entry quality, risk management, execution and psychology after every trade.",
+          "An automated review of entry quality, risk management, execution and psychology based on the trades you logged.",
       },
       { property: "og:title", content: "AI Trade Review — ChartFusionX" },
       {
@@ -70,7 +70,7 @@ export default function AiReview() {
       <PageHeader
         eyebrow="Module 03 · Core feature"
         title="AI Trade Review"
-        description="After every trade, the AI reads your data, notes, emotions, screenshots, playbook rules and full history — then reviews your execution like a coach would."
+        description="After every trade, the AI reads your data, notes, emotions, screenshots, playbook rules and full history — then summarises how your execution compared with the rules you set for yourself."
         action={
           <Button onClick={() => void spendAiAction()} disabled={reviewing || isEmpty}>
             Review latest trade

@@ -101,7 +101,7 @@ function VoiceSummary() {
       {
         label: "Best session",
         text: bestSession
-          ? `The ${bestSession.name} session is your most profitable window, with a ${Math.round(bestSession.winRate)} percent win rate.`
+          ? `The ${bestSession.name} session recorded your highest net result, with a ${Math.round(bestSession.winRate)} percent win rate.`
           : "Log the session for each trade and I will tell you when you trade best.",
       },
       {
