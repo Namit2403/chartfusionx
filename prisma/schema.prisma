@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StorePlatform {
+  SHOPIFY
+}
+
+enum AdPlatform {
+  META
+  GOOGLE
+  TIKTOK
+}
+
+enum ConnectionStatus {
+  DISCONNECTED
+  PENDING
+  CONNECTED
+  ERROR
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stores Store[]
+}
+
+model Store {
+  id         String           @id @default(cuid())
+  name       String
+  domain     String?
+  platform   StorePlatform    @default(SHOPIFY)
+  status     ConnectionStatus @default(DISCONNECTED)
+  currency   String           @default("USD")
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  products   Product[]
+  adAccounts AdAccount[]
+  insights   Insight[]
+
+  @@index([userId])
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  title     String
+  sku       String?
+  cost      Decimal  @default(0) @db.Decimal(12, 2)
+  price     Decimal  @default(0) @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
+
+model AdAccount {
+  id        String           @id @default(cuid())
+  name      String
+  platform  AdPlatform
+  status    ConnectionStatus @default(DISCONNECTED)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
+
+model Insight {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  severity  String   @default("info")
+  createdAt DateTime @default(now())
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
