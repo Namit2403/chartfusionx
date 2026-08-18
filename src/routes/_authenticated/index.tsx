@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { MarketingLanding } from "@/components/marketing-landing";
 import { NoTradesYet } from "@/components/no-trades-yet";
 import { OnboardingModal } from "@/components/onboarding-modal";
 import { useAuthUser } from "@/hooks/useAuthUser";
