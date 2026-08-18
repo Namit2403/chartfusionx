@@ -75,7 +75,7 @@ export const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 export const FREE_TRADE_LIMIT = 10;
 
 /** Routes that stay reachable while signed in without an active subscription. */
-export const PAYWALL_EXEMPT_PATHS = ["/billing", "/privacy", "/terms", "/refund-policy"];
+export const PAYWALL_EXEMPT_PATHS = ["/billing", "/pricing", "/privacy", "/terms", "/refund-policy"];
 
 export function isPaywallExempt(pathname: string) {
   return PAYWALL_EXEMPT_PATHS.some(

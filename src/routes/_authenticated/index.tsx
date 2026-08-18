@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { MarketingLanding } from "@/components/marketing-landing";
 import { NoTradesYet } from "@/components/no-trades-yet";
 import { OnboardingModal } from "@/components/onboarding-modal";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -41,10 +42,13 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 function Dashboard() {
-  const { user } = useAuthUser();
+  const { user, loading: authLoading } = useAuthUser();
   const { trades, stats, equityCurve, weekdayPerf, strategyPerf, isEmpty } = useTradeData();
   const bestStrategy = [...strategyPerf].sort((a, b) => b.expectancy - a.expectancy)[0];
   const worstStrategy = [...strategyPerf].sort((a, b) => a.expectancy - b.expectancy)[0];
+
+  if (!authLoading && !user) return <MarketingLanding />;
+
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">

@@ -172,9 +172,13 @@ function RootComponent() {
               <RiskDisclaimerLine />
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                 <span>© {new Date().getFullYear()} ChartFusionX</span>
+                <Link to="/pricing" className="hover:text-foreground">
+                  Pricing
+                </Link>
                 <Link to="/privacy" className="hover:text-foreground">
                   Privacy Policy
                 </Link>
+
                 <Link to="/terms" className="hover:text-foreground">
                   Terms of Service
                 </Link>
