@@ -24,7 +24,6 @@ export const AI_FEATURES = [
   "screenshot-reader",
   "chart-critique",
   "voice-summary",
-  "coach",
   "trader-dna",
   "reports",
 ] as const;
