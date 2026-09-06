@@ -191,16 +191,10 @@ function NewTrade() {
   const hydrated = useRef(false);
 
 
-  const {
-    isActive,
-    tradesUsed,
-    tradesRemaining,
-    userId,
-    loading: subLoading,
-    refresh,
-  } = useSubscription();
+  const { userId, loading: subLoading, refresh } = useSubscription();
 
-  // Restore whatever was typed before the paywall / upgrade detour.
+  // Restore whatever was typed before signing in.
+
   useEffect(() => {
     const saved = readDraft();
     setDraft(saved);
