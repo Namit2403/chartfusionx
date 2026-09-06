@@ -8,9 +8,17 @@
 
 export const BETA_LABEL = "Free beta";
 
+export type ComingSoonPath =
+  | "/ai-review"
+  | "/chart-critique"
+  | "/screenshot-reader"
+  | "/strategy-discovery"
+  | "/trader-dna"
+  | "/voice-summary";
+
 export type ComingSoonFeature = {
   slug: string;
-  path: string;
+  path: ComingSoonPath;
   name: string;
   short: string;
   description: string;
