@@ -22,7 +22,7 @@ vi.mock("@tanstack/react-router", () => ({
 
 vi.mock("@/components/paywall-dialog", () => ({
   PaywallDialog: () => null,
-  openPaywall: () => {},
+  openComingSoon: () => {},
   openSignInPrompt: () => {},
 }));
 
