@@ -6,9 +6,8 @@ import { RotateCcw } from "lucide-react";
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
 import { AttachmentSlot, type AttachmentSlotValue } from "@/components/attachment-slot";
 import { supabase } from "@/integrations/supabase/client";
-import { openPaywall, openSignInPrompt } from "@/components/paywall-dialog";
-import { FREE_TRADE_LIMIT } from "@/lib/entitlements";
-import { consumeTradeLog, useSubscription } from "@/hooks/useSubscription";
+import { openSignInPrompt } from "@/components/paywall-dialog";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -192,16 +191,10 @@ function NewTrade() {
   const hydrated = useRef(false);
 
 
-  const {
-    isActive,
-    tradesUsed,
-    tradesRemaining,
-    userId,
-    loading: subLoading,
-    refresh,
-  } = useSubscription();
+  const { userId, loading: subLoading, refresh } = useSubscription();
 
-  // Restore whatever was typed before the paywall / upgrade detour.
+  // Restore whatever was typed before signing in.
+
   useEffect(() => {
     const saved = readDraft();
     setDraft(saved);
@@ -237,7 +230,8 @@ function NewTrade() {
     if (userId) return true;
     openSignInPrompt({
       title: "Sign in to save this trade",
-      description: `Your draft is safe on this device. Create a free account to keep it — free accounts can log ${FREE_TRADE_LIMIT} trades.`,
+      description:
+        "Your draft is safe on this device. Create a free account to keep it — ChartFusionX is free during the beta.",
     });
     return false;
   }
@@ -262,16 +256,6 @@ function NewTrade() {
     if (!requireAccount()) return;
     setSaving(true);
     try {
-      const result = await consumeTradeLog();
-      if (!result.ok) {
-        openPaywall({
-          title: `You've logged all ${FREE_TRADE_LIMIT} free trades`,
-          description:
-            "Start a plan to keep journaling without limits. Your draft is saved on this device, so you can pick up exactly where you left off.",
-        });
-        return;
-      }
-
       const uid = userId!;
       const uploaded = await uploadAttachments(uid);
 
@@ -328,11 +312,7 @@ function NewTrade() {
       });
       if (error) throw error;
 
-      toast.success(
-        isActive
-          ? "Trade saved — AI review queued"
-          : `Trade saved — ${Math.max(0, FREE_TRADE_LIMIT - result.tradesUsed)} free trades left`,
-      );
+      toast.success("Trade saved to your journal");
       clearDraft();
       setAttachments({ before: null, after: null, extra: null });
       void refresh();
@@ -509,16 +489,14 @@ function NewTrade() {
           ))}
         </div>
         <div className="mt-3">
-          <Pill tone="accent">Uploads become AI-readable context</Pill>
+          <Pill tone="accent">Uploads are stored with the trade</Pill>
         </div>
       </Panel>
 
 
       <div className="flex flex-wrap items-center justify-end gap-2 pb-4">
         <span className="mr-auto text-xs text-muted-foreground">
-          {userId && !isActive && tradesRemaining !== null
-            ? `Free plan · ${tradesUsed} of ${FREE_TRADE_LIMIT} trades logged — ${tradesRemaining} left.`
-            : "Draft autosaves on this device — nothing is lost if you step out to upgrade."}
+          Free beta · unlimited trades. Draft autosaves on this device.
         </span>
         <Button variant="secondary" onClick={saveDraft}>
           Save draft

@@ -4,7 +4,6 @@ import {
   BarChart3,
   BellRing,
   BookOpen,
-  CreditCard,
   Dna,
   FileText,
   Gauge,
@@ -15,7 +14,7 @@ import {
   NotebookPen,
   Sparkles,
   Target,
-  
+  Rocket,
 } from "lucide-react";
 
 import {
@@ -35,44 +34,44 @@ export const navGroups = [
   {
     label: "Journal",
     items: [
-      { title: "Dashboard", url: "/", icon: LayoutDashboard },
-      { title: "Trade Journal", url: "/journal", icon: NotebookPen },
-      { title: "Trade Gallery", url: "/gallery", icon: ImageIcon },
-      { title: "Playbook", url: "/playbook", icon: BookOpen },
-    ],
-  },
-  {
-    label: "AI Systems",
-    items: [
-      { title: "AI Trade Review", url: "/ai-review", icon: Sparkles },
-      { title: "Strategy Discovery", url: "/strategy-discovery", icon: LineChart },
-      { title: "Screenshot Reader", url: "/screenshot-reader", icon: Activity },
-      { title: "Chart Critique", url: "/chart-critique", icon: Gauge },
-      { title: "Voice Summary", url: "/voice-summary", icon: Mic },
-      
+      { title: "Dashboard", url: "/", icon: LayoutDashboard, soon: false },
+      { title: "Trade Journal", url: "/journal", icon: NotebookPen, soon: false },
+      { title: "Trade Gallery", url: "/gallery", icon: ImageIcon, soon: false },
+      { title: "Playbook", url: "/playbook", icon: BookOpen, soon: false },
     ],
   },
   {
     label: "Growth",
     items: [
-      { title: "Trader DNA", url: "/trader-dna", icon: Dna },
-      { title: "Goals & Habits", url: "/goals", icon: Target },
-      { title: "Reports", url: "/reports", icon: FileText },
-      { title: "Analytics", url: "/analytics", icon: BarChart3 },
-      
-      { title: "Notifications", url: "/notifications", icon: BellRing },
-      { title: "Pricing", url: "/pricing", icon: CreditCard },
-      { title: "Plans & Billing", url: "/billing", icon: CreditCard },
+      { title: "Analytics", url: "/analytics", icon: BarChart3, soon: false },
+      { title: "Reports", url: "/reports", icon: FileText, soon: false },
+      { title: "Goals & Habits", url: "/goals", icon: Target, soon: false },
+      { title: "Notifications", url: "/notifications", icon: BellRing, soon: false },
     ],
+  },
+  {
+    label: "AI Systems",
+    items: [
+      { title: "AI Trade Review", url: "/ai-review", icon: Sparkles, soon: true },
+      { title: "AI Chart Critique", url: "/chart-critique", icon: Gauge, soon: true },
+      { title: "Screenshot Reader", url: "/screenshot-reader", icon: Activity, soon: true },
+      { title: "Strategy Discovery", url: "/strategy-discovery", icon: LineChart, soon: true },
+      { title: "Trader DNA", url: "/trader-dna", icon: Dna, soon: true },
+      { title: "Voice Summary", url: "/voice-summary", icon: Mic, soon: true },
+    ],
+  },
+  {
+    label: "Beta",
+    items: [{ title: "What's Coming", url: "/whats-coming", icon: Rocket, soon: false }],
   },
 ] as const;
 
 export const coreItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Trade Journal", url: "/journal", icon: NotebookPen },
-  { title: "AI Trade Review", url: "/ai-review", icon: Sparkles },
-  { title: "Trader DNA", url: "/trader-dna", icon: Dna },
+  { title: "Trade Gallery", url: "/gallery", icon: ImageIcon },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
+  { title: "What's Coming", url: "/whats-coming", icon: Rocket },
 ];
 
 export function AppSidebar() {
@@ -88,8 +87,13 @@ export function AppSidebar() {
             X
           </span>
           {!collapsed && (
-            <span className="font-display text-sm font-semibold tracking-tight">
-              ChartFusion<span className="text-primary">X</span>
+            <span className="flex flex-col leading-tight">
+              <span className="font-display text-sm font-semibold tracking-tight">
+                ChartFusion<span className="text-primary">X</span>
+              </span>
+              <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                Free beta
+              </span>
             </span>
           )}
         </Link>
@@ -105,11 +109,16 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={pathname === item.url}
-                      tooltip={item.title}
+                      tooltip={item.soon ? `${item.title} — coming soon` : item.title}
                     >
                       <Link to={item.url} className="flex items-center gap-2">
                         <item.icon className="size-4" />
-                        <span>{item.title}</span>
+                        <span className="flex-1 truncate">{item.title}</span>
+                        {item.soon && !collapsed && (
+                          <span className="rounded-full border border-border px-1.5 py-px text-[9px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                            Soon
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

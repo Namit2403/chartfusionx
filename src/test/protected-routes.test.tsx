@@ -22,7 +22,7 @@ vi.mock("@tanstack/react-router", () => ({
 
 vi.mock("@/components/paywall-dialog", () => ({
   PaywallDialog: () => null,
-  openPaywall: () => {},
+  openComingSoon: () => {},
   openSignInPrompt: () => {},
 }));
 
@@ -98,26 +98,22 @@ describe("authenticated visits", () => {
   });
 });
 
-describe("action gating", () => {
-  it("gates trade logging behind sign-in and the free trade limit", () => {
+describe("free beta gating", () => {
+  it("only gates trade logging behind sign-in — no paywall", () => {
     const src = readFileSync(path.join(ROUTES_DIR, "journal.new.tsx"), "utf8");
     expect(src).toMatch(/openSignInPrompt/);
-    expect(src).toMatch(/consumeTradeLog/);
-    expect(src).toMatch(/openPaywall/);
+    expect(src).not.toMatch(/openPaywall/);
+    expect(src).not.toMatch(/consumeTradeLog/);
   });
 
-  it("keeps the free trade limit at 10", async () => {
-    const { FREE_TRADE_LIMIT } = await import("@/lib/entitlements");
-    expect(FREE_TRADE_LIMIT).toBe(10);
-  });
-
-  it("gates every AI action behind sign-in and an active plan", () => {
-    const src = readFileSync(path.resolve(process.cwd(), "src/hooks/useAiAction.ts"), "utf8");
-    expect(src).toMatch(/openSignInPrompt/);
-    expect(src).toMatch(/consumeAiAction/);
-    expect(src).toMatch(/openPaywall/);
+  it("shows AI modules as coming soon instead of running a model", () => {
+    for (const file of ["ai-review.tsx", "chart-critique.tsx", "trader-dna.tsx", "voice-summary.tsx", "strategy-discovery.tsx", "screenshot-reader.tsx"]) {
+      const src = readFileSync(path.join(ROUTES_DIR, file), "utf8");
+      expect(src).toMatch(/ComingSoonPage/);
+    }
   });
 });
+
 
 describe("source hygiene", () => {
   const sources = [

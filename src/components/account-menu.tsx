@@ -13,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SubscriptionWidget } from "@/components/subscription-widget";
 import { readProfile } from "@/lib/profile";
 
 import { getLegalAcceptance } from "@/utils/profile.functions";
@@ -123,13 +122,16 @@ export function AccountMenu() {
           )}
         </div>
         <DropdownMenuSeparator />
-        <SubscriptionWidget />
+        <div className="px-2 py-2 text-xs leading-relaxed text-muted-foreground">
+          <span className="font-semibold text-foreground">Free beta.</span> Every feature that's
+          live today is free while we build the AI modules.
+        </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void navigate({ to: "/settings" })}>
           Account settings
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => void navigate({ to: "/billing" })}>
-          Plans & billing
+        <DropdownMenuItem onSelect={() => void navigate({ to: "/whats-coming" })}>
+          What's coming
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => void signOut()}>Sign out</DropdownMenuItem>
 

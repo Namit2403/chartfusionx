@@ -36,15 +36,15 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-/** Opens the upgrade dialog from anywhere (hooks or event handlers). */
-export function openPaywall(options?: { title?: string; description?: string }) {
+/** Opens the "this feature is still being built" dialog. */
+export function openComingSoon(options?: { title?: string; description?: string }) {
   setState({
     open: true,
     mode: "paywall",
-    title: options?.title ?? "Start your free trial to continue",
+    title: options?.title ?? "This module is still in development",
     description:
       options?.description ??
-      "This action needs an active plan. Both plans include a 7-day free trial — you won't be charged if you cancel before it ends.",
+      "ChartFusionX is free during beta. Join the waitlist and we'll notify you the moment this goes live.",
   });
 }
 
@@ -101,7 +101,7 @@ export function PaywallDialog() {
           ) : (
             <>
               <Button asChild onClick={closePaywall}>
-                <Link to="/billing">See plans</Link>
+                <Link to="/whats-coming">Join the waitlist</Link>
               </Button>
               <Button variant="secondary" onClick={closePaywall}>
                 Keep looking around
