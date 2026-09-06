@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { BetaFeatureOverview } from "@/components/beta-feature-overview";
 import { MarketingLanding } from "@/components/marketing-landing";
 import { NoTradesYet } from "@/components/no-trades-yet";
 import { OnboardingModal } from "@/components/onboarding-modal";
@@ -56,18 +57,27 @@ function Dashboard() {
       <section className="panel-hero grid-lines overflow-hidden p-6 sm:p-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
-              The AI trading journal built for traders who are still learning.
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Welcome to the ChartFusionX Free Beta
+              </span>
+              <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Free beta
+              </span>
             </div>
             <h1 className="mt-3 max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">
-              Log your trades. Review AI summaries. See exactly what your own data says.
+              Log your trades. See exactly what your own data says.
             </h1>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
+              You're getting early access to the core ChartFusionX experience while we build the
+              next generation of AI-powered trading tools.
+            </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild>
                 <Link to="/journal/new">Log your first trade</Link>
               </Button>
               <Button asChild variant="secondary">
-                <Link to="/ai-review">Get AI feedback</Link>
+                <Link to="/whats-coming">See what's coming</Link>
               </Button>
             </div>
           </div>
@@ -91,6 +101,8 @@ function Dashboard() {
       </section>
 
       <RiskDisclaimer />
+
+      <BetaFeatureOverview />
 
 
 
@@ -213,7 +225,7 @@ function Dashboard() {
           <p className="text-sm leading-relaxed text-foreground">
             {bestStrategy
               ? `${bestStrategy.name} is currently your highest-expectancy setup at ${bestStrategy.expectancy.toFixed(2)}R over ${bestStrategy.trades} trades.`
-              : "Log a few more trades and the AI will start ranking your setups."}
+              : "Log a few more trades to see how your setups compare."}
           </p>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
             {bestStrategy && (
@@ -234,9 +246,9 @@ function Dashboard() {
           </ul>
           <Button asChild className="mt-5 w-full" variant="secondary">
             {user ? (
-              <Link to="/strategy-discovery">See strategy discovery</Link>
+              <Link to="/analytics">Open analytics</Link>
             ) : (
-              <Link to="/signup">Unlock strategy discovery</Link>
+              <Link to="/signup">Create your free account</Link>
             )}
           </Button>
         </Panel>
