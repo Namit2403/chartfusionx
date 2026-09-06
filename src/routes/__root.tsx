@@ -154,9 +154,15 @@ function RootComponent() {
           <div className="flex min-w-0 flex-1 flex-col">
             <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
               <SidebarTrigger />
+              <span className="hidden items-center gap-2 sm:flex">
+                <span className="text-sm font-semibold tracking-tight">ChartFusionX</span>
+                <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  Free beta
+                </span>
+              </span>
               <div className="ml-auto flex items-center gap-2">
-                <Button asChild size="sm" variant="secondary" className="hidden sm:inline-flex">
-                  <Link to="/ai-review">AI review</Link>
+                <Button asChild size="sm" variant="ghost" className="hidden sm:inline-flex">
+                  <Link to="/whats-coming">What's coming</Link>
                 </Button>
 
                 <Button asChild size="sm" variant="secondary" className="hidden sm:inline-flex">
@@ -172,8 +178,8 @@ function RootComponent() {
               <RiskDisclaimerLine />
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                 <span>© {new Date().getFullYear()} ChartFusionX</span>
-                <Link to="/pricing" className="hover:text-foreground">
-                  Pricing
+                <Link to="/whats-coming" className="hover:text-foreground">
+                  What's Coming
                 </Link>
                 <Link to="/privacy" className="hover:text-foreground">
                   Privacy Policy

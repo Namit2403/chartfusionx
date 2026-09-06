@@ -13,6 +13,7 @@ import {
   Mic,
   NotebookPen,
   Sparkles,
+  Target,
   Rocket,
 } from "lucide-react";
 
