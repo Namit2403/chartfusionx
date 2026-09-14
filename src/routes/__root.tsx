@@ -4,10 +4,12 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Home } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -18,15 +20,13 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { THEME_BOOT_SCRIPT, getTheme } from "@/lib/theme";
 import { RiskDisclaimerLine } from "@/components/risk-disclaimer";
 import { NotFound as GhostNotFound } from "@/components/ui/ghost-404-page-1";
-
-
 
 function NotFoundComponent() {
   return <GhostNotFound />;
 }
-
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
@@ -104,9 +104,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body>
         {children}
@@ -116,9 +117,13 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+const CHROMELESS_ROUTES = ["/", "/auth", "/signup", "/reset-password"];
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const chromeless = CHROMELESS_ROUTES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
@@ -129,7 +134,13 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
 
-
+  if (chromeless) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -137,7 +148,7 @@ function RootComponent() {
         <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
           <div className="flex min-w-0 flex-1 flex-col">
-            <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
+            <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background px-4">
               <SidebarTrigger />
               <span className="hidden items-center gap-2 sm:flex">
                 <span className="text-sm font-semibold tracking-tight">ChartFusionX</span>
@@ -145,8 +156,14 @@ function RootComponent() {
                   Free beta
                 </span>
               </span>
-              <div className="ml-auto flex items-center gap-2">
-                <Button asChild size="sm" variant="ghost" className="hidden sm:inline-flex">
+              <div className="ml-auto flex min-w-0 items-center gap-2">
+                <Button asChild size="sm" variant="ghost" className="hidden lg:inline-flex">
+                  <Link to="/" aria-label="Back to landing page">
+                    <Home className="size-4 sm:hidden" />
+                    <span className="hidden sm:inline">Landing</span>
+                  </Link>
+                </Button>
+                <Button asChild size="sm" variant="ghost" className="hidden lg:inline-flex">
                   <Link to="/whats-coming">What's coming</Link>
                 </Button>
 
@@ -163,6 +180,9 @@ function RootComponent() {
               <RiskDisclaimerLine />
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                 <span>© {new Date().getFullYear()} ChartFusionX</span>
+                <Link to="/" className="hover:text-foreground">
+                  Landing
+                </Link>
                 <Link to="/whats-coming" className="hover:text-foreground">
                   What's Coming
                 </Link>
@@ -182,7 +202,7 @@ function RootComponent() {
           <MobileBottomNav />
         </div>
       </SidebarProvider>
-      <Toaster />
+      <Toaster theme={getTheme()} />
     </QueryClientProvider>
   );
 }

@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { AuthGhostButton, AuthGlassInput, AuthSceneCard } from "@/components/auth-scene";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
@@ -36,14 +34,37 @@ export const Route = createFileRoute("/auth")({
 });
 
 function safePath(value: string | undefined) {
-  if (!value) return "/";
+  if (!value) return "/app";
   try {
     const url = new URL(value, window.location.origin);
-    if (url.origin !== window.location.origin) return "/";
+    if (url.origin !== window.location.origin) return "/app";
     return url.pathname + url.search;
   } catch {
-    return "/";
+    return "/app";
   }
+}
+
+function GoogleIcon() {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24" className="size-4">
+      <path
+        fill="#EA4335"
+        d="M12 5.04c1.62 0 3.06.56 4.2 1.64l3.12-3.12C17.46 1.8 14.96.75 12 .75 7.62.75 3.84 3.27 1.96 6.96l3.66 2.84C6.5 7.13 9.03 5.04 12 5.04z"
+      />
+      <path
+        fill="#4285F4"
+        d="M23.25 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58l3.68 2.85c2.15-1.99 3.5-4.92 3.5-8.67z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.62 14.2a7.2 7.2 0 0 1 0-4.4L1.96 6.96a11.26 11.26 0 0 0 0 10.08l3.66-2.84z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23.25c3.04 0 5.6-1 7.46-2.72l-3.68-2.85c-1.02.69-2.33 1.1-3.78 1.1-2.97 0-5.5-2.09-6.38-4.58l-3.66 2.84c1.88 3.69 5.66 6.21 10.04 6.21z"
+      />
+    </svg>
+  );
 }
 
 function AuthPage() {
@@ -124,101 +145,112 @@ function AuthPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md py-10">
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {mode === "signin" ? "Sign in to ChartFusionX" : "Create your account"}
-        </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Log your trades. Get AI feedback. Understand exactly why you win and lose.
-        </p>
+    <AuthSceneCard
+      title={mode === "signin" ? "Sign in to ChartFusionX" : "Create your account"}
+      subtitle="Log your trades. Get AI feedback. Understand exactly why you win and lose."
+    >
+      {pendingConfirm ? (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm leading-relaxed text-white/60">
+          We sent a confirmation link to <span className="text-white">{email}</span>. Click it to
+          activate your account, then sign in.
+        </div>
+      ) : (
+        <>
+          <AuthGhostButton type="button" onClick={google} disabled={busy}>
+            <GoogleIcon />
+            Continue with Google
+          </AuthGhostButton>
 
-        {pendingConfirm ? (
-          <div className="mt-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-            We sent a confirmation link to <span className="text-foreground">{email}</span>. Click
-            it to activate your account, then sign in.
+          <div className="my-6 flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.2em] text-white/30">
+            <span className="h-px flex-1 bg-white/10" />
+            or
+            <span className="h-px flex-1 bg-white/10" />
           </div>
-        ) : (
-          <>
-            <Button
-              type="button"
-              variant="secondary"
-              className="mt-6 w-full"
-              onClick={google}
-              disabled={busy}
-            >
-              Continue with Google
-            </Button>
 
-            <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              <span className="h-px flex-1 bg-border" />
-              or
-              <span className="h-px flex-1 bg-border" />
+          <form onSubmit={submit} className="space-y-3.5">
+            {mode === "signup" && (
+              <div className="space-y-1.5">
+                <label htmlFor="displayName" className="block text-xs font-medium text-white/60">
+                  Display name
+                </label>
+                <AuthGlassInput
+                  id="displayName"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Alex Trader"
+                />
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="block text-xs font-medium text-white/60">
+                Email address
+              </label>
+              <AuthGlassInput
+                id="email"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Your email address"
+              />
             </div>
-
-            <form onSubmit={submit} className="space-y-4">
-              {mode === "signup" && (
-                <div className="space-y-1.5">
-                  <Label htmlFor="displayName">Display name</Label>
-                  <Input
-                    id="displayName"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="Alex Trader"
-                  />
-                </div>
-              )}
-              <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                />
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="block text-xs font-medium text-white/60">
+                  Password
+                </label>
+                {mode === "signin" && (
+                  <button
+                    type="button"
+                    onClick={resetPassword}
+                    className="cursor-pointer text-xs text-white/45 transition hover:text-white/80"
+                  >
+                    Forgot password?
+                  </button>
+                )}
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={8}
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={busy}>
-                {mode === "signin" ? "Sign in" : "Create account"}
-              </Button>
-            </form>
+              <AuthGlassInput
+                id="password"
+                type="password"
+                required
+                minLength={8}
+                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Your password"
+              />
+            </div>
+            <button type="submit" disabled={busy} className="auth-primary-btn">
+              {busy ? "One moment…" : mode === "signin" ? "Continue" : "Create account"}
+            </button>
+          </form>
 
-            <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-              <Link
-                to="/signup"
-                className="underline-offset-4 hover:text-foreground hover:underline"
-              >
-                Create an account
-              </Link>
-
-              {mode === "signin" && (
-                <button
-                  type="button"
-                  className="underline-offset-4 hover:text-foreground hover:underline"
-                  onClick={resetPassword}
+          <p className="mt-6 text-center text-sm text-white/45">
+            {mode === "signin" ? (
+              <>
+                Don&apos;t have an account?{" "}
+                <Link
+                  to="/signup"
+                  className="font-medium text-white underline-offset-4 transition hover:underline"
                 >
-                  Forgot password?
-                </button>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+                  Sign up
+                </Link>
+              </>
+            ) : (
+              <>
+                Already have an account?{" "}
+                <Link
+                  to="/auth"
+                  className="font-medium text-white underline-offset-4 transition hover:underline"
+                >
+                  Sign in
+                </Link>
+              </>
+            )}
+          </p>
+        </>
+      )}
+    </AuthSceneCard>
   );
 }

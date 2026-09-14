@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { ComingSoonBadge } from "@/components/coming-soon";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { AVAILABLE_NOW, COMING_SOON_FEATURES } from "@/lib/beta";
+import { PLANS } from "@/lib/entitlements";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -12,12 +14,12 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "ChartFusionX is currently free. There are no paid plans during the beta — journal your trades, review your analytics, and join the waitlist for the AI modules.",
+          "ChartFusionX is free during the beta. After the beta: Pro at $29/month and Max at $69/month — journal your trades today and join the waitlist for the AI modules.",
       },
       { property: "og:title", content: "Pricing — ChartFusionX is Free in Beta" },
       {
         property: "og:description",
-        content: "Free during beta. No plans, no card, no checkout.",
+        content: "Free during beta. After the beta: Pro $29/mo, Max $69/mo.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ChartFusionX" },
@@ -53,6 +55,51 @@ function PricingPage() {
       </header>
 
       <section>
+        <h2 className="text-xl font-semibold tracking-tight">Plans after the beta</h2>
+        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          Today everything below the waitlist is free. When the beta ends, two paid tiers take over
+          — the free tier keeps its core journal and analytics.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold">Free Beta</span>
+              <span className="rounded-full border border-positive/30 bg-positive/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-positive">
+                Live now
+              </span>
+            </div>
+            <p className="num mt-3 text-3xl font-semibold tracking-tight">$0</p>
+            <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
+              <li>Unlimited trades during the beta</li>
+              <li>Dashboard, analytics &amp; reports</li>
+              <li>Playbook, goals &amp; gallery</li>
+            </ul>
+            <Button asChild size="sm" variant="secondary" className="mt-5 w-full">
+              <Link to="/app">Open the app</Link>
+            </Button>
+          </div>
+          {PLANS.map((plan) => (
+            <div key={plan.priceId} className="rounded-2xl border border-border bg-card p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold">{plan.name}</span>
+                <ComingSoonBadge />
+              </div>
+              <p className="num mt-3 text-3xl font-semibold tracking-tight">
+                ${plan.price}
+                <span className="text-sm font-normal text-muted-foreground"> / month</span>
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{plan.tagline}</p>
+              <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
+                {plan.features.map((feature) => (
+                  <li key={feature}>{feature}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section>
         <h2 className="text-xl font-semibold tracking-tight">Available now — free</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {AVAILABLE_NOW.map((item) => (
@@ -76,7 +123,9 @@ function PricingPage() {
                 <span className="text-sm font-semibold">{feature.name}</span>
                 <ComingSoonBadge />
               </div>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{feature.short}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                {feature.short}
+              </p>
             </div>
           ))}
         </div>

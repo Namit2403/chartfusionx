@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthErrorRouteImport } from './routes/auth-error'
@@ -20,9 +21,9 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WhatsComingRouteImport } from './routes/whats-coming'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAiReviewRouteImport } from './routes/_authenticated/ai-review'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as AuthenticatedChartCritiqueRouteImport } from './routes/_authenticated/chart-critique'
 import { Route as AuthenticatedGalleryRouteImport } from './routes/_authenticated/gallery'
@@ -37,10 +38,16 @@ import { Route as AuthenticatedTraderDnaRouteImport } from './routes/_authentica
 import { Route as AuthenticatedVoiceSummaryRouteImport } from './routes/_authenticated/voice-summary'
 import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal.index'
 import { Route as AuthenticatedJournalNewRouteImport } from './routes/_authenticated/journal.new'
+import { Route as ApiWebhooksWhopRouteImport } from './routes/api/webhooks/whop'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -95,11 +102,6 @@ const WhatsComingRoute = WhatsComingRouteImport.update({
   path: '/whats-coming',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedAiReviewRoute = AuthenticatedAiReviewRouteImport.update({
   id: '/ai-review',
   path: '/ai-review',
@@ -108,6 +110,11 @@ const AuthenticatedAiReviewRoute = AuthenticatedAiReviewRouteImport.update({
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
@@ -186,6 +193,11 @@ const AuthenticatedJournalNewRoute = AuthenticatedJournalNewRouteImport.update({
   path: '/journal/new',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiWebhooksWhopRoute = ApiWebhooksWhopRouteImport.update({
+  id: '/api/webhooks/whop',
+  path: '/api/webhooks/whop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -204,7 +216,7 @@ const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/auth-error': typeof AuthErrorRoute
   '/pricing': typeof PricingRoute
@@ -217,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/whats-coming': typeof WhatsComingRoute
   '/ai-review': typeof AuthenticatedAiReviewRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/app': typeof AuthenticatedAppRoute
   '/billing': typeof AuthenticatedBillingRoute
   '/chart-critique': typeof AuthenticatedChartCritiqueRoute
   '/gallery': typeof AuthenticatedGalleryRoute
@@ -230,12 +243,14 @@ export interface FileRoutesByFullPath {
   '/trader-dna': typeof AuthenticatedTraderDnaRoute
   '/voice-summary': typeof AuthenticatedVoiceSummaryRoute
   '/journal/new': typeof AuthenticatedJournalNewRoute
+  '/api/webhooks/whop': typeof ApiWebhooksWhopRoute
   '/journal/': typeof AuthenticatedJournalIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/auth-error': typeof AuthErrorRoute
   '/pricing': typeof PricingRoute
@@ -248,6 +263,7 @@ export interface FileRoutesByTo {
   '/whats-coming': typeof WhatsComingRoute
   '/ai-review': typeof AuthenticatedAiReviewRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/app': typeof AuthenticatedAppRoute
   '/billing': typeof AuthenticatedBillingRoute
   '/chart-critique': typeof AuthenticatedChartCritiqueRoute
   '/gallery': typeof AuthenticatedGalleryRoute
@@ -260,8 +276,8 @@ export interface FileRoutesByTo {
   '/strategy-discovery': typeof AuthenticatedStrategyDiscoveryRoute
   '/trader-dna': typeof AuthenticatedTraderDnaRoute
   '/voice-summary': typeof AuthenticatedVoiceSummaryRoute
-  '/': typeof AuthenticatedIndexRoute
   '/journal/new': typeof AuthenticatedJournalNewRoute
+  '/api/webhooks/whop': typeof ApiWebhooksWhopRoute
   '/journal': typeof AuthenticatedJournalIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -269,6 +285,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/auth-error': typeof AuthErrorRoute
@@ -282,6 +299,7 @@ export interface FileRoutesById {
   '/whats-coming': typeof WhatsComingRoute
   '/_authenticated/ai-review': typeof AuthenticatedAiReviewRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/chart-critique': typeof AuthenticatedChartCritiqueRoute
   '/_authenticated/gallery': typeof AuthenticatedGalleryRoute
@@ -294,8 +312,8 @@ export interface FileRoutesById {
   '/_authenticated/strategy-discovery': typeof AuthenticatedStrategyDiscoveryRoute
   '/_authenticated/trader-dna': typeof AuthenticatedTraderDnaRoute
   '/_authenticated/voice-summary': typeof AuthenticatedVoiceSummaryRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/journal/new': typeof AuthenticatedJournalNewRoute
+  '/api/webhooks/whop': typeof ApiWebhooksWhopRoute
   '/_authenticated/journal/': typeof AuthenticatedJournalIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -317,6 +335,7 @@ export interface FileRouteTypes {
     | '/whats-coming'
     | '/ai-review'
     | '/analytics'
+    | '/app'
     | '/billing'
     | '/chart-critique'
     | '/gallery'
@@ -330,12 +349,14 @@ export interface FileRouteTypes {
     | '/trader-dna'
     | '/voice-summary'
     | '/journal/new'
+    | '/api/webhooks/whop'
     | '/journal/'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/auth'
     | '/auth-error'
     | '/pricing'
@@ -348,6 +369,7 @@ export interface FileRouteTypes {
     | '/whats-coming'
     | '/ai-review'
     | '/analytics'
+    | '/app'
     | '/billing'
     | '/chart-critique'
     | '/gallery'
@@ -360,14 +382,15 @@ export interface FileRouteTypes {
     | '/strategy-discovery'
     | '/trader-dna'
     | '/voice-summary'
-    | '/'
     | '/journal/new'
+    | '/api/webhooks/whop'
     | '/journal'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/auth'
     | '/auth-error'
@@ -381,6 +404,7 @@ export interface FileRouteTypes {
     | '/whats-coming'
     | '/_authenticated/ai-review'
     | '/_authenticated/analytics'
+    | '/_authenticated/app'
     | '/_authenticated/billing'
     | '/_authenticated/chart-critique'
     | '/_authenticated/gallery'
@@ -393,8 +417,8 @@ export interface FileRouteTypes {
     | '/_authenticated/strategy-discovery'
     | '/_authenticated/trader-dna'
     | '/_authenticated/voice-summary'
-    | '/_authenticated/'
     | '/_authenticated/journal/new'
+    | '/api/webhooks/whop'
     | '/_authenticated/journal/'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -402,6 +426,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   AuthErrorRoute: typeof AuthErrorRoute
@@ -413,6 +438,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   WhatsComingRoute: typeof WhatsComingRoute
+  ApiWebhooksWhopRoute: typeof ApiWebhooksWhopRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -420,6 +446,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -497,13 +530,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WhatsComingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/ai-review': {
       id: '/_authenticated/ai-review'
       path: '/ai-review'
@@ -516,6 +542,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/billing': {
@@ -616,6 +649,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJournalNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/webhooks/whop': {
+      id: '/api/webhooks/whop'
+      path: '/api/webhooks/whop'
+      fullPath: '/api/webhooks/whop'
+      preLoaderRoute: typeof ApiWebhooksWhopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -643,6 +683,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiReviewRoute: typeof AuthenticatedAiReviewRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedChartCritiqueRoute: typeof AuthenticatedChartCritiqueRoute
   AuthenticatedGalleryRoute: typeof AuthenticatedGalleryRoute
@@ -655,7 +696,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedStrategyDiscoveryRoute: typeof AuthenticatedStrategyDiscoveryRoute
   AuthenticatedTraderDnaRoute: typeof AuthenticatedTraderDnaRoute
   AuthenticatedVoiceSummaryRoute: typeof AuthenticatedVoiceSummaryRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedJournalNewRoute: typeof AuthenticatedJournalNewRoute
   AuthenticatedJournalIndexRoute: typeof AuthenticatedJournalIndexRoute
 }
@@ -663,6 +703,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiReviewRoute: AuthenticatedAiReviewRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedChartCritiqueRoute: AuthenticatedChartCritiqueRoute,
   AuthenticatedGalleryRoute: AuthenticatedGalleryRoute,
@@ -675,7 +716,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedStrategyDiscoveryRoute: AuthenticatedStrategyDiscoveryRoute,
   AuthenticatedTraderDnaRoute: AuthenticatedTraderDnaRoute,
   AuthenticatedVoiceSummaryRoute: AuthenticatedVoiceSummaryRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedJournalNewRoute: AuthenticatedJournalNewRoute,
   AuthenticatedJournalIndexRoute: AuthenticatedJournalIndexRoute,
 }
@@ -684,6 +724,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   AuthErrorRoute: AuthErrorRoute,
@@ -695,6 +736,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   WhatsComingRoute: WhatsComingRoute,
+  ApiWebhooksWhopRoute: ApiWebhooksWhopRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,

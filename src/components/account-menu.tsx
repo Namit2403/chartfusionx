@@ -52,7 +52,6 @@ export function AccountMenu() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-
   const signOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -66,7 +65,7 @@ export function AccountMenu() {
         <Button
           size="sm"
           variant="ghost"
-          className="hidden sm:inline-flex"
+          className="hidden lg:inline-flex"
           onClick={() => navigate({ to: "/auth" })}
         >
           Sign in
@@ -134,7 +133,6 @@ export function AccountMenu() {
           What's coming
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => void signOut()}>Sign out</DropdownMenuItem>
-
       </DropdownMenuContent>
     </DropdownMenu>
   );

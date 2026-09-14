@@ -1,12 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  ACTIVE_STATUSES,
-  FREE_TRADE_LIMIT,
-  getPlan,
-  type AiFeature,
-} from "@/lib/entitlements";
+import { ACTIVE_STATUSES, FREE_TRADE_LIMIT, getPlan, type AiFeature } from "@/lib/entitlements";
 import {
   gatewayFetch,
   getPaddleClient,
@@ -34,6 +29,91 @@ function subscriptionIsUsable(sub: SubscriptionRecord | null) {
   if (ACTIVE_STATUSES.includes(sub.status)) return notExpired;
   if (sub.status === "canceled") return notExpired;
   return false;
+}
+
+/**
+ * Founding access (Whop presale) entitlement for this account's verified
+ * email. Only rows with access_status = 'active' grant plan access, and only
+ * while now() is inside the 365-day window — a pending or refunded purchase
+ * grants nothing. Returns null when the caller should fall back to regular
+ * subscription logic.
+ */
+
+type AnySupabase = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  from: (table: string) => any;
+};
+
+async function resolveFoundingPlan(
+  supabase: AnySupabase,
+  email: string | null | undefined,
+): Promise<{ planName: string; accessEnd: string } | null> {
+  if (!email) return null;
+
+  const { data: row } = await supabase
+    .from("founding_entitlements")
+    .select("plan_name, access_end, access_status")
+    .eq("access_status", "active")
+    .ilike("customer_email", email)
+    .gt("access_end", new Date().toISOString())
+    .order("access_end", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!row) return null;
+  return { planName: row.plan_name, accessEnd: row.access_end };
+}
+
+/**
+ * Combined entitlement check: Paddle subscription first, then an active
+ * founding purchase matched on the account email. Used by every gate so a
+ * founding Pro/Max member is treated identically to a subscribed member.
+ */
+async function resolveEntitlement(
+  supabase: AnySupabase,
+  userId: string,
+  environment: string,
+  verifiedEmail: string | null | undefined,
+): Promise<{
+  entitled: boolean;
+  aiLimit: number | null;
+  subscription: SubscriptionRecord | null;
+}> {
+  const { data: subRow } = await supabase
+    .from("subscriptions")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("environment", environment)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const subscription = (subRow as SubscriptionRecord | null) ?? null;
+  if (subscriptionIsUsable(subscription)) {
+    const plan = getPlan(subscription?.price_id);
+    return { entitled: true, aiLimit: plan?.aiActionsPerPeriod ?? null, subscription };
+  }
+
+  let founding: { planName: string; accessEnd: string } | null = null;
+  if (verifiedEmail) {
+    founding = await resolveFoundingPlan(supabase, verifiedEmail);
+  } else {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("id", userId)
+      .maybeSingle();
+    founding = await resolveFoundingPlan(supabase, profile?.email);
+  }
+  if (founding) {
+    // Founding Pro carries the Pro plan's AI-action cap; founding Max is
+    // unlimited — same semantics as the paid tiers.
+    const foundingAiLimit =
+      founding.planName === "Max" ? null : (getPlan("pro_monthly")?.aiActionsPerPeriod ?? null);
+    return { entitled: true, aiLimit: foundingAiLimit, subscription: null };
+  }
+
+  return { entitled: false, aiLimit: null, subscription };
 }
 
 /** Start of the metering window: the current billing period, else the last 30 days. */
@@ -74,8 +154,30 @@ export const getBillingOverview = createServerFn({ method: "GET" })
       .maybeSingle();
 
     const subscription = (subRow as SubscriptionRecord | null) ?? null;
-    const entitled = subscriptionIsUsable(subscription);
+    const subscriptionEntitled = subscriptionIsUsable(subscription);
     const plan = getPlan(subscription?.price_id);
+
+    // Founding access: a verified Whop founding purchase whose 365-day
+    // window is active acts as the entitlement when there is no Paddle plan
+    // (this is how pre-launch founders become Pro/Max after launch).
+    const verifiedEmail =
+      typeof (context as { claims?: { email?: string } }).claims?.email === "string"
+        ? ((context as { claims: { email: string } }).claims.email as string)
+        : null;
+    let founding: { planName: string; accessEnd: string } | null = null;
+    if (verifiedEmail) {
+      founding = await resolveFoundingPlan(supabase, verifiedEmail);
+    } else {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("id", userId)
+        .maybeSingle();
+      founding = await resolveFoundingPlan(supabase, profile?.email);
+    }
+
+    const entitled = subscriptionEntitled || Boolean(founding);
+    const effectivePlanName = founding?.planName ?? plan?.name ?? null;
 
     const { count } = await supabase
       .from("ai_usage_events")
@@ -96,17 +198,21 @@ export const getBillingOverview = createServerFn({ method: "GET" })
       .from("trades")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId);
-
-
     const aiUsed = count ?? 0;
-    const aiLimit = plan?.aiActionsPerPeriod ?? null;
+    const aiLimit =
+      plan === null && founding
+        ? founding.planName === "Max"
+          ? null
+          : (getPlan("pro_monthly")?.aiActionsPerPeriod ?? null)
+        : (plan?.aiActionsPerPeriod ?? null);
     const tradesUsed = tradesLogged ?? 0;
 
     return {
       subscription,
       entitled,
-      planId: plan?.priceId ?? null,
-      planName: plan?.name ?? null,
+      planId: plan?.priceId ?? (founding ? `founding_${founding.planName.toLowerCase()}` : null),
+      planName: effectivePlanName,
+      founding: founding ? { planName: founding.planName, accessEnd: founding.accessEnd } : null,
       aiUsed,
       aiLimit,
       aiRemaining: aiLimit === null ? null : Math.max(0, aiLimit - aiUsed),
@@ -127,22 +233,20 @@ export const recordTradeLog = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    const { data: subRow } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("environment", data.environment)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const entitled = subscriptionIsUsable((subRow as SubscriptionRecord | null) ?? null);
+    const entitlement = await resolveEntitlement(
+      supabase,
+      userId,
+      data.environment,
+      typeof (context as { claims?: { email?: string } }).claims?.email === "string"
+        ? ((context as { claims: { email: string } }).claims.email as string)
+        : null,
+    );
+    const entitled = entitlement.entitled;
 
     const { count } = await supabase
       .from("trades")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId);
-
 
     const tradesUsed = count ?? 0;
     if (!entitled && tradesUsed >= FREE_TRADE_LIMIT) {
@@ -175,28 +279,25 @@ export const recordAiUsage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    const { data: subRow } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("environment", data.environment)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const subscription = (subRow as SubscriptionRecord | null) ?? null;
-    if (!subscriptionIsUsable(subscription)) {
+    const entitlement = await resolveEntitlement(
+      supabase,
+      userId,
+      data.environment,
+      typeof (context as { claims?: { email?: string } }).claims?.email === "string"
+        ? ((context as { claims: { email: string } }).claims.email as string)
+        : null,
+    );
+    if (!entitlement.entitled) {
       return { ok: false as const, reason: "no-subscription" as const, aiUsed: 0, aiLimit: 0 };
     }
 
-    const plan = getPlan(subscription?.price_id);
-    const aiLimit = plan?.aiActionsPerPeriod ?? null;
+    const aiLimit = entitlement.aiLimit;
 
     const { count } = await supabase
       .from("ai_usage_events")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
-      .gte("created_at", periodStart(subscription));
+      .gte("created_at", periodStart(entitlement.subscription));
 
     const aiUsed = count ?? 0;
     if (aiLimit !== null && aiUsed >= aiLimit) {
@@ -470,7 +571,6 @@ export const createCheckoutIntent = createServerFn({ method: "POST" })
     }
   });
 
-
 /** Creates a Paddle customer portal session for payment methods and invoices. */
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -498,10 +598,9 @@ export const createPortalSession = createServerFn({ method: "POST" })
 
     try {
       const paddle = getPaddleClient(subscription.environment as PaddleEnv);
-      const session = await paddle.customerPortalSessions.create(
-        subscription.paddle_customer_id,
-        [subscription.paddle_subscription_id],
-      );
+      const session = await paddle.customerPortalSessions.create(subscription.paddle_customer_id, [
+        subscription.paddle_subscription_id,
+      ]);
       const overviewUrl = session.urls?.general?.overview ?? null;
       if (!overviewUrl) {
         return {
@@ -523,4 +622,3 @@ export const createPortalSession = createServerFn({ method: "POST" })
       return { ok: false as const, message, overviewUrl: null };
     }
   });
-

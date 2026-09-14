@@ -77,7 +77,7 @@ function AuthErrorPage() {
   const signOutAndRestart = async () => {
     setBusy(true);
     await supabase.auth.signOut();
-    navigate({ to: "/auth", search: { redirect: redirect ?? "/" }, replace: true });
+    navigate({ to: "/auth", search: { redirect: redirect ?? "/app" }, replace: true });
   };
 
   return (

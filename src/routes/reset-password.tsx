@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { AuthGlassInput, AuthSceneCard } from "@/components/auth-scene";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
@@ -55,38 +53,40 @@ function ResetPasswordPage() {
       return;
     }
     toast.success("Password updated.");
-    navigate({ to: "/", replace: true });
+    navigate({ to: "/app", replace: true });
   };
 
   return (
-    <div className="mx-auto w-full max-w-md py-10">
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Set a new password</h1>
-        {ready ? (
-          <form onSubmit={submit} className="mt-6 space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="new-password">New password</Label>
-              <Input
-                id="new-password"
-                type="password"
-                required
-                minLength={8}
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={busy}>
-              Update password
-            </Button>
-          </form>
-        ) : (
-          <p className="mt-4 text-sm text-muted-foreground">
-            This reset link is invalid or has expired. Request a new one from the sign-in page.
-          </p>
-        )}
-      </div>
-    </div>
+    <AuthSceneCard
+      title="Set a new password"
+      subtitle="Choose a strong password and get back to your journal."
+    >
+      {ready ? (
+        <form onSubmit={submit} className="space-y-3.5">
+          <div className="space-y-1.5">
+            <label htmlFor="new-password" className="block text-xs font-medium text-white/60">
+              New password
+            </label>
+            <AuthGlassInput
+              id="new-password"
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 8 characters"
+            />
+          </div>
+          <button type="submit" disabled={busy} className="auth-primary-btn">
+            {busy ? "One moment…" : "Update password"}
+          </button>
+        </form>
+      ) : (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm leading-relaxed text-white/60">
+          This reset link is invalid or has expired. Request a new one from the sign-in page.
+        </div>
+      )}
+    </AuthSceneCard>
   );
 }

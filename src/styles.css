@@ -5,12 +5,29 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * ChartFusionX — "Clinical blueprint on frosted paper".
- * Monochromatic light system: white paper cards, warm-gray canvas,
- * hairline borders, single ember red reserved for destructive states.
+ * ChartFusionX themes — "midnight" (default) and "daylight".
+ * Both share the same token contract; the active set is selected by the
+ * `.dark` class on <html> (managed by the theme store in src/lib/theme.ts).
+ *
+ * midnight: deep indigo-black canvas, frosted navy panels, white primary
+ * actions, soft indigo focus rings, ember red for destructive.
+ * daylight: the original "clinical blueprint" light paper system.
  */
 
 @theme inline {
+  /* Slush landing system — sticker-book on pastel paper */
+  --color-carbon: #000000;
+  --color-paper-white: #ffffff;
+  --color-sky-wash: #dceeff;
+  --color-concrete-gray: #cccccc;
+  --color-soft-mist: #e9e9e9;
+  --color-electric-blue: #4da2ff;
+  --color-mint-pop: #55db9c;
+  --color-lavender: #e9ccff;
+  --color-ember: #fb4903;
+  --color-sunburst: #ffd731;
+  --color-voltage-violet: #5c4ade;
+
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -22,7 +39,6 @@
   --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -68,9 +84,84 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-:root {
+/* ---- midnight (default) ---- */
+:root,
+:host,
+.dark {
   --radius: 1.125rem;
 
+  --background: #080810;
+  --foreground: #f4f5fa;
+  --surface: #101120;
+  --surface-2: #0d0e1a;
+
+  --card: #101120;
+  --card-foreground: #f4f5fa;
+  --popover: #12131f;
+  --popover-foreground: #f4f5fa;
+
+  --primary: #f4f5fa;
+  --primary-foreground: #0b0c14;
+  --primary-glow: #c3c8ff;
+
+  --secondary: #171930;
+  --secondary-foreground: #f4f5fa;
+
+  --muted: #14152a;
+  --muted-foreground: #8b8fa8;
+
+  --accent: #1c1e38;
+  --accent-foreground: #f4f5fa;
+  --viz: #565b7c;
+  --viz-deep: #22243f;
+
+  --destructive: #f43f5e;
+  --destructive-foreground: #ffffff;
+
+  --positive: #f4f5fa;
+  --positive-foreground: #0b0c14;
+  --negative: #f43f5e;
+  --negative-foreground: #ffffff;
+
+  --border: #232541;
+  --input: #232541;
+  --ring: #c3c8ff;
+
+  --chart-1: #e2e5ff;
+  --chart-2: #9aa2d8;
+  --chart-3: #565b7c;
+  --chart-4: #2c2e4d;
+  --chart-5: #f43f5e;
+
+  /* Sidebar — dark glass rail (Quantix-style): frosted graphite panel with a
+     soft violet bloom over the midnight canvas. */
+  --sidebar: transparent;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #131316;
+  --sidebar-accent: rgba(255, 255, 255, 0.07);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: rgba(255, 255, 255, 0.35);
+  --sidebar-glass: linear-gradient(
+    168deg,
+    rgba(30, 32, 50, 0.94) 0%,
+    rgba(13, 14, 26, 0.94) 55%,
+    rgba(24, 22, 42, 0.96) 100%
+  );
+  --sidebar-glow-1: rgba(139, 92, 246, 0.16);
+  --sidebar-glow-2: rgba(56, 189, 248, 0.09);
+  --page-glow: radial-gradient(1100px 480px at 50% -8%, rgba(99, 102, 241, 0.09), transparent 62%);
+  --gradient-primary: linear-gradient(135deg, #e2e5ff, #c3c8ff);
+  --gradient-surface: #101120;
+  --shadow-panel:
+    0 0 0 1px rgba(255, 255, 255, 0.05), 0 12px 32px -12px rgba(0, 0, 0, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 0 1px #232541;
+}
+
+/* ---- daylight ---- */
+:root:not(.dark) {
   --background: #f5f5f5;
   --foreground: #0a0a0a;
   --surface: #ffffff;
@@ -83,7 +174,7 @@
 
   --primary: #0a0a0a;
   --primary-foreground: #fafafa;
-  --primary-glow: #171717;
+  --primary-glow: #6366f1;
 
   --secondary: #f5f5f5;
   --secondary-foreground: #0a0a0a;
@@ -91,8 +182,8 @@
   --muted: #f5f5f5;
   --muted-foreground: #737373;
 
-  --accent: #171717;
-  --accent-foreground: #fafafa;
+  --accent: #ececf3;
+  --accent-foreground: #0a0a0a;
   --viz: #737373;
   --viz-deep: #e5e5e5;
 
@@ -106,7 +197,7 @@
 
   --border: #e5e5e5;
   --input: #e5e5e5;
-  --ring: #0a0a0a;
+  --ring: #6366f1;
 
   --chart-1: #0a0a0a;
   --chart-2: #737373;
@@ -114,18 +205,30 @@
   --chart-4: #d4d4d4;
   --chart-5: #e7000b;
 
-  --sidebar: #fafafa;
-  --sidebar-foreground: #0a0a0a;
-  --sidebar-primary: #0a0a0a;
-  --sidebar-primary-foreground: #fafafa;
-  --sidebar-accent: #f5f5f5;
-  --sidebar-accent-foreground: #0a0a0a;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #0a0a0a;
+  /* Sidebar — dark glass rail in both themes; it keeps its own token set so
+     the midnight rail reads as intentional against the light paper canvas. */
+  --sidebar: transparent;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #131316;
+  --sidebar-accent: rgba(255, 255, 255, 0.07);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: rgba(255, 255, 255, 0.35);
+  --sidebar-glass: linear-gradient(
+    168deg,
+    rgba(30, 32, 50, 0.94) 0%,
+    rgba(13, 14, 26, 0.94) 55%,
+    rgba(24, 22, 42, 0.96) 100%
+  );
+  --sidebar-glow-1: rgba(139, 92, 246, 0.16);
+  --sidebar-glow-2: rgba(56, 189, 248, 0.09);
+  --page-glow: radial-gradient(1100px 480px at 50% -8%, rgba(99, 102, 241, 0.06), transparent 62%);
 
   --gradient-primary: linear-gradient(135deg, #171717, #0a0a0a);
   --gradient-surface: #ffffff;
-  --shadow-panel: 0 0 0 1px rgba(23, 23, 23, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1),
+  --shadow-panel:
+    0 0 0 1px rgba(23, 23, 23, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1),
     0 1px 2px -1px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 0 1px #e5e5e5;
 }
@@ -137,15 +240,31 @@
 
   html {
     color-scheme: light;
+    scroll-behavior: smooth;
+    scroll-padding-top: 84px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  :root.dark {
+    color-scheme: dark;
   }
 
   body {
     background-color: var(--color-background);
+    background-image: var(--page-glow, none);
+    background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-size: 14px;
     line-height: 1.43;
-    font-feature-settings: "ss01" on, "cv11" on;
+    font-feature-settings:
+      "ss01" on,
+      "cv11" on;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -185,7 +304,444 @@
 
 @utility grid-lines {
   background-image:
-    linear-gradient(to right, color-mix(in oklab, var(--border) 60%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklab, var(--border) 60%, transparent) 1px, transparent 1px);
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--border) 60%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--border) 60%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 48px 48px;
+}
+
+/* Sidebar glass system — frosted graphite panel with ambient violet bloom.
+   Glow layers and base glass live in ONE background stack so utilities
+   cannot shadow each other. */
+@utility glass-sidebar {
+  background:
+    radial-gradient(340px 260px at 82% -4%, var(--sidebar-glow-1), transparent 70%),
+    radial-gradient(300px 300px at -30% 42%, var(--sidebar-glow-2), transparent 70%),
+    radial-gradient(260px 240px at 60% 105%, rgba(168, 85, 247, 0.07), transparent 70%),
+    var(--sidebar-glass);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    24px 0 60px -24px rgba(10, 10, 15, 0.45);
+}
+
+@utility glass-item {
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 20px -12px rgba(0, 0, 0, 0.6);
+}
+
+@utility glass-card {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+@utility glass-divider {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.12) 18%,
+    rgba(255, 255, 255, 0.12) 82%,
+    transparent
+  );
+}
+
+/* Auth scene — AuthKit-style dark backdrop: starfield, hairline grid and a
+   soft spotlight bleeding down from above the card. */
+@utility auth-scene {
+  background-color: #06060d;
+  background-image:
+    radial-gradient(1.5px 1.5px at 18% 22%, rgba(255, 255, 255, 0.5) 50%, transparent 52%),
+    radial-gradient(1px 1px at 74% 14%, rgba(255, 255, 255, 0.38) 50%, transparent 52%),
+    radial-gradient(1px 1px at 30% 64%, rgba(255, 255, 255, 0.26) 50%, transparent 52%),
+    radial-gradient(1.5px 1.5px at 85% 55%, rgba(255, 255, 255, 0.3) 50%, transparent 52%),
+    radial-gradient(1px 1px at 55% 82%, rgba(255, 255, 255, 0.24) 50%, transparent 52%),
+    radial-gradient(1px 1px at 8% 80%, rgba(255, 255, 255, 0.2) 50%, transparent 52%),
+    radial-gradient(900px 480px at 50% -8%, rgba(129, 110, 255, 0.17), transparent 65%),
+    radial-gradient(1100px 640px at 50% -2%, rgba(64, 106, 255, 0.08), transparent 62%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    64px 64px,
+    64px 64px;
+}
+
+/* ---- Slush landing system — sticker-book on pastel paper ---- */
+@font-face {
+  font-family: "Bowlby One";
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/bowlbyone/v23/taiPGmCeCfEYv9zscNd3vPSesQ.woff2")
+    format("woff2");
+}
+
+.slush-display {
+  font-family: "Bowlby One", "Arial Black", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  line-height: 0.78;
+  letter-spacing: -0.01em;
+  color: var(--color-carbon);
+  text-transform: uppercase;
+}
+
+.slush-ui {
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+.slush-pill-label {
+  font-weight: 700;
+  letter-spacing: 0.032em;
+  text-transform: uppercase;
+}
+
+@utility slush-marquee {
+  background: var(--color-carbon);
+  color: var(--color-paper-white);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.slush-marquee-track {
+  display: inline-block;
+  animation: slush-marquee-scroll 28s linear infinite;
+  padding-block: 8px;
+}
+
+@keyframes slush-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slush-marquee-track {
+    animation: none;
+  }
+}
+
+@utility slush-sticker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-carbon);
+  border-radius: 20px;
+  box-shadow: none;
+}
+
+@utility slush-sticker-btn {
+  cursor: pointer;
+  border: 1px solid var(--color-carbon);
+  background: var(--color-paper-white);
+  border-radius: 1600px;
+  font-weight: 700;
+  letter-spacing: 0.032em;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.slush-sticker-btn:hover {
+  transform: translateY(-2px);
+  background: var(--color-soft-mist);
+}
+
+@utility slush-card {
+  border: 1px solid var(--color-carbon);
+  border-radius: 24px;
+  background: var(--color-paper-white);
+}
+
+@utility slush-cta {
+  cursor: pointer;
+  background: var(--color-carbon);
+  color: var(--color-paper-white);
+  border: 1px solid var(--color-carbon);
+  border-radius: 40px;
+  font-weight: 700;
+  letter-spacing: 0.032em;
+  transition: transform 0.15s ease;
+}
+
+.slush-cta:hover {
+  transform: translateY(-2px);
+}
+
+@utility auth-card {
+  background: linear-gradient(165deg, rgba(24, 26, 42, 0.72), rgba(10, 11, 20, 0.8));
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 40px 90px -30px rgba(0, 0, 0, 0.8);
+}
+
+/* ---- Auth scene primitives (theme-aware plain classes) ---- */
+.auth-input {
+  height: 2.75rem;
+  width: 100%;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  color: #ffffff;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+.auth-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+.auth-input:focus {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+}
+.auth-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.auth-ghost-btn {
+  display: flex;
+  height: 2.75rem;
+  width: 100%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.auth-ghost-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+}
+.auth-ghost-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+.auth-ghost-btn:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.auth-primary-btn {
+  margin-top: 0.25rem;
+  display: flex;
+  height: 2.75rem;
+  width: 100%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+.auth-primary-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+.auth-primary-btn:disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+.dark .auth-primary-btn {
+  background: #ffffff;
+  color: #0b0c14;
+}
+.dark .auth-primary-btn:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* ---- Daylight variants for the dark glass systems ---- */
+:root:not(.dark) .glass-sidebar {
+  background:
+    radial-gradient(340px 260px at 82% -4%, rgba(139, 92, 246, 0.14), transparent 70%),
+    radial-gradient(300px 300px at -30% 42%, rgba(56, 189, 248, 0.1), transparent 70%),
+    radial-gradient(260px 240px at 60% 105%, rgba(168, 85, 247, 0.06), transparent 70%),
+    linear-gradient(
+      168deg,
+      rgba(255, 255, 255, 0.86) 0%,
+      rgba(246, 246, 251, 0.9) 55%,
+      rgba(240, 238, 250, 0.93) 100%
+    );
+  border-right: 1px solid rgba(20, 21, 42, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    24px 0 60px -30px rgba(20, 21, 42, 0.18);
+}
+:root:not(.dark) .glass-sidebar [class*="text-white"] {
+  color: #191a2e;
+}
+:root:not(.dark) .glass-sidebar [class*="text-white/2"],
+:root:not(.dark) .glass-sidebar [class*="text-white/3"],
+:root:not(.dark) .glass-sidebar [class*="text-white/4"],
+:root:not(.dark) .glass-sidebar [class*="text-white/5"] {
+  color: rgba(25, 26, 46, 0.55);
+}
+:root:not(.dark) .glass-sidebar [class*="border-white"] {
+  border-color: rgba(20, 21, 42, 0.1);
+}
+:root:not(.dark) .glass-sidebar [class*="bg-white/1"],
+:root:not(.dark) .glass-sidebar [class*="bg-white/"] {
+  background-color: rgba(20, 21, 42, 0.05);
+}
+:root:not(.dark) .glass-sidebar [data-sidebar="menu-button"]:hover {
+  background: rgba(20, 21, 42, 0.05);
+  color: #14152a;
+}
+:root:not(.dark) .glass-sidebar a[class*="hover:bg-white"]:hover {
+  background: rgba(20, 21, 42, 0.04);
+  border-color: rgba(20, 21, 42, 0.16);
+}
+:root:not(.dark) .glass-sidebar [class*="from-white/90"] {
+  background: linear-gradient(to bottom, rgba(20, 21, 42, 0.9), rgba(20, 21, 42, 0.4));
+  box-shadow: 0 0 10px rgba(20, 21, 42, 0.35);
+}
+:root:not(.dark) .glass-sidebar .bg-white {
+  background: #191a2e;
+}
+:root:not(.dark) .glass-item {
+  background: linear-gradient(120deg, rgba(20, 20, 40, 0.06), rgba(20, 20, 40, 0.02));
+  border: 1px solid rgba(20, 20, 40, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 8px 20px -12px rgba(20, 20, 45, 0.25);
+}
+:root:not(.dark) .glass-card {
+  background: linear-gradient(150deg, rgba(20, 20, 40, 0.04), rgba(20, 20, 40, 0.015));
+  border: 1px solid rgba(20, 20, 40, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+:root:not(.dark) .glass-divider {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(20, 20, 40, 0.14) 18%,
+    rgba(20, 20, 40, 0.14) 82%,
+    transparent
+  );
+}
+
+/* Auth scene in daylight: pale sky backdrop, white glass card, dark ink */
+:root:not(.dark) .auth-scene {
+  background-color: #eef0f7;
+  background-image:
+    radial-gradient(1.5px 1.5px at 18% 22%, rgba(20, 21, 42, 0.28) 50%, transparent 52%),
+    radial-gradient(1px 1px at 74% 14%, rgba(20, 21, 42, 0.2) 50%, transparent 52%),
+    radial-gradient(1px 1px at 30% 64%, rgba(20, 21, 42, 0.16) 50%, transparent 52%),
+    radial-gradient(1.5px 1.5px at 85% 55%, rgba(20, 21, 42, 0.18) 50%, transparent 52%),
+    radial-gradient(1px 1px at 55% 82%, rgba(20, 21, 42, 0.14) 50%, transparent 52%),
+    radial-gradient(1px 1px at 8% 80%, rgba(20, 21, 42, 0.12) 50%, transparent 52%),
+    radial-gradient(900px 480px at 50% -8%, rgba(99, 102, 241, 0.14), transparent 65%),
+    radial-gradient(1100px 640px at 50% -2%, rgba(64, 106, 255, 0.07), transparent 62%),
+    linear-gradient(to right, rgba(20, 21, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 21, 42, 0.035) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    auto,
+    64px 64px,
+    64px 64px;
+}
+:root:not(.dark) .auth-card {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.82), rgba(246, 246, 251, 0.88));
+  border: 1px solid rgba(20, 21, 42, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 40px 90px -30px rgba(20, 21, 42, 0.3);
+}
+:root:not(.dark) .auth-card [class*="text-white"] {
+  color: #14152a;
+}
+:root:not(.dark) .auth-card [class*="text-white/2"],
+:root:not(.dark) .auth-card [class*="text-white/3"],
+:root:not(.dark) .auth-card [class*="text-white/4"],
+:root:not(.dark) .auth-card [class*="text-white/5"] {
+  color: rgba(20, 21, 42, 0.55);
+}
+:root:not(.dark) .auth-card [class*="border-white"] {
+  border-color: rgba(20, 21, 42, 0.1);
+}
+:root:not(.dark) .auth-card [class*="bg-white/1"],
+:root:not(.dark) .auth-card [class*="bg-white/2"],
+:root:not(.dark) .auth-card [class*="bg-white/0"] {
+  background-color: rgba(20, 21, 42, 0.04);
+}
+:root:not(.dark) .auth-card .bg-white {
+  background: rgba(20, 21, 42, 0.22);
+}
+:root:not(.dark) .auth-input {
+  border-color: rgba(20, 21, 42, 0.14);
+  background: rgba(20, 21, 42, 0.035);
+  color: #14152a;
+}
+:root:not(.dark) .auth-input::placeholder {
+  color: rgba(20, 21, 42, 0.38);
+}
+:root:not(.dark) .auth-input:focus {
+  border-color: rgba(20, 21, 42, 0.3);
+  background: rgba(20, 21, 42, 0.05);
+}
+:root:not(.dark) .auth-ghost-btn {
+  border-color: rgba(20, 21, 42, 0.12);
+  background: rgba(20, 21, 42, 0.04);
+  color: rgba(20, 21, 42, 0.8);
+}
+:root:not(.dark) .auth-ghost-btn:hover {
+  border-color: rgba(20, 21, 42, 0.28);
+  background: rgba(20, 21, 42, 0.07);
+  color: #14152a;
+}
+:root:not(.dark) .auth-primary-btn {
+  background: #101120;
+  color: #ffffff;
+}
+:root:not(.dark) .auth-primary-btn:hover {
+  background: #1c1e38;
 }

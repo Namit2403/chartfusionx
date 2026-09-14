@@ -1,11 +1,11 @@
 /**
  * Single source of truth for what each plan allows.
  *
- * Both plans expose every feature; they differ on how many AI actions may be
- * run per billing period. Starter is capped, Pro is unlimited.
+ * Two paid tiers: Pro ($29/mo, capped AI actions) and Max ($69/mo,
+ * unlimited AI actions). Both plans expose every feature.
  */
 
-export type PlanId = "starter_monthly" | "pro_monthly";
+export type PlanId = "pro_monthly" | "max_monthly";
 
 export type PlanConfig = {
   priceId: PlanId;
@@ -32,9 +32,9 @@ export type AiFeature = (typeof AI_FEATURES)[number];
 
 export const PLANS: PlanConfig[] = [
   {
-    priceId: "starter_monthly",
-    productId: "starter_plan",
-    name: "Starter",
+    priceId: "pro_monthly",
+    productId: "pro_plan",
+    name: "Pro",
     price: 29,
     tagline: "For traders building the habit.",
     aiActionsPerPeriod: 50,
@@ -47,14 +47,14 @@ export const PLANS: PlanConfig[] = [
     ],
   },
   {
-    priceId: "pro_monthly",
-    productId: "pro_plan",
-    name: "Pro",
+    priceId: "max_monthly",
+    productId: "max_plan",
+    name: "Max",
     price: 69,
     tagline: "For traders reviewing at higher volume.",
     aiActionsPerPeriod: null,
     features: [
-      "Everything in Starter",
+      "Everything in Pro",
       "Unlimited AI actions",
       "AI reviews, voice summaries & strategy analytics",
       "Advanced reports, analytics & exports",
@@ -74,12 +74,16 @@ export const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 export const FREE_TRADE_LIMIT = 10;
 
 /** Routes that stay reachable while signed in without an active subscription. */
-export const PAYWALL_EXEMPT_PATHS = ["/billing", "/pricing", "/privacy", "/terms", "/refund-policy"];
+export const PAYWALL_EXEMPT_PATHS = [
+  "/billing",
+  "/pricing",
+  "/privacy",
+  "/terms",
+  "/refund-policy",
+];
 
 export function isPaywallExempt(pathname: string) {
-  return PAYWALL_EXEMPT_PATHS.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`),
-  );
+  return PAYWALL_EXEMPT_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }
 
 export function aiLimitLabel(limit: number | null) {
