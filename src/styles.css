@@ -302,6 +302,30 @@
   letter-spacing: -0.02em;
 }
 
+/* Dashboard entrance — cards fade and rise in on load, staggered via
+   the --reveal-delay custom property (integer index). */
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility fade-rise {
+  animation: fade-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--reveal-delay, 0) * 60ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-rise {
+    animation: none;
+  }
+}
+
 @utility grid-lines {
   background-image:
     linear-gradient(

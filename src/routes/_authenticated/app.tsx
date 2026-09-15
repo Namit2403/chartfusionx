@@ -57,11 +57,23 @@ export const Route = createFileRoute("/_authenticated/app")({
 /* Small building blocks                                               */
 /* ------------------------------------------------------------------ */
 
-function Card({ className, children }: { className?: string; children: React.ReactNode }) {
+function Card({
+  className,
+  reveal,
+  children,
+}: {
+  className?: string;
+  reveal?: number | undefined;
+  children: React.ReactNode;
+}) {
   return (
     <div
+      style={
+        reveal !== undefined ? ({ "--reveal-delay": reveal } as React.CSSProperties) : undefined
+      }
       className={cn(
         "rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.8)]",
+        "fade-rise",
         className,
       )}
     >
@@ -85,24 +97,28 @@ function StatCard({
   delta,
   icon: Icon,
   tile,
+  reveal,
 }: {
   label: string;
   value: string;
   delta: string;
   icon: typeof Flame;
   tile: string;
+  reveal?: number | undefined;
 }) {
   return (
-    <Card className="relative overflow-hidden">
+    <Card className="relative overflow-hidden" reveal={reveal}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
-          <p className="num mt-2 text-3xl font-semibold tracking-tight text-foreground">{value}</p>
+          <p className="num mt-2 text-2xl font-semibold tracking-tight text-foreground xl:text-3xl">
+            {value}
+          </p>
           <p className="mt-2 text-xs font-medium text-violet-300">{delta}</p>
         </div>
         <span
           className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-xl text-white shadow-lg",
+            "flex size-9 shrink-0 items-center justify-center rounded-xl text-white shadow-lg xl:size-10",
             tile,
           )}
         >
@@ -120,11 +136,16 @@ function gradeTone(grade: string) {
   return "bg-rose-500/15 text-rose-300 border-rose-500/30";
 }
 
-function RecentTradeCard({ trade }: { trade: Trade }) {
+function RecentTradeCard({ trade, reveal }: { trade: Trade; reveal?: number | undefined }) {
   const win = trade.pnl >= 0;
   const barPct = Math.min(100, (Math.abs(trade.r) / 3.5) * 100);
   return (
-    <div className="group rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-4 transition hover:border-violet-500/40">
+    <div
+      style={
+        reveal !== undefined ? ({ "--reveal-delay": reveal } as React.CSSProperties) : undefined
+      }
+      className="group fade-rise rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-4 transition hover:border-violet-500/40"
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-foreground">{trade.asset}</p>
@@ -171,7 +192,7 @@ function RecentTradeCard({ trade }: { trade: Trade }) {
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-function MiniCalendar({ markedDates }: { markedDates: Set<string> }) {
+function MiniCalendar({ markedDates, reveal }: { markedDates: Set<string>; reveal?: number | undefined }) {
   const [cursor, setCursor] = useState(() => new Date());
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
@@ -192,7 +213,7 @@ function MiniCalendar({ markedDates }: { markedDates: Set<string> }) {
     `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
   return (
-    <Card className="p-4">
+    <Card className="p-4" reveal={reveal}>
       <div className="mb-3 flex items-center justify-between">
         <p className="text-sm font-semibold text-foreground">{monthLabel}</p>
         <div className="flex gap-1">
@@ -295,7 +316,7 @@ function nextOpenUtc(openUtcHours: number, now: Date) {
   return target;
 }
 
-function SessionCountdowns() {
+function SessionCountdowns({ reveal }: { reveal?: number | undefined }) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);
@@ -303,7 +324,7 @@ function SessionCountdowns() {
   }, []);
 
   return (
-    <Card className="p-4">
+    <Card className="p-4" reveal={reveal}>
       <SectionHeader title="Session opens" />
       <ul className="space-y-3">
         {SESSIONS.map((s) => {
@@ -400,6 +421,7 @@ function Dashboard() {
             delta={`↑ ${stats.accountGrowth.toFixed(2)}% account growth`}
             icon={TrendingUp}
             tile="bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-violet-500/30"
+            reveal={0}
           />
           <StatCard
             label="Win rate"
@@ -407,6 +429,7 @@ function Dashboard() {
             delta={`${stats.totalTrades} trades logged`}
             icon={Target}
             tile="bg-gradient-to-br from-sky-500 to-cyan-400 shadow-sky-500/30"
+            reveal={1}
           />
           <StatCard
             label="Win streak"
@@ -414,6 +437,7 @@ function Dashboard() {
             delta={stats.streak === 1 ? "current win" : "current wins in a row"}
             icon={Flame}
             tile="bg-gradient-to-br from-amber-500 to-orange-500 shadow-amber-500/30"
+            reveal={2}
           />
           <StatCard
             label="Avg R / trade"
@@ -421,6 +445,7 @@ function Dashboard() {
             delta={`profit factor ${stats.profitFactor.toFixed(2)}`}
             icon={Zap}
             tile="bg-gradient-to-br from-emerald-500 to-teal-400 shadow-emerald-500/30"
+            reveal={3}
           />
         </div>
 
@@ -446,8 +471,8 @@ function Dashboard() {
             </Card>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
-              {recentTrades.map((t) => (
-                <RecentTradeCard key={t.id} trade={t} />
+              {recentTrades.map((t, i) => (
+                <RecentTradeCard key={t.id} trade={t} reveal={4 + i} />
               ))}
             </div>
           )}
@@ -455,7 +480,7 @@ function Dashboard() {
 
         {/* Charts row */}
         <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2" reveal={8}>
             <SectionHeader
               title="Equity progress"
               action={
@@ -512,18 +537,18 @@ function Dashboard() {
             </div>
           </Card>
 
-          <Card>
+          <Card reveal={9}>
             <SectionHeader title="Top setups" />
-            <div className="flex items-center gap-4">
-              <div className="relative size-36 shrink-0">
+            <div className="flex flex-wrap items-center justify-center gap-3 xl:justify-start">
+              <div className="relative size-28 shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={topSetups}
                       dataKey="trades"
                       nameKey="name"
-                      innerRadius={44}
-                      outerRadius={68}
+                      innerRadius={34}
+                      outerRadius={54}
                       paddingAngle={3}
                       strokeWidth={0}
                     >
@@ -543,7 +568,7 @@ function Dashboard() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="num text-xl font-semibold text-foreground">
+                  <span className="num text-lg font-semibold text-foreground">
                     {strategyPerf.length}
                   </span>
                   <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -551,7 +576,7 @@ function Dashboard() {
                   </span>
                 </div>
               </div>
-              <ul className="min-w-0 flex-1 space-y-2">
+              <ul className="min-w-[7rem] flex-1 space-y-2">
                 {topSetups.map((s, i) => (
                   <li key={s.name} className="flex items-center gap-2 text-xs">
                     <span
@@ -571,7 +596,7 @@ function Dashboard() {
 
         {/* Quote + AI coach */}
         <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="relative overflow-hidden lg:col-span-2">
+          <Card className="relative overflow-hidden lg:col-span-2" reveal={10}>
             <div className="pointer-events-none absolute -left-8 -top-8 size-32 rounded-full bg-violet-500/20 blur-3xl" />
             <div className="relative flex items-start gap-4">
               <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/30">
@@ -587,7 +612,7 @@ function Dashboard() {
             </div>
           </Card>
 
-          <Card className="relative overflow-hidden">
+          <Card className="relative overflow-hidden" reveal={11}>
             <div className="pointer-events-none absolute -right-6 -top-10 size-28 rounded-full bg-fuchsia-500/20 blur-3xl" />
             <div className="relative">
               <span className="rounded-full border border-violet-500/30 bg-violet-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-300">
@@ -618,9 +643,9 @@ function Dashboard() {
       </div>
 
       {/* ------------------------------ Right rail ------------------------------ */}
-      <aside className="hidden w-72 shrink-0 space-y-4 lg:block">
+      <aside className="hidden w-72 shrink-0 space-y-4 xl:block">
         {/* Trader card */}
-        <Card className="flex items-center gap-3 p-4">
+        <Card className="flex items-center gap-3 p-4" reveal={12}>
           <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-sm font-bold text-white shadow-lg shadow-violet-500/30">
             {initial}
           </span>
@@ -637,10 +662,10 @@ function Dashboard() {
           )}
         </Card>
 
-        <MiniCalendar markedDates={markedDates} />
+        <MiniCalendar markedDates={markedDates} reveal={13} />
 
         {/* Daily goal */}
-        <Card className="p-4">
+        <Card className="p-4" reveal={14}>
           <div className="mb-2 flex items-center justify-between">
             <p className="text-sm font-semibold text-foreground">Journaling goal</p>
             <Link
@@ -674,7 +699,7 @@ function Dashboard() {
           </div>
         </Card>
 
-        <SessionCountdowns />
+        <SessionCountdowns reveal={15} />
       </aside>
     </div>
   );
