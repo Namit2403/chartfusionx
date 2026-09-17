@@ -123,7 +123,7 @@ function periodStart(sub: SubscriptionRecord | null) {
 }
 
 export const resolvePaddlePrice = createServerFn({ method: "GET" })
-  .inputValidator((data: { priceId: string; environment: PaddleEnv }) => data)
+  .validator((data: { priceId: string; environment: PaddleEnv }) => data)
   .handler(async ({ data }) => {
     const response = await gatewayFetch(
       data.environment,
@@ -140,7 +140,7 @@ export const resolvePaddlePrice = createServerFn({ method: "GET" })
  */
 export const getBillingOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { environment: PaddleEnv }) => data)
+  .validator((data: { environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -229,7 +229,7 @@ export const getBillingOverview = createServerFn({ method: "GET" })
  */
 export const recordTradeLog = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { environment: PaddleEnv }) => data)
+  .validator((data: { environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -275,7 +275,7 @@ export const recordTradeLog = createServerFn({ method: "POST" })
  */
 export const recordAiUsage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { feature: AiFeature | string; environment: PaddleEnv }) => data)
+  .validator((data: { feature: AiFeature | string; environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -315,7 +315,7 @@ export const recordAiUsage = createServerFn({ method: "POST" })
 /** Upgrade or downgrade in place, charging the prorated difference immediately. */
 export const changePlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { priceId: string; environment: PaddleEnv }) => data)
+  .validator((data: { priceId: string; environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -367,7 +367,7 @@ export const changePlan = createServerFn({ method: "POST" })
  */
 export const cancelSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { environment: PaddleEnv }) => data)
+  .validator((data: { environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -410,7 +410,7 @@ export const cancelSubscription = createServerFn({ method: "POST" })
 /** Undoes a scheduled cancellation while the plan is still running. */
 export const resumeSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { environment: PaddleEnv }) => data)
+  .validator((data: { environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -456,7 +456,7 @@ export const resumeSubscription = createServerFn({ method: "POST" })
  */
 export const createCheckoutIntent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { priceId: string; environment: PaddleEnv }) => data)
+  .validator((data: { priceId: string; environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -574,7 +574,7 @@ export const createCheckoutIntent = createServerFn({ method: "POST" })
 /** Creates a Paddle customer portal session for payment methods and invoices. */
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { environment: PaddleEnv }) => data)
+  .validator((data: { environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
