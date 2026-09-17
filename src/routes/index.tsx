@@ -5,6 +5,7 @@ import {
   BookOpen,
   BrainCircuit,
   Camera,
+  Check,
   LineChart,
   Mic,
   NotebookPen,
@@ -372,10 +373,10 @@ function Marquee() {
         {row.map((item, i) => (
           <span
             key={`${item}-${i}`}
-            className="slush-pill-label mx-6 inline-flex items-center gap-3 text-xs"
+            className="mono-label mx-4 inline-flex items-center gap-4 text-[11px]"
           >
-            <span className="inline-block size-1.5 rounded-full bg-sunburst" />
             {item}
+            <span className="tape-sep" aria-hidden />
           </span>
         ))}
       </div>
@@ -402,32 +403,42 @@ function StickerBadge({
 }
 
 function StickerCard({ feature, onOpen }: { feature: StickerFeature; onOpen: () => void }) {
-  const bodyTone = feature.text === "text-white" ? "text-white/85" : "text-carbon/75";
+  const isLive = feature.status === "live";
   // Touch vs pointer copy: exactly one span renders (the other is display:none,
   // so screen readers also read only one). See .detail-hint-* in styles.css.
-  const status = feature.status === "live" ? "Live now" : "Coming soon";
+  const status = isLive ? "Live now" : "Coming soon";
   const pillTouch = `${status} — tap for details`;
   const pillPointer = `${status} — click for details`;
+  const statusTag = (
+    <span className={isLive ? "tag-solid" : "tag-stamp"}>
+      {isLive && <Check className="size-3 text-up" strokeWidth={3} aria-hidden />}
+      <span className="mono-label">{status}</span>
+      <span className="detail-hint-touch"> — {"tap"} for details</span>
+      <span className="detail-hint-pointer"> — {"click"} for details</span>
+    </span>
+  );
   return (
-    <div className={`${feature.rotate} transition-transform hover:rotate-0`}>
+    <div>
       <button
         type="button"
         onClick={onOpen}
         aria-haspopup="dialog"
-        className={`slush-card group relative h-full w-full cursor-pointer p-6 text-left ${feature.fill} ${feature.text}`}
+        className={`group relative h-full w-full cursor-pointer p-6 text-left ${
+          isLive ? "card-live" : "card-soon"
+        }`}
       >
         <div className="flex items-start justify-between gap-3">
-          <feature.icon className="size-7" strokeWidth={2.2} />
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-carbon bg-paper-white text-carbon transition-transform duration-200 group-hover:rotate-90">
+          <feature.icon className="size-7" strokeWidth={2.2} aria-hidden />
+          <span
+            className="flex size-7 shrink-0 items-center justify-center rounded-full border border-current transition-transform duration-200 group-hover:rotate-90"
+            aria-hidden
+          >
             <Plus className="size-4" strokeWidth={2.5} />
           </span>
         </div>
         <h3 className="mt-4 text-xl font-bold tracking-tight">{feature.name}</h3>
-        <p className={`mt-2 text-sm font-medium leading-relaxed ${bodyTone}`}>{feature.body}</p>
-        <span className="slush-pill-label mt-4 inline-block rounded-full border border-current px-2.5 py-1 text-[10px]">
-          <span className="detail-hint-touch">{pillTouch}</span>
-          <span className="detail-hint-pointer">{pillPointer}</span>
-        </span>
+        <p className="mt-2 text-sm font-medium leading-relaxed text-current/80">{feature.body}</p>
+        <span className="mt-4 inline-block">{statusTag}</span>
       </button>
     </div>
   );
@@ -519,8 +530,10 @@ function FeatureDetailDialog({
                     Join the waitlist
                   </Link>
                 )}
-                <span className="text-xs font-medium text-carbon/60">
-                  Free while in beta · No card required
+                <span className="mono-label text-carbon/60">
+                  <span>Free while in beta</span>
+                  <span aria-hidden>—</span>
+                  <span>No card required</span>
                 </span>
               </div>
             </div>
@@ -571,40 +584,18 @@ function LandingPage() {
         </div>
       </header>
 
-      {/* Hero — sky wash band */}
-      <section className="relative overflow-hidden bg-sky-wash">
-        {/* decorative sticker cluster */}
-        <StickerBadge
-          label="↑ 2.4R"
-          fill="bg-mint-pop"
-          className="absolute left-[6%] top-16 hidden -rotate-6 lg:inline-flex"
-        />
-        <StickerBadge
-          label="Win rate 61%"
-          fill="bg-sunburst"
-          className="absolute right-[8%] top-24 hidden rotate-3 lg:inline-flex"
-        />
-        <StickerBadge
-          label="43-day streak"
-          fill="bg-lavender"
-          className="absolute bottom-24 left-[10%] hidden rotate-2 lg:inline-flex"
-        />
-        <StickerBadge
-          label="A- grade"
-          fill="bg-ember"
-          className="absolute bottom-32 right-[12%] hidden -rotate-3 lg:inline-flex"
-        />
-
-        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-20 pt-16 text-center sm:px-6 md:pt-24">
-          <h1 className="slush-display text-[72px] sm:text-[110px] md:text-[160px]">
+      {/* Hero — ledger paper with graph ruling */}
+      <section className="ledger-grid relative overflow-hidden bg-paper-white">
+        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-16 text-center sm:px-6 md:pt-24">
+          <h1 className="slush-display text-[72px] sm:text-[110px] md:text-[150px]">
             Chart
             <br />
             Fusion
-            <span className="text-electric-blue">X</span>
+            <span className="text-blueprint">X</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-carbon sm:text-2xl">
-            Log every trade, understand your behavior, improve your execution — the journal and
-            analytics system serious traders run on, with an AI coach for every trade arriving soon.
+            Log every trade, understand your behavior, improve your execution. The AI operating
+            system for serious traders — in development, arriving soon.
           </p>
           {/* TODO(social-proof): when a real, verifiable trader count exists, insert the line
               below directly after this comment (replace N — never an estimate or round-up).
@@ -620,21 +611,73 @@ function LandingPage() {
               See pricing
             </a>
           </div>
-          <p className="mt-4 text-xs font-medium text-carbon/60">
-            Free while in beta · No card required
-          </p>
+          <div className="meta-row mt-4 text-carbon/60">
+            <span className="mono-label">Free while in beta</span>
+            <span className="mono-label">No card required</span>
+          </div>
+
+          {/* The one loud element: an illustrative session chart that draws
+              itself in on load. Explicitly labeled — not real data. */}
+          <figure
+            className="session-strip mt-12 w-full max-w-3xl px-4 pb-3 pt-4 text-left sm:px-6"
+            aria-label="Illustrative trading session chart"
+          >
+            <svg viewBox="0 0 560 150" className="h-auto w-full" aria-hidden focusable="false">
+              {[
+                { x: 20, o: 92, c: 116 },
+                { x: 60, o: 118, c: 104 },
+                { x: 100, o: 102, c: 126 },
+                { x: 140, o: 124, c: 110 },
+                { x: 180, o: 108, c: 96 },
+                { x: 220, o: 94, c: 112 },
+                { x: 260, o: 114, c: 138 },
+                { x: 300, o: 136, c: 118 },
+                { x: 340, o: 116, c: 134 },
+                { x: 380, o: 132, c: 108 },
+                { x: 420, o: 106, c: 128 },
+                { x: 460, o: 126, c: 146 },
+              ].map((c, i) => (
+                <g key={c.x} className="strip-bar" style={{ "--bar-i": i } as React.CSSProperties}>
+                  <rect
+                    x={c.x - 4}
+                    y={Math.min(c.o, c.c) - 3}
+                    width={8}
+                    height={Math.abs(c.o - c.c) + 6}
+                    rx={1}
+                    fill={c.c >= c.o ? "var(--color-up)" : "var(--color-down)"}
+                  />
+                  <line
+                    x1={c.x}
+                    x2={c.x}
+                    y1={c.o - 12}
+                    y2={c.c + 12}
+                    stroke="var(--color-carbon)"
+                    strokeWidth={1.5}
+                  />
+                </g>
+              ))}
+              <path
+                className="strip-line"
+                d="M20 96 L60 104 L100 88 L140 94 L180 108 L220 92 L260 76 L300 88 L340 72 L380 84 L420 62 L460 48 L520 40"
+                fill="none"
+                stroke="var(--color-blueprint)"
+                strokeWidth={2.5}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            </svg>
+            <figcaption className="mono-label mt-2 text-carbon/55">
+              Illustrative session — not real data
+            </figcaption>
+          </figure>
         </div>
 
         {/* inflated ribbon band */}
-        <div className="relative h-28 bg-electric-blue sm:h-36">
-          <div className="absolute inset-x-0 -top-10 mx-auto flex max-w-7xl items-center justify-center">
-            <StickerBadge label="Free beta" fill="bg-sunburst" className="rotate-2" />
-          </div>
-        </div>
+        <div className="relative h-16 bg-blueprint sm:h-20" aria-hidden />
       </section>
 
-      {/* Features — white band */}
-      <section id="features" className="bg-paper-white py-20">
+      {/* Features — ledger paper band */}
+      <section id="features" className="ledger-grid bg-paper-white py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <h2 className="slush-display text-[40px] sm:text-[70px]">
             Every trade,
@@ -652,8 +695,8 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* AI modules — concrete band */}
-      <section id="ai" className="bg-concrete-gray py-20">
+      {/* AI modules — draft band: bare ledger ground, dashed cards */}
+      <section id="ai" className="bg-paper-white py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <h2 className="slush-display text-[40px] sm:text-[70px]">
@@ -668,7 +711,7 @@ function LandingPage() {
               </p>
             </div>
           </div>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-14 grid gap-8 border-t border-dashed border-carbon/30 pt-12 sm:grid-cols-2 lg:grid-cols-3">
             {AI_MODULES.map((f) => (
               <StickerCard key={f.name} feature={f} onOpen={() => openDetail(f.name)} />
             ))}
@@ -689,9 +732,10 @@ function LandingPage() {
             — waitlist members get first pick.
           </p>
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
-            <div className="slush-card flex flex-col bg-mint-pop p-6">
-              <span className="slush-pill-label w-fit rounded-full border border-carbon bg-paper-white px-3 py-1 text-[10px]">
-                Live now
+            <div className="card-live flex flex-col p-6">
+              <span className="tag-solid w-fit">
+                <Check className="size-3 text-up" strokeWidth={3} aria-hidden />
+                <span className="mono-label">Live now</span>
               </span>
               <h3 className="slush-display mt-4 text-3xl">Free Beta</h3>
               <p className="slush-display mt-1 text-5xl">$0</p>
@@ -705,24 +749,26 @@ function LandingPage() {
                 Try Now
               </Link>
             </div>
-            <div className="slush-card flex flex-col bg-paper-white p-6">
-              <span className="slush-pill-label w-fit rounded-full border border-carbon bg-sunburst px-3 py-1 text-[10px]">
-                {FOUNDER_CTA_LIVE ? "Founding access" : "After beta"}
+            <div className="card-live flex flex-col p-6">
+              <span className="tag-stamp w-fit">
+                <span className="mono-label">
+                  {FOUNDER_CTA_LIVE ? "Founding access" : "After beta"}
+                </span>
               </span>
               <h3 className="slush-display mt-4 text-3xl">Pro</h3>
               <p className="slush-display mt-1 text-5xl">
                 {FOUNDER_CTA_LIVE ? (
                   <>
                     ${FOUNDER_PLANS.pro_founding.price}
-                    <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
-                      ONE-TIME · FOUNDING YEAR
+                    <span className="mono-label mt-1 block text-carbon/50">
+                      One-time — founding year
                     </span>
                   </>
                 ) : (
                   <>
                     $29
-                    <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
-                      PER MONTH · AFTER BETA
+                    <span className="mono-label mt-1 block text-carbon/50">
+                      Per month — after beta
                     </span>
                   </>
                 )}
@@ -738,24 +784,24 @@ function LandingPage() {
                 className="slush-sticker-btn mt-6 px-6 py-3 text-center text-sm"
               />
             </div>
-            <div className="slush-card flex flex-col bg-lavender p-6">
-              <span className="slush-pill-label w-fit rounded-full border border-carbon bg-voltage-violet px-3 py-1 text-[10px] text-white">
-                Best for heavy reviewers
+            <div className="card-live flex flex-col p-6">
+              <span className="tag-stamp w-fit">
+                <span className="mono-label">Best for heavy reviewers</span>
               </span>
               <h3 className="slush-display mt-4 text-3xl">Max</h3>
               <p className="slush-display mt-1 text-5xl">
                 {FOUNDER_CTA_LIVE ? (
                   <>
                     ${FOUNDER_PLANS.max_founding.price}
-                    <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
-                      ONE-TIME · FOUNDING YEAR
+                    <span className="mono-label mt-1 block text-carbon/50">
+                      One-time — founding year
                     </span>
                   </>
                 ) : (
                   <>
                     $69
-                    <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
-                      PER MONTH · AFTER BETA
+                    <span className="mono-label mt-1 block text-carbon/50">
+                      Per month — after beta
                     </span>
                   </>
                 )}
@@ -775,15 +821,15 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* CTA band — sky wash again */}
-      <section id="get-started" className="scroll-mt-20 bg-sky-wash py-24">
+      {/* CTA band — ink, the ledger closes */}
+      <section id="get-started" className="scroll-mt-20 bg-carbon py-24 text-paper-white">
         <div className="mx-auto flex max-w-4xl flex-col items-center px-4 text-center sm:px-6">
-          <h2 className="slush-display text-[48px] sm:text-[80px]">
+          <h2 className="slush-display text-[48px] sm:text-[80px] text-paper-white">
             Stop guessing.
             <br />
             Start logging.
           </h2>
-          <p className="mt-5 max-w-xl text-base font-medium text-carbon/70 sm:text-xl">
+          <p className="mt-5 max-w-xl text-base font-medium text-paper-white/75 sm:text-xl">
             Every trade creates data. Every piece of data creates insight. Every insight creates
             improvement.
           </p>
@@ -795,16 +841,18 @@ function LandingPage() {
               Sign in
             </Link>
           </div>
-          <p className="mt-4 text-xs font-medium text-carbon/60">
-            Free while in beta · No card required · Demo mode available
-          </p>
+          <div className="meta-row mt-4">
+            <span className="mono-label text-paper-white/65">Free while in beta</span>
+            <span className="mono-label text-paper-white/65">No card required</span>
+            <span className="mono-label text-paper-white/65">Demo mode available</span>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-carbon bg-paper-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-8 text-xs font-medium text-carbon/60 sm:px-6">
-          <span className="slush-display text-sm text-carbon">ChartFusionX</span>
+          <span className="mono-label text-carbon">ChartFusionX</span>
           <span>© {new Date().getFullYear()}</span>
           <a href="#pricing" className="hover:text-carbon">
             Pricing

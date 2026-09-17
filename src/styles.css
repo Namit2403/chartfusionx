@@ -15,13 +15,21 @@
  */
 
 @theme inline {
-  /* Slush landing system — sticker-book on pastel paper */
+  /* Landing system — "The Trader's Ledger": ledger paper, graph grid, ink,
+     and the semantic two-color of candlestick convention (up green / down
+     red) plus one annotation-pen blue. Color is semantic, never decorative. */
   --color-carbon: #000000;
   --color-paper-white: #ffffff;
+  --color-ledger: #f7f5ef;
+  --color-grid-line: #d8d3c6;
+  --color-ink-soft: #3d4252;
+  --color-up: #1e7f4f;
+  --color-down: #c2402a;
+  --color-blueprint: #2f5fe3;
   --color-sky-wash: #dceeff;
   --color-concrete-gray: #cccccc;
   --color-soft-mist: #e9e9e9;
-  --color-electric-blue: #4da2ff;
+  --color-electric-blue: #2f5fe3;
   --color-mint-pop: #55db9c;
   --color-lavender: #e9ccff;
   --color-ember: #fb4903;
@@ -413,21 +421,15 @@
     64px 64px;
 }
 
-/* ---- Slush landing system — sticker-book on pastel paper ---- */
-@font-face {
-  font-family: "Bowlby One";
-  font-display: swap;
-  src: url("https://fonts.gstatic.com/s/bowlbyone/v23/taiPGmCeCfEYv9zscNd3vPSesQ.woff2")
-    format("woff2");
-}
-
+/* ---- Trader's Ledger primitives ---- */
 .slush-display {
-  font-family: "Bowlby One", "Arial Black", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-mono);
   font-weight: 800;
-  line-height: 0.78;
-  letter-spacing: -0.01em;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
   color: var(--color-carbon);
   text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
 }
 
 .slush-ui {
@@ -439,6 +441,176 @@
   font-weight: 700;
   letter-spacing: 0.032em;
   text-transform: uppercase;
+}
+
+/* ---- Trader's Ledger primitives ---- */
+@utility mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Posted entries (shipped product): solid ink border, paper ground, a
+   3px candlestick-green top rule. Reads as "real" before any label. */
+@utility card-live {
+  border: 1px solid var(--color-carbon);
+  border-top: 3px solid var(--color-up);
+  border-radius: 10px;
+  background: var(--color-paper-white);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.card-live:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 0 0 var(--color-carbon);
+}
+
+/* Draft entries (roadmap): dashed ink border on bare ledger ground at
+   reduced ink weight — "not yet real" without lowering opacity. */
+@utility card-soon {
+  border: 1.5px dashed color-mix(in oklab, var(--color-carbon) 65%, transparent);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--color-paper-white) 30%, transparent);
+  color: color-mix(in oklab, var(--color-carbon) 72%, var(--color-paper-white));
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.card-soon:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-carbon);
+}
+
+.card-soon h3 {
+  color: color-mix(in oklab, var(--color-carbon) 78%, var(--color-paper-white));
+}
+
+/* Status tags encode hierarchy by treatment, not just words:
+   solid pill + tick = live; outline stamp = planned. */
+@utility tag-solid {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--color-carbon);
+  border-radius: 4px;
+  background: var(--color-paper-white);
+  padding: 3px 8px;
+  box-shadow: 0 1px 0 0 var(--color-carbon);
+}
+
+@utility tag-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px dashed color-mix(in oklab, var(--color-carbon) 65%, transparent);
+  border-radius: 4px;
+  background: transparent;
+  padding: 3px 8px;
+  transform: rotate(-1.2deg);
+}
+
+/* Ticker tape: hairline rules between items instead of bullet dots. */
+@utility tape-sep {
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  background: color-mix(in oklab, var(--color-paper-white) 40%, transparent);
+}
+
+/* Spaced meta row — the replacement for middle-dot-joined strings. */
+@utility meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 28px;
+  row-gap: 4px;
+}
+
+@utility meta-row-left {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: 28px;
+  row-gap: 4px;
+}
+
+/* Hero session strip — the one loud element. Graph grid on paper,
+   animated bars and a drawing equity line; static under reduced motion. */
+@utility session-strip {
+  border: 1px solid var(--color-carbon);
+  border-radius: 12px;
+  background-color: var(--color-paper-white);
+  background-image:
+    linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  box-shadow: 0 2px 0 0 var(--color-carbon);
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes line-draw {
+  from {
+    stroke-dashoffset: 760;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@utility strip-bar {
+  transform-origin: bottom;
+  animation: bar-grow 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(0.25s + var(--bar-i, 0) * 55ms);
+}
+
+@utility strip-line {
+  stroke-dasharray: 760;
+  animation: line-draw 1.15s cubic-bezier(0.65, 0, 0.35, 1) 0.55s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip-bar,
+  .strip-line {
+    animation: none;
+  }
+  .strip-line {
+    stroke-dashoffset: 0;
+  }
+  .card-live:hover,
+  .card-soon:hover {
+    transform: none;
+  }
+}
+
+/* Visible keyboard focus across the ledger primitives. */
+.slush-cta:focus-visible,
+.slush-sticker-btn:focus-visible,
+.card-live:focus-visible,
+.card-soon:focus-visible {
+  outline: 2px solid var(--color-blueprint);
+  outline-offset: 3px;
+}
+
+/* Graph-paper ruling behind the hero and feature sections. */
+@utility ledger-grid {
+  background-image:
+    linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
 }
 
 /* Card detail hints: show the touch or pointer variant, never both (the hidden
@@ -496,6 +668,7 @@
   cursor: pointer;
   border: 1px solid var(--color-carbon);
   background: var(--color-paper-white);
+  color: var(--color-carbon);
   border-radius: 1600px;
   font-weight: 700;
   letter-spacing: 0.032em;

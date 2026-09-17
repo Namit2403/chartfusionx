@@ -13,7 +13,7 @@
 
 - Dev server binds **port 8080**, not 5173 — the `@lovable.dev` Vite preset overrides the default. URL: `http://localhost:8080/`.
 - Vite client env vars need the `VITE_` prefix (default `envPrefix`, no override in the preset config): `import.meta.env.FOO` is always undefined unless the var is `VITE_FOO`. Founding-CTA flag: `VITE_FOUNDER_CTA_LIVE` (see `src/lib/whop-founding.ts`); test flag branches by deleting/setting the key on `import.meta.env` + `vi.resetModules()` before a dynamic import.
-- Pre-existing benign console noise: a `<html>` hydration warning from `__root.tsx` and one external-font 404. Don't chase these when checking logs.
+- Pre-existing benign console noise: a `<html>` hydration warning from `__root.tsx` only (the old external-font 404 was fixed by deleting the unused Bowlby One `@font-face`). Don't chase the hydration warning.
 - `code_search` intermittently fails with a ripgrep ENOENT (uv_spawn) error; retrying the identical call usually works.
 
 ## Running & testing
@@ -21,6 +21,7 @@
 - No `test` script in package.json — run `npx vitest run` (jsdom + testing-library, setup in `src/test/setup.ts`). Typecheck: `npx tsc --noEmit`. Lint: `npx eslint <files> --fix`.
 - To test a TanStack file-route component, mock `@tanstack/react-router` (`createFileRoute` → identity fn, `Link` → `<a>`), dynamically import the route module, and use `(Route as any).component`. See `src/routes/_authenticated/app.dashboard.test.tsx`.
 - Dashboard P&L renders on both the stat card and the trade card, so tests need `getAllByText` for money/percent strings.
+- Landing visual identity ("The Trader's Ledger", 2026-09): ledger paper + graph ruling, Geist Mono display, semantic candle colors (`--up` green = live, `--down` red), annotation blue (`--blueprint`). Card split: `.card-live` (solid ink, green top rule) vs `.card-soon` (dashed, ink at 72%); tags `.tag-solid` vs `.tag-stamp`. Hero session chart is an explicitly-labeled illustrative SVG — keep the "not real data" caption if edited. Slush pastels/mint/lavender/sunburst remain defined in the theme but are no longer used by the landing.
 
 ## Freebuff preview webview (this environment)
 
