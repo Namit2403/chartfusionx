@@ -149,6 +149,33 @@ idempotent like everything else):
 
 Apply via the usual `supabase db push` (Lovable Cloud applies it on deploy).
 
+## CTA go-live switch (founder checkout links)
+
+The marketing pages (`/` and `/pricing`) read `VITE_FOUNDER_CTA_LIVE`:
+
+- **Unset / anything but `true`** → Pro/Max CTAs link to the waitlist
+  (`/whats-coming`) as before. The Whop checkout is never linked.
+- **`VITE_FOUNDER_CTA_LIVE=true`** (a build-time `import.meta.env` variable —
+  the `VITE_` prefix is required for Vite to expose it to client code) →
+  Pro/Max CTAs link to the canonical Whop checkout for each plan
+  (`whop.com/checkout/<plan_id>`) and the cards show founding pricing
+  ($199 Pro / $399 Max, one payment for a founding year).
+
+Shared constants: `src/lib/whop-founding.ts` (checkout URLs, prices, label);
+the server module re-derives its webhook plan map from it so the two cannot
+drift.
+
+**Go-live order (do not reorder):**
+
+1. Configure `WHOP_WEBHOOK_SECRET` in the production environment (below).
+2. Create and verify the Whop webhook (steps 2–3 below) — send a test event
+   and confirm it lands in `whop_webhook_events`.
+3. Only then set `FOUNDER_CTA_LIVE=true` and redeploy. If the webhook is not
+   yet verified, a customer could pay on Whop while the app records nothing.
+
+To stop offering founding access later, remove the flag and redeploy — CTAs
+fall back to the waitlist automatically.
+
 ## Operational runbook
 
 **Set up (once credentials exist):**

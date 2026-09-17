@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   Area,
@@ -18,16 +18,21 @@ import {
   ChevronLeft,
   ChevronRight,
   Flame,
+  LineChart,
   Quote,
+  RotateCcw,
   Sparkles,
   Target,
   TrendingUp,
+  TriangleAlert,
   Zap,
 } from "lucide-react";
 
 import { NoTradesYet } from "@/components/no-trades-yet";
+import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { OnboardingModal } from "@/components/onboarding-modal";
 import { RiskDisclaimer } from "@/components/risk-disclaimer";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useTradeData } from "@/hooks/useTradeData";
@@ -91,6 +96,31 @@ function SectionHeader({ title, action }: { title: string; action?: React.ReactN
   );
 }
 
+/**
+ * Placeholder for a data surface that has no numbers to show yet. Used while a
+ * signed-in trader's trades are still loading, and once they load empty — a new
+ * trader must never be shown sample numbers as their own results.
+ */
+function ChartPlaceholder({
+  message,
+  className,
+}: {
+  message: string;
+  className?: string | undefined;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-6 text-center",
+        className,
+      )}
+    >
+      <LineChart className="size-5 text-muted-foreground" />
+      <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">{message}</p>
+    </div>
+  );
+}
+
 function StatCard({
   label,
   value,
@@ -98,6 +128,8 @@ function StatCard({
   icon: Icon,
   tile,
   reveal,
+  loading,
+  muted,
 }: {
   label: string;
   value: string;
@@ -105,16 +137,34 @@ function StatCard({
   icon: typeof Flame;
   tile: string;
   reveal?: number | undefined;
+  loading?: boolean | undefined;
+  muted?: boolean | undefined;
 }) {
   return (
     <Card className="relative overflow-hidden" reveal={reveal}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
-          <p className="num mt-2 text-2xl font-semibold tracking-tight text-foreground xl:text-3xl">
-            {value}
-          </p>
-          <p className="mt-2 text-xs font-medium text-violet-300">{delta}</p>
+          {loading ? (
+            <>
+              <Skeleton className="mt-2 h-7 w-28 xl:h-8" />
+              <Skeleton className="mt-2.5 h-3 w-36" />
+            </>
+          ) : (
+            <>
+              <p className="num mt-2 text-2xl font-semibold tracking-tight text-foreground xl:text-3xl">
+                {value}
+              </p>
+              <p
+                className={cn(
+                  "mt-2 text-xs font-medium",
+                  muted ? "text-muted-foreground" : "text-violet-300",
+                )}
+              >
+                {delta}
+              </p>
+            </>
+          )}
         </div>
         <span
           className={cn(
@@ -192,7 +242,13 @@ function RecentTradeCard({ trade, reveal }: { trade: Trade; reveal?: number | un
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-function MiniCalendar({ markedDates, reveal }: { markedDates: Set<string>; reveal?: number | undefined }) {
+function MiniCalendar({
+  markedDates,
+  reveal,
+}: {
+  markedDates: Set<string>;
+  reveal?: number | undefined;
+}) {
   const [cursor, setCursor] = useState(() => new Date());
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
@@ -332,7 +388,12 @@ function SessionCountdowns({ reveal }: { reveal?: number | undefined }) {
           return (
             <li key={s.name} className="flex items-center justify-between gap-3">
               <span className="flex items-center gap-2 text-sm text-foreground">
-                <span className={cn("size-2 rounded-full", s.color)} />
+                <span
+                  className={cn(
+                    "size-2 rounded-full transition-opacity",
+                    open.getTime() - now.getTime() <= 0 ? s.color : "opacity-40",
+                  )}
+                />
                 {s.name}
               </span>
               <span className="num text-xs text-muted-foreground">
@@ -366,8 +427,10 @@ function displayName(
 }
 
 function Dashboard() {
+  const navigate = useNavigate();
   const { user, loading: authLoading } = useAuthUser();
-  const { trades, stats, equityCurve, strategyPerf, isEmpty } = useTradeData();
+  const { trades, stats, equityCurve, strategyPerf, isEmpty, isDemo, error, loading, refresh } =
+    useTradeData();
   const { planName, entitled } = useSubscription();
 
   const { name, initial } = displayName(user ?? null);
@@ -394,6 +457,13 @@ function Dashboard() {
 
   const recentTrades = trades.slice(0, 4);
 
+  // With an empty journal the deltas have no meaning yet, so they say so
+  // instead of reading like results ("↑ 0.00% account growth"). A failed fetch
+  // is not an empty journal though — never claim the trader has no trades when
+  // we simply couldn't read them.
+  const noTradesYet = !loading && !isDemo && isEmpty && !error;
+  const statHint = error ? "Not available right now" : null;
+
   return (
     <div className="flex w-full gap-6">
       <OnboardingModal />
@@ -405,47 +475,115 @@ function Dashboard() {
             Welcome back{name ? `, ${name}` : ""}! <span aria-hidden>👋</span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {authLoading
+            {authLoading || (loading && !isDemo)
               ? "Loading your journal…"
-              : isEmpty && !user
-                ? "Browsing the demo journal — sign in to log your own trades."
-                : "Here's what your trading data says today."}
+              : isDemo
+                ? "Browsing the demo journal — these numbers are an example. Sign in and your own stats fill in here."
+                : isEmpty
+                  ? "Your dashboard is ready — it fills in the moment you log your first trade."
+                  : "Here's what your trading data says today."}
           </p>
         </div>
+
+        {/* Demo banner — shows what this page becomes once you sign in */}
+        {isDemo && !authLoading && (
+          <div className="fade-rise flex flex-wrap items-center justify-between gap-3 rounded-xl border border-violet-500/25 bg-violet-500/[0.08] px-4 py-3">
+            <p className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Sparkles className="size-4 shrink-0 text-violet-300" />
+              This is a sample trader's journal. Sign in and every number here becomes yours.
+            </p>
+            <button
+              type="button"
+              onClick={() => void navigate({ to: "/auth" })}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-500/15 px-2.5 py-1 text-[11px] font-semibold text-violet-200 transition hover:bg-violet-500/25 hover:text-violet-100"
+            >
+              Sign in to make it yours
+            </button>
+          </div>
+        )}
+
+        {/* First-run checklist — signed-in traders only, auto-completes as data arrives */}
+        {user && <OnboardingChecklist trades={trades} />}
+
+        {/* The fetch failed — say so instead of showing zeros as if they were results */}
+        {error && !isDemo && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/25 bg-amber-500/[0.07] px-4 py-3">
+            <p className="flex items-center gap-2 text-xs text-amber-200">
+              <TriangleAlert className="size-4 shrink-0" />
+              We couldn't load your trades just now — these numbers may be out of date.
+            </p>
+            <button
+              type="button"
+              onClick={refresh}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-200 transition hover:bg-amber-500/20"
+            >
+              <RotateCcw className="size-3" />
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Stat cards */}
         <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
           <StatCard
             label="Net P&L (month)"
             value={currency(stats.monthlyPnl)}
-            delta={`↑ ${stats.accountGrowth.toFixed(2)}% account growth`}
+            delta={
+              statHint ??
+              (noTradesYet
+                ? "No trades logged yet"
+                : `↑ ${stats.accountGrowth.toFixed(2)}% account growth`)
+            }
+            muted={statHint !== null || noTradesYet}
             icon={TrendingUp}
             tile="bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-violet-500/30"
             reveal={0}
+            loading={loading}
           />
           <StatCard
             label="Win rate"
             value={`${stats.winRate.toFixed(1)}%`}
-            delta={`${stats.totalTrades} trades logged`}
+            delta={
+              statHint ??
+              (noTradesYet ? "Nothing to rate yet" : `${stats.totalTrades} trades logged`)
+            }
+            muted={statHint !== null || noTradesYet}
             icon={Target}
             tile="bg-gradient-to-br from-sky-500 to-cyan-400 shadow-sky-500/30"
             reveal={1}
+            loading={loading}
           />
           <StatCard
             label="Win streak"
             value={`${stats.streak}`}
-            delta={stats.streak === 1 ? "current win" : "current wins in a row"}
+            delta={
+              statHint ??
+              (noTradesYet
+                ? "Log a trade to start a streak"
+                : stats.streak === 1
+                  ? "1 win in a row"
+                  : `${stats.streak} wins in a row`)
+            }
+            muted={statHint !== null || noTradesYet}
             icon={Flame}
             tile="bg-gradient-to-br from-amber-500 to-orange-500 shadow-amber-500/30"
             reveal={2}
+            loading={loading}
           />
           <StatCard
             label="Avg R / trade"
             value={`${stats.avgR >= 0 ? "+" : ""}${stats.avgR.toFixed(2)}R`}
-            delta={`profit factor ${stats.profitFactor.toFixed(2)}`}
+            delta={
+              statHint ??
+              (noTradesYet
+                ? "Waiting on your first trade"
+                : `profit factor ${stats.profitFactor.toFixed(2)}`)
+            }
+            muted={statHint !== null || noTradesYet}
             icon={Zap}
             tile="bg-gradient-to-br from-emerald-500 to-teal-400 shadow-emerald-500/30"
             reveal={3}
+            loading={loading}
           />
         </div>
 
@@ -462,11 +600,21 @@ function Dashboard() {
               </Link>
             }
           />
-          {isEmpty ? (
+          {loading ? (
+            <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-32 rounded-2xl" />
+              ))}
+            </div>
+          ) : isEmpty ? (
             <Card>
               <NoTradesYet
-                title="Your dashboard is waiting on your first trade"
-                description="Equity curve, win rate, expectancy and AI insight all come from the trades you log — nothing here is sample data."
+                title={error ? "We couldn't load your trades" : "Your journal starts here"}
+                description={
+                  error
+                    ? "Your journal is safe on the server — retry above to pull it back in."
+                    : "Log your first trade and this grid fills with your entries — every stat, curve and score on this page is computed from them."
+                }
               />
             </Card>
           ) : (
@@ -489,73 +637,39 @@ function Dashboard() {
                 </span>
               }
             />
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={equityCurve} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="eq" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.45} />
-                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
-                  <XAxis
-                    dataKey="date"
-                    stroke="rgba(255,255,255,0.35)"
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    stroke="rgba(255,255,255,0.35)"
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={false}
-                    width={56}
-                    domain={["dataMin - 200", "dataMax + 200"]}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: "rgba(15,15,30,0.95)",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      borderRadius: 12,
-                      fontSize: 12,
-                      color: "#fff",
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="equity"
-                    stroke="#a855f7"
-                    strokeWidth={2}
-                    fill="url(#eq)"
-                    dot={{ r: 3, fill: "#a855f7", strokeWidth: 0 }}
-                    activeDot={{ r: 5 }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          <Card reveal={9}>
-            <SectionHeader title="Top setups" />
-            <div className="flex flex-wrap items-center justify-center gap-3 xl:justify-start">
-              <div className="relative size-28 shrink-0">
+            {loading ? (
+              <Skeleton className="h-64 w-full rounded-xl" />
+            ) : isEmpty ? (
+              <ChartPlaceholder
+                className="h-64"
+                message="Your equity curve appears once you log your first trade."
+              />
+            ) : (
+              <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={topSetups}
-                      dataKey="trades"
-                      nameKey="name"
-                      innerRadius={34}
-                      outerRadius={54}
-                      paddingAngle={3}
-                      strokeWidth={0}
-                    >
-                      {topSetups.map((_, i) => (
-                        <Cell key={i} fill={SETUPS_COLORS[i % SETUPS_COLORS.length]} />
-                      ))}
-                    </Pie>
+                  <AreaChart data={equityCurve} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="eq" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.45} />
+                        <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      stroke="rgba(255,255,255,0.35)"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="rgba(255,255,255,0.35)"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                      width={56}
+                      domain={["dataMin - 200", "dataMax + 200"]}
+                    />
                     <Tooltip
                       contentStyle={{
                         background: "rgba(15,15,30,0.95)",
@@ -565,32 +679,84 @@ function Dashboard() {
                         color: "#fff",
                       }}
                     />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="num text-lg font-semibold text-foreground">
-                    {strategyPerf.length}
-                  </span>
-                  <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                    setups
-                  </span>
-                </div>
-              </div>
-              <ul className="min-w-[7rem] flex-1 space-y-2">
-                {topSetups.map((s, i) => (
-                  <li key={s.name} className="flex items-center gap-2 text-xs">
-                    <span
-                      className="size-2 shrink-0 rounded-full"
-                      style={{ background: SETUPS_COLORS[i % SETUPS_COLORS.length] }}
+                    <Area
+                      type="monotone"
+                      dataKey="equity"
+                      stroke="#a855f7"
+                      strokeWidth={2}
+                      fill="url(#eq)"
+                      dot={{ r: 3, fill: "#a855f7", strokeWidth: 0 }}
+                      activeDot={{ r: 5 }}
                     />
-                    <span className="min-w-0 flex-1 truncate text-foreground">{s.name}</span>
-                    <span className="num text-muted-foreground">
-                      {Math.round((s.trades / totalSetupTrades) * 100)}%
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </Card>
+
+          <Card reveal={9}>
+            <SectionHeader title="Top setups" />
+            {loading ? (
+              <Skeleton className="h-40 w-full rounded-xl" />
+            ) : isEmpty ? (
+              <ChartPlaceholder
+                className="h-40"
+                message="Setups are grouped from the trades you log — this fills in after your first one."
+              />
+            ) : (
+              <div className="flex flex-wrap items-center justify-center gap-3 xl:justify-start">
+                <div className="relative size-28 shrink-0">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={topSetups}
+                        dataKey="trades"
+                        nameKey="name"
+                        innerRadius={34}
+                        outerRadius={54}
+                        paddingAngle={3}
+                        strokeWidth={0}
+                      >
+                        {topSetups.map((_, i) => (
+                          <Cell key={i} fill={SETUPS_COLORS[i % SETUPS_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          background: "rgba(15,15,30,0.95)",
+                          border: "1px solid rgba(255,255,255,0.12)",
+                          borderRadius: 12,
+                          fontSize: 12,
+                          color: "#fff",
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="num text-lg font-semibold text-foreground">
+                      {strategyPerf.length}
                     </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                    <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      setups
+                    </span>
+                  </div>
+                </div>
+                <ul className="min-w-[7rem] flex-1 space-y-2">
+                  {topSetups.map((s, i) => (
+                    <li key={s.name} className="flex items-center gap-2 text-xs">
+                      <span
+                        className="size-2 shrink-0 rounded-full"
+                        style={{ background: SETUPS_COLORS[i % SETUPS_COLORS.length] }}
+                      />
+                      <span className="min-w-0 flex-1 truncate text-foreground">{s.name}</span>
+                      <span className="num text-muted-foreground">
+                        {Math.round((s.trades / totalSetupTrades) * 100)}%
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </Card>
         </div>
 

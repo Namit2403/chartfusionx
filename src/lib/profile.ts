@@ -3,6 +3,8 @@ const PROFILE_KEY = "cfx-profile";
 export type UserProfile = {
   legalAcceptedAt?: string; // ISO timestamp
   legalAcceptedVersion?: string;
+  onboardingDismissedAt?: string; // ISO timestamp — user closed the first-run checklist
+  onboardingCompletedAt?: string; // ISO timestamp — every checklist step finished
 };
 
 /** Bump when legal documents change materially so acceptance is re-requested. */
@@ -34,4 +36,20 @@ export function recordLegalAcceptance(at: Date = new Date()) {
 
 export function hasAcceptedLegal(profile: UserProfile = readProfile()) {
   return Boolean(profile.legalAcceptedAt) && profile.legalAcceptedVersion === LEGAL_VERSION;
+}
+
+export function hasDismissedOnboarding(profile: UserProfile = readProfile()) {
+  return Boolean(profile.onboardingDismissedAt);
+}
+
+export function recordOnboardingDismissed(at: Date = new Date()) {
+  writeProfile({ onboardingDismissedAt: at.toISOString() });
+}
+
+export function hasCompletedOnboarding(profile: UserProfile = readProfile()) {
+  return Boolean(profile.onboardingCompletedAt);
+}
+
+export function recordOnboardingCompleted(at: Date = new Date()) {
+  writeProfile({ onboardingCompletedAt: at.toISOString() });
 }

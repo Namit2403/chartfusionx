@@ -44,7 +44,7 @@ export const navGroups = [
   {
     label: "Journal",
     items: [
-      { title: "Dashboard", url: "/", icon: LayoutDashboard, soon: false },
+      { title: "Dashboard", url: "/app", icon: LayoutDashboard, soon: false },
       { title: "Trade Journal", url: "/journal", icon: NotebookPen, soon: false },
       { title: "Trade Gallery", url: "/gallery", icon: ImageIcon, soon: false },
       { title: "Playbook", url: "/playbook", icon: BookOpen, soon: false },
@@ -77,7 +77,7 @@ export const navGroups = [
 ] as const;
 
 export const coreItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/app", icon: LayoutDashboard },
   { title: "Trade Journal", url: "/journal", icon: NotebookPen },
   { title: "Trade Gallery", url: "/gallery", icon: ImageIcon },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },

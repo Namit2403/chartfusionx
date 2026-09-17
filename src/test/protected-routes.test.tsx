@@ -73,7 +73,8 @@ afterEach(() => {
 describe("route discovery", () => {
   it("finds every app route file", () => {
     expect(protectedPaths.length).toBeGreaterThanOrEqual(16);
-    expect(protectedPaths).toContain("/");
+    // The dashboard lives at /app; / is the public landing page.
+    expect(protectedPaths).toContain("/app");
     expect(protectedPaths).toContain("/journal");
     expect(protectedPaths).toContain("/journal/new");
     expect(protectedPaths).toContain("/ai-review");
@@ -107,13 +108,19 @@ describe("free beta gating", () => {
   });
 
   it("shows AI modules as coming soon instead of running a model", () => {
-    for (const file of ["ai-review.tsx", "chart-critique.tsx", "trader-dna.tsx", "voice-summary.tsx", "strategy-discovery.tsx", "screenshot-reader.tsx"]) {
+    for (const file of [
+      "ai-review.tsx",
+      "chart-critique.tsx",
+      "trader-dna.tsx",
+      "voice-summary.tsx",
+      "strategy-discovery.tsx",
+      "screenshot-reader.tsx",
+    ]) {
       const src = readFileSync(path.join(ROUTES_DIR, file), "utf8");
       expect(src).toMatch(/ComingSoonPage/);
     }
   });
 });
-
 
 describe("source hygiene", () => {
   const sources = [

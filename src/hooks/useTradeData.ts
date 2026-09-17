@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -65,45 +66,84 @@ function toTrade(row: Row): Trade {
   };
 }
 
+const NO_TRADES: Trade[] = [];
+
+/** The one query key for the signed-in trader's trades. */
+export const tradesQueryKey = (userId: string) => ["trades", userId] as const;
+
+async function fetchTrades(userId: string): Promise<Trade[]> {
+  const { data, error } = await supabase
+    .from("trades")
+    .select("*")
+    .order("traded_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((d) => toTrade(d as Row));
+}
+
 /**
- * Signed-in traders always see their OWN data — which is empty until they log
- * their first trade. Signed-out visitors browsing the product see the demo set
- * so the pages aren't blank shells.
+ * Trade data for every data surface.
+ *
+ * Demo numbers are a fallback for confirmed signed-out visitors ONLY. While the
+ * session is still resolving — or when a fetch fails — this reports `loading`
+ * (or `error`) with empty data, so a signed-in trader never sees sample numbers
+ * presented as their own. Fetching, caching, retries and cross-route sharing are
+ * TanStack Query's job: all routes asking at once share one fetch and one cache
+ * entry per user.
  */
 export function useTradeData() {
   const { user, loading: authLoading } = useAuthUser();
-  const [rows, setRows] = useState<Trade[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  const userId = user?.id ?? null;
+  const signedOut = !authLoading && !userId;
+
+  const query = useQuery({
+    queryKey: tradesQueryKey(userId ?? "anonymous"),
+    queryFn: () => fetchTrades(userId!),
+    enabled: Boolean(userId),
+    // Realtime events mark the query stale and refetch active observers; focus
+    // refetch covers tabs that missed them. Cached rows stay on screen during
+    // background refetches instead of blanking to skeletons.
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+    retry: false,
+  });
+
+  // Realtime: a trade logged in the journal (or another tab) updates these numbers.
+  const refresh = useCallback(() => {
+    if (userId) void queryClient.invalidateQueries({ queryKey: tradesQueryKey(userId) });
+  }, [queryClient, userId]);
 
   useEffect(() => {
-    let active = true;
-    if (authLoading) return;
-    if (!user) {
-      setRows(null);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    void supabase
-      .from("trades")
-      .select("*")
-      .order("traded_at", { ascending: false })
-      .then(({ data }) => {
-        if (!active) return;
-        setRows((data ?? []).map((d) => toTrade(d as Row)));
-        setLoading(false);
-      });
+    if (!userId) return;
+    const channel = supabase
+      .channel(`trades:${userId}:${Math.random().toString(36).slice(2)}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "trades",
+          filter: `user_id=eq.${userId}`,
+        },
+        refresh,
+      )
+      .subscribe();
     return () => {
-      active = false;
+      void supabase.removeChannel(channel);
     };
-  }, [user, authLoading]);
+  }, [userId, refresh]);
+
+  // Returning to the tab should never show numbers that went stale meanwhile.
+  useEffect(() => {
+    if (!userId) return;
+    const onFocus = () => refresh();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [userId, refresh]);
 
   return useMemo(() => {
-    const isDemo = !user;
-    const trades = isDemo ? demoTrades : (rows ?? []);
-    const isEmpty = trades.length === 0;
-
-    if (isDemo) {
+    if (signedOut) {
       return {
         trades: demoTrades,
         stats: demoStats,
@@ -114,21 +154,33 @@ export function useTradeData() {
         dnaScores: demoDna,
         isDemo: true,
         isEmpty: false,
-        loading: authLoading,
+        error: false,
+        loading: false,
+        refresh,
       };
     }
 
+    // The query key includes the user id, so cached rows can never be
+    // attributed to another user mid-handshake.
+    const current = query.data ?? NO_TRADES;
+    const error = Boolean(userId && query.isError);
+    // First load of this user (no cache yet) blocks rendering; background
+    // refetches and user switches keep the screen stable.
+    const loading = authLoading || (!error && !current.length && query.isPending);
+
     return {
-      trades,
-      stats: computeStats(trades),
-      equityCurve: computeEquityCurve(trades),
-      strategyPerf: computeStrategyPerf(trades),
-      sessionPerf: computeSessionPerf(trades),
-      weekdayPerf: computeWeekdayPerf(trades),
-      dnaScores: computeDnaScores(trades),
+      trades: current,
+      stats: computeStats(current),
+      equityCurve: computeEquityCurve(current),
+      strategyPerf: computeStrategyPerf(current),
+      sessionPerf: computeSessionPerf(current),
+      weekdayPerf: computeWeekdayPerf(current),
+      dnaScores: computeDnaScores(current),
       isDemo: false,
-      isEmpty,
-      loading: authLoading || loading,
+      isEmpty: current.length === 0,
+      error,
+      loading,
+      refresh,
     };
-  }, [user, rows, authLoading, loading]);
+  }, [signedOut, userId, query.data, query.isError, query.isPending, authLoading, refresh]);
 }

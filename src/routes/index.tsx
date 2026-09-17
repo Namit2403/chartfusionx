@@ -15,19 +15,21 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { FounderTierCta } from "@/components/founder-tier-cta";
+import { FOUNDER_CTA_LABEL, FOUNDER_CTA_LIVE, FOUNDER_PLANS } from "@/lib/whop-founding";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ChartFusionX — The AI Operating System for Serious Traders" },
+      { title: "ChartFusionX — The Trading Journal for Serious Traders" },
       {
         name: "description",
         content:
-          "Log every trade. Understand your behavior. Improve your execution. ChartFusionX turns your journal into an equity curve, a win rate, and an AI coach.",
+          "Log every trade. Understand your behavior. Improve your execution. ChartFusionX turns your journal into an equity curve, a win rate, and a clear read on your trading behavior — with AI coaching on every trade arriving soon.",
       },
       {
         property: "og:title",
-        content: "ChartFusionX — The AI Operating System for Serious Traders",
+        content: "ChartFusionX — The Trading Journal for Serious Traders",
       },
       {
         property: "og:description",
@@ -401,8 +403,11 @@ function StickerBadge({
 
 function StickerCard({ feature, onOpen }: { feature: StickerFeature; onOpen: () => void }) {
   const bodyTone = feature.text === "text-white" ? "text-white/85" : "text-carbon/75";
-  const pill =
-    feature.status === "live" ? "Live now — tap for details" : "Coming soon — tap for details";
+  // Touch vs pointer copy: exactly one span renders (the other is display:none,
+  // so screen readers also read only one). See .detail-hint-* in styles.css.
+  const status = feature.status === "live" ? "Live now" : "Coming soon";
+  const pillTouch = `${status} — tap for details`;
+  const pillPointer = `${status} — click for details`;
   return (
     <div className={`${feature.rotate} transition-transform hover:rotate-0`}>
       <button
@@ -420,7 +425,8 @@ function StickerCard({ feature, onOpen }: { feature: StickerFeature; onOpen: () 
         <h3 className="mt-4 text-xl font-bold tracking-tight">{feature.name}</h3>
         <p className={`mt-2 text-sm font-medium leading-relaxed ${bodyTone}`}>{feature.body}</p>
         <span className="slush-pill-label mt-4 inline-block rounded-full border border-current px-2.5 py-1 text-[10px]">
-          {pill}
+          <span className="detail-hint-touch">{pillTouch}</span>
+          <span className="detail-hint-pointer">{pillPointer}</span>
         </span>
       </button>
     </div>
@@ -560,7 +566,7 @@ function LandingPage() {
             </a>
           </nav>
           <Link to="/app" className="slush-cta px-5 py-2.5 text-xs">
-            Try Now
+            Start Journaling
           </Link>
         </div>
       </header>
@@ -597,9 +603,15 @@ function LandingPage() {
             <span className="text-electric-blue">X</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-carbon sm:text-2xl">
-            The AI operating system for serious traders. Log every trade, understand your behavior,
-            improve your execution.
+            Log every trade, understand your behavior, improve your execution — the journal and
+            analytics system serious traders run on, with an AI coach for every trade arriving soon.
           </p>
+          {/* TODO(social-proof): when a real, verifiable trader count exists, insert the line
+              below directly after this comment (replace N — never an estimate or round-up).
+              <p className="mt-6 text-sm font-medium text-carbon/60">
+                Join <span className="num">N</span> traders already journaling on ChartFusionX.
+              </p>
+          */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link to="/app" className="slush-cta px-8 py-4 text-sm">
               Try Now — it's free
@@ -695,14 +707,25 @@ function LandingPage() {
             </div>
             <div className="slush-card flex flex-col bg-paper-white p-6">
               <span className="slush-pill-label w-fit rounded-full border border-carbon bg-sunburst px-3 py-1 text-[10px]">
-                After beta
+                {FOUNDER_CTA_LIVE ? "Founding access" : "After beta"}
               </span>
               <h3 className="slush-display mt-4 text-3xl">Pro</h3>
               <p className="slush-display mt-1 text-5xl">
-                $29
-                <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
-                  PER MONTH · AFTER BETA
-                </span>
+                {FOUNDER_CTA_LIVE ? (
+                  <>
+                    ${FOUNDER_PLANS.pro_founding.price}
+                    <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
+                      ONE-TIME · FOUNDING YEAR
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    $29
+                    <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
+                      PER MONTH · AFTER BETA
+                    </span>
+                  </>
+                )}
               </p>
               <ul className="mt-5 flex-1 space-y-2 text-sm font-medium text-carbon/80">
                 <li>✓ Everything in Free Beta</li>
@@ -710,12 +733,10 @@ function LandingPage() {
                 <li>✓ 50 AI actions per month</li>
                 <li>✓ Priority support</li>
               </ul>
-              <Link
-                to="/whats-coming"
+              <FounderTierCta
+                planId="pro_founding"
                 className="slush-sticker-btn mt-6 px-6 py-3 text-center text-sm"
-              >
-                Join the waitlist
-              </Link>
+              />
             </div>
             <div className="slush-card flex flex-col bg-lavender p-6">
               <span className="slush-pill-label w-fit rounded-full border border-carbon bg-voltage-violet px-3 py-1 text-[10px] text-white">
@@ -723,10 +744,21 @@ function LandingPage() {
               </span>
               <h3 className="slush-display mt-4 text-3xl">Max</h3>
               <p className="slush-display mt-1 text-5xl">
-                $69
-                <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
-                  PER MONTH · AFTER BETA
-                </span>
+                {FOUNDER_CTA_LIVE ? (
+                  <>
+                    ${FOUNDER_PLANS.max_founding.price}
+                    <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
+                      ONE-TIME · FOUNDING YEAR
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    $69
+                    <span className="slush-ui mt-1 block text-xs font-bold tracking-[0.14em] text-carbon/50">
+                      PER MONTH · AFTER BETA
+                    </span>
+                  </>
+                )}
               </p>
               <ul className="mt-5 flex-1 space-y-2 text-sm font-medium text-carbon/80">
                 <li>✓ Everything in Pro</li>
@@ -734,12 +766,10 @@ function LandingPage() {
                 <li>✓ Unlimited AI actions</li>
                 <li>✓ Priority AI processing</li>
               </ul>
-              <Link
-                to="/whats-coming"
+              <FounderTierCta
+                planId="max_founding"
                 className="slush-sticker-btn mt-6 px-6 py-3 text-center text-sm"
-              >
-                Join the waitlist
-              </Link>
+              />
             </div>
           </div>
         </div>

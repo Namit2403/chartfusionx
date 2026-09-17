@@ -441,6 +441,20 @@
   text-transform: uppercase;
 }
 
+/* Card detail hints: show the touch or pointer variant, never both (the hidden
+   span is display:none, so screen readers read only one). */
+@media (pointer: coarse) {
+  .detail-hint-pointer {
+    display: none;
+  }
+}
+
+@media (not (pointer: coarse)) {
+  .detail-hint-touch {
+    display: none;
+  }
+}
+
 @utility slush-marquee {
   background: var(--color-carbon);
   color: var(--color-paper-white);

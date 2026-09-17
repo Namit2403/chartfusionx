@@ -137,6 +137,8 @@ function RootComponent() {
   if (chromeless) {
     return (
       <QueryClientProvider client={queryClient}>
+        {/* Chromeless routes still need the Toaster — failed sign-ins report via toast. */}
+        <Toaster theme={getTheme()} />
         <Outlet />
       </QueryClientProvider>
     );

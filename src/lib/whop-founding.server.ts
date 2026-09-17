@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/integrations/supabase/types";
+import { FOUNDER_PLANS as FOUNDER_CHECKOUT_PLANS } from "@/lib/whop-founding";
 
 /**
  * Whop founding-access core. SERVER-ONLY: never import this from client code.
@@ -14,9 +15,19 @@ const FOUNDER_COMPANY_ID = "biz_9w4gyExnEat48S";
 const FOUNDER_PRODUCT_ID = "prod_PjjTLlXzGV6hQ";
 const FOUNDER_ACCESS_DAYS = 365;
 
+/**
+ * Plan metadata lives in the shared client-safe module (`@/lib/whop-founding`);
+ * this map keys it by Whop plan id for webhook processing.
+ */
 export const FOUNDER_PLANS: Record<WhopPlanId, { plan: "Pro" | "Max"; priceCents: number }> = {
-  plan_8ljFtIGCyybJb: { plan: "Pro", priceCents: 19900 },
-  plan_w4Hiq9mjM33aQ: { plan: "Max", priceCents: 39900 },
+  plan_8ljFtIGCyybJb: {
+    plan: FOUNDER_CHECKOUT_PLANS.pro_founding.plan,
+    priceCents: FOUNDER_CHECKOUT_PLANS.pro_founding.price * 100,
+  },
+  plan_w4Hiq9mjM33aQ: {
+    plan: FOUNDER_CHECKOUT_PLANS.max_founding.plan,
+    priceCents: FOUNDER_CHECKOUT_PLANS.max_founding.price * 100,
+  },
 };
 
 export function isFounderPlanId(value: unknown): value is WhopPlanId {

@@ -3,9 +3,16 @@ import { Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ComingSoonBadge } from "@/components/coming-soon";
+import { FounderTierCta } from "@/components/founder-tier-cta";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { AVAILABLE_NOW, COMING_SOON_FEATURES } from "@/lib/beta";
-import { PLANS } from "@/lib/entitlements";
+import { PLANS, type PlanId } from "@/lib/entitlements";
+import { FOUNDER_CTA_LIVE, FOUNDER_PLANS, type FounderPlanId } from "@/lib/whop-founding";
+
+const FOUNDER_PLAN_BY_TIER: Record<PlanId, FounderPlanId> = {
+  pro_monthly: "pro_founding",
+  max_monthly: "max_founding",
+};
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -13,13 +20,16 @@ export const Route = createFileRoute("/pricing")({
       { title: "Pricing — ChartFusionX is Free in Beta" },
       {
         name: "description",
-        content:
-          "ChartFusionX is free during the beta. After the beta: Pro at $29/month and Max at $69/month — journal your trades today and join the waitlist for the AI modules.",
+        content: FOUNDER_CTA_LIVE
+          ? "ChartFusionX is free during the beta. Founding Access: one payment of $199 (Pro) or $399 (Max) for a year of access after launch. Monthly pricing applies after the founding year."
+          : "ChartFusionX is free during the beta. After the beta: Pro at $29/month and Max at $69/month — journal your trades today and join the waitlist for the AI modules.",
       },
       { property: "og:title", content: "Pricing — ChartFusionX is Free in Beta" },
       {
         property: "og:description",
-        content: "Free during beta. After the beta: Pro $29/mo, Max $69/mo.",
+        content: FOUNDER_CTA_LIVE
+          ? "Free during beta. Founding Access: $199 (Pro) or $399 (Max), one payment for a year."
+          : "Free during beta. After the beta: Pro $29/mo, Max $69/mo.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ChartFusionX" },
@@ -28,7 +38,9 @@ export const Route = createFileRoute("/pricing")({
       { name: "twitter:title", content: "Pricing — ChartFusionX is Free in Beta" },
       {
         name: "twitter:description",
-        content: "ChartFusionX is free while in beta. Join the waitlist for the AI modules.",
+        content: FOUNDER_CTA_LIVE
+          ? "ChartFusionX is free while in beta. Founding Access is open — one payment for a year of Pro or Max."
+          : "ChartFusionX is free while in beta. Join the waitlist for the AI modules.",
       },
     ],
     links: [{ rel: "canonical", href: "https://chartfusionx.app/pricing" }],
@@ -55,10 +67,13 @@ function PricingPage() {
       </header>
 
       <section>
-        <h2 className="text-xl font-semibold tracking-tight">Plans after the beta</h2>
+        <h2 className="text-xl font-semibold tracking-tight">
+          {FOUNDER_CTA_LIVE ? "Founding access" : "Plans after the beta"}
+        </h2>
         <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Today everything below the waitlist is free. When the beta ends, two paid tiers take over
-          — the free tier keeps its core journal and analytics.
+          {FOUNDER_CTA_LIVE
+            ? "Founding Access locks in a full year of Pro or Max with one payment, before launch. Monthly pricing ($29 Pro, $69 Max) applies after the founding year ends."
+            : "Today everything below the waitlist is free. When the beta ends, two paid tiers take over — the free tier keeps its core journal and analytics."}
         </p>
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           <div className="rounded-2xl border border-border bg-card p-5">
@@ -78,24 +93,50 @@ function PricingPage() {
               <Link to="/app">Open the app</Link>
             </Button>
           </div>
-          {PLANS.map((plan) => (
-            <div key={plan.priceId} className="rounded-2xl border border-border bg-card p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold">{plan.name}</span>
-                <ComingSoonBadge />
+          {PLANS.map((plan) => {
+            const founderPlanId = FOUNDER_PLAN_BY_TIER[plan.priceId];
+            const founderPlan = FOUNDER_PLANS[founderPlanId];
+            return (
+              <div key={plan.priceId} className="rounded-2xl border border-border bg-card p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold">{plan.name}</span>
+                  {FOUNDER_CTA_LIVE ? (
+                    <span className="rounded-full border border-positive/30 bg-positive/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-positive">
+                      Founding access
+                    </span>
+                  ) : (
+                    <ComingSoonBadge />
+                  )}
+                </div>
+                {FOUNDER_CTA_LIVE ? (
+                  <p className="num mt-3 text-3xl font-semibold tracking-tight">
+                    ${founderPlan.price}
+                    <span className="text-sm font-normal text-muted-foreground">
+                      {" "}
+                      founding year
+                    </span>
+                  </p>
+                ) : (
+                  <p className="num mt-3 text-3xl font-semibold tracking-tight">
+                    ${plan.price}
+                    <span className="text-sm font-normal text-muted-foreground"> / month</span>
+                  </p>
+                )}
+                <p className="mt-1 text-xs text-muted-foreground">{plan.tagline}</p>
+                <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
+                  {plan.features.map((feature) => (
+                    <li key={feature}>{feature}</li>
+                  ))}
+                </ul>
+                {FOUNDER_CTA_LIVE && (
+                  <FounderTierCta
+                    planId={founderPlanId}
+                    className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
+                  />
+                )}
               </div>
-              <p className="num mt-3 text-3xl font-semibold tracking-tight">
-                ${plan.price}
-                <span className="text-sm font-normal text-muted-foreground"> / month</span>
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">{plan.tagline}</p>
-              <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

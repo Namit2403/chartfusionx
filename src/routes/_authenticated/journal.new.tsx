@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Sparkles } from "lucide-react";
 
 import { EmptyHint, PageHeader, Panel, Pill } from "@/components/shell";
 import { AttachmentSlot, type AttachmentSlotValue } from "@/components/attachment-slot";
@@ -76,7 +76,6 @@ const num = (v: string | undefined) => {
   const n = Number.parseFloat((v ?? "").replace(/[^0-9.-]/g, ""));
   return Number.isFinite(n) ? n : null;
 };
-
 
 function readDraft(): Draft {
   if (typeof window === "undefined") return EMPTY_DRAFT;
@@ -174,7 +173,12 @@ function AreaField({
 }) {
   return (
     <Field label={label}>
-      <Textarea rows={3} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
+      <Textarea
+        rows={3}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </Field>
   );
 }
@@ -183,13 +187,14 @@ function NewTrade() {
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [restored, setRestored] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [fromOnboarding, setFromOnboarding] = useState(false);
+  const navigate = useNavigate();
   const [attachments, setAttachments] = useState<Record<AttachmentKey, AttachmentSlotValue>>({
     before: null,
     after: null,
     extra: null,
   });
   const hydrated = useRef(false);
-
 
   const { userId, loading: subLoading, refresh } = useSubscription();
 
@@ -200,12 +205,18 @@ function NewTrade() {
     setDraft(saved);
     if (hasContent(saved)) setRestored(true);
     hydrated.current = true;
+    // Arriving from the dashboard checklist closes the loop after saving.
+    setFromOnboarding(new URLSearchParams(window.location.search).get("from") === "onboarding");
   }, []);
 
   // Keep the draft persisted on every keystroke so nothing is lost when the
   // user leaves for billing (or reloads mid-entry).
   useEffect(() => {
     if (!hydrated.current) return;
+    // An empty draft must never be written: on mount this effect runs before
+    // the restored state lands, and persisting the empty initial value would
+    // wipe the saved draft it is about to restore.
+    if (!hasContent(draft)) return;
     try {
       window.localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
     } catch {
@@ -316,6 +327,7 @@ function NewTrade() {
       clearDraft();
       setAttachments({ before: null, after: null, extra: null });
       void refresh();
+      if (fromOnboarding) void navigate({ to: "/app" });
     } catch (err) {
       console.error("save trade failed", err);
       toast.error("We couldn't save that trade. Try again in a moment.");
@@ -324,12 +336,10 @@ function NewTrade() {
     }
   }
 
-
   function saveDraft() {
     if (!requireAccount()) return;
     toast.success("Draft saved");
   }
-
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -351,53 +361,165 @@ function NewTrade() {
         </div>
       )}
 
+      {fromOnboarding && (
+        <div className="flex items-center gap-3 rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 text-sm">
+          <Sparkles className="size-4 shrink-0 text-violet-300" />
+          <span className="text-muted-foreground">
+            Setup checklist: save the trade, add your entry reason, and rate your emotions — the
+            checklist on your dashboard ticks off as you go, and saving brings you back there.
+          </span>
+        </div>
+      )}
+
       <Panel title="Basic trade information">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Picker label="Market" value={draft.fields["market"] ?? ""} onChange={(v) => setField("market", v)} options={["Forex", "Crypto", "Stocks", "Futures", "Options"]} />
-          <TextField label="Asset" value={draft.fields["asset"] ?? ""} onChange={(v) => setField("asset", v)} placeholder="EURUSD" />
-          <TextField label="Broker" value={draft.fields["broker"] ?? ""} onChange={(v) => setField("broker", v)} placeholder="IC Markets" />
-          <Picker label="Account type" value={draft.fields["accountType"] ?? ""} onChange={(v) => setField("accountType", v)} options={["Live", "Demo", "Prop Challenge", "Funded"]} />
-          <TextField label="Account size" value={draft.fields["accountSize"] ?? ""} onChange={(v) => setField("accountSize", v)} placeholder="10000" decimal />
-          <TextField label="Setup name" value={draft.fields["setup"] ?? ""} onChange={(v) => setField("setup", v)} placeholder="London break & retest" />
+          <Picker
+            label="Market"
+            value={draft.fields["market"] ?? ""}
+            onChange={(v) => setField("market", v)}
+            options={["Forex", "Crypto", "Stocks", "Futures", "Options"]}
+          />
+          <TextField
+            label="Asset"
+            value={draft.fields["asset"] ?? ""}
+            onChange={(v) => setField("asset", v)}
+            placeholder="EURUSD"
+          />
+          <TextField
+            label="Broker"
+            value={draft.fields["broker"] ?? ""}
+            onChange={(v) => setField("broker", v)}
+            placeholder="IC Markets"
+          />
+          <Picker
+            label="Account type"
+            value={draft.fields["accountType"] ?? ""}
+            onChange={(v) => setField("accountType", v)}
+            options={["Live", "Demo", "Prop Challenge", "Funded"]}
+          />
+          <TextField
+            label="Account size"
+            value={draft.fields["accountSize"] ?? ""}
+            onChange={(v) => setField("accountSize", v)}
+            placeholder="10000"
+            decimal
+          />
+          <TextField
+            label="Setup name"
+            value={draft.fields["setup"] ?? ""}
+            onChange={(v) => setField("setup", v)}
+            placeholder="London break & retest"
+          />
           <Picker
             label="Strategy"
-            value={draft.fields["strategy"] ?? ""} onChange={(v) => setField("strategy", v)}
+            value={draft.fields["strategy"] ?? ""}
+            onChange={(v) => setField("strategy", v)}
             options={["Break & Retest", "Momentum", "Reversal", "Swing Continuation", "News Play"]}
           />
-          <Picker label="Direction" value={draft.fields["direction"] ?? ""} onChange={(v) => setField("direction", v)} options={["Long", "Short"]} />
-          <Picker label="Timeframe" value={draft.fields["timeframe"] ?? ""} onChange={(v) => setField("timeframe", v)} options={["1m", "5m", "15m", "30m", "1h", "4h", "1D"]} />
+          <Picker
+            label="Direction"
+            value={draft.fields["direction"] ?? ""}
+            onChange={(v) => setField("direction", v)}
+            options={["Long", "Short"]}
+          />
+          <Picker
+            label="Timeframe"
+            value={draft.fields["timeframe"] ?? ""}
+            onChange={(v) => setField("timeframe", v)}
+            options={["1m", "5m", "15m", "30m", "1h", "4h", "1D"]}
+          />
         </div>
       </Panel>
 
       <Panel title="Entry & exit data">
         <div className="grid gap-4 sm:grid-cols-3">
-          <TextField label="Entry price" value={draft.fields["entry"] ?? ""} onChange={(v) => setField("entry", v)} placeholder="1.0842" decimal />
-          <TextField label="Exit price" value={draft.fields["exit"] ?? ""} onChange={(v) => setField("exit", v)} placeholder="1.0891" decimal />
-          <TextField label="Stop loss" value={draft.fields["stop"] ?? ""} onChange={(v) => setField("stop", v)} placeholder="1.0820" decimal />
-          <TextField label="Take profit" value={draft.fields["target"] ?? ""} onChange={(v) => setField("target", v)} placeholder="1.0905" decimal />
-          <TextField label="Position size" value={draft.fields["size"] ?? ""} onChange={(v) => setField("size", v)} placeholder="1.0 lot" decimal />
-          <TextField label="Risk %" value={draft.fields["risk"] ?? ""} onChange={(v) => setField("risk", v)} placeholder="0.75" decimal />
-          <TextField label="Reward %" value={draft.fields["reward"] ?? ""} onChange={(v) => setField("reward", v)} placeholder="2.25" decimal />
-          <TextField label="Fees / commissions" value={draft.fields["fees"] ?? ""} onChange={(v) => setField("fees", v)} placeholder="4.20" decimal />
-          <TextField label="Trade duration" value={draft.fields["duration"] ?? ""} onChange={(v) => setField("duration", v)} placeholder="1h 40m" />
+          <TextField
+            label="Entry price"
+            value={draft.fields["entry"] ?? ""}
+            onChange={(v) => setField("entry", v)}
+            placeholder="1.0842"
+            decimal
+          />
+          <TextField
+            label="Exit price"
+            value={draft.fields["exit"] ?? ""}
+            onChange={(v) => setField("exit", v)}
+            placeholder="1.0891"
+            decimal
+          />
+          <TextField
+            label="Stop loss"
+            value={draft.fields["stop"] ?? ""}
+            onChange={(v) => setField("stop", v)}
+            placeholder="1.0820"
+            decimal
+          />
+          <TextField
+            label="Take profit"
+            value={draft.fields["target"] ?? ""}
+            onChange={(v) => setField("target", v)}
+            placeholder="1.0905"
+            decimal
+          />
+          <TextField
+            label="Position size"
+            value={draft.fields["size"] ?? ""}
+            onChange={(v) => setField("size", v)}
+            placeholder="1.0 lot"
+            decimal
+          />
+          <TextField
+            label="Risk %"
+            value={draft.fields["risk"] ?? ""}
+            onChange={(v) => setField("risk", v)}
+            placeholder="0.75"
+            decimal
+          />
+          <TextField
+            label="Reward %"
+            value={draft.fields["reward"] ?? ""}
+            onChange={(v) => setField("reward", v)}
+            placeholder="2.25"
+            decimal
+          />
+          <TextField
+            label="Fees / commissions"
+            value={draft.fields["fees"] ?? ""}
+            onChange={(v) => setField("fees", v)}
+            placeholder="4.20"
+            decimal
+          />
+          <TextField
+            label="Trade duration"
+            value={draft.fields["duration"] ?? ""}
+            onChange={(v) => setField("duration", v)}
+            placeholder="1h 40m"
+          />
         </div>
         <EmptyHint>
-          P&amp;L, R multiple, risk-reward, expectancy and drawdown are calculated automatically once
-          the trade is saved.
+          P&amp;L, R multiple, risk-reward, expectancy and drawdown are calculated automatically
+          once the trade is saved.
         </EmptyHint>
       </Panel>
 
       <Panel title="Trading context">
         <div className="grid gap-4 sm:grid-cols-3">
-          <Picker label="Session" value={draft.fields["session"] ?? ""} onChange={(v) => setField("session", v)} options={["Asian", "London", "New York"]} />
+          <Picker
+            label="Session"
+            value={draft.fields["session"] ?? ""}
+            onChange={(v) => setField("session", v)}
+            options={["Asian", "London", "New York"]}
+          />
           <Picker
             label="Day of week"
-            value={draft.fields["day"] ?? ""} onChange={(v) => setField("day", v)}
+            value={draft.fields["day"] ?? ""}
+            onChange={(v) => setField("day", v)}
             options={["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]}
           />
           <Picker
             label="Market conditions"
-            value={draft.fields["conditions"] ?? ""} onChange={(v) => setField("conditions", v)}
+            value={draft.fields["conditions"] ?? ""}
+            onChange={(v) => setField("conditions", v)}
             options={["Trending", "Ranging", "Volatile", "Thin liquidity", "News driven"]}
           />
         </div>
@@ -411,7 +533,9 @@ function NewTrade() {
               <div className="mt-3 flex items-center gap-4">
                 <Slider
                   value={[draft.confidence]}
-                  onValueChange={(v) => setDraft((d) => ({ ...d, confidence: v[0] ?? d.confidence }))}
+                  onValueChange={(v) =>
+                    setDraft((d) => ({ ...d, confidence: v[0] ?? d.confidence }))
+                  }
                   min={1}
                   max={10}
                   step={1}
@@ -419,10 +543,16 @@ function NewTrade() {
                 <span className="num w-8 text-right text-sm">{draft.confidence}</span>
               </div>
             </div>
-            <Picker label="Emotion" value={draft.fields["emotionBefore"] ?? ""} onChange={(v) => setField("emotionBefore", v)} options={["Calm", "Fear", "Greed", "FOMO", "Revenge"]} />
+            <Picker
+              label="Emotion"
+              value={draft.fields["emotionBefore"] ?? ""}
+              onChange={(v) => setField("emotionBefore", v)}
+              options={["Calm", "Fear", "Greed", "FOMO", "Revenge"]}
+            />
             <AreaField
               label="Reason for entry"
-              value={draft.fields["reason"] ?? ""} onChange={(v) => setField("reason", v)}
+              value={draft.fields["reason"] ?? ""}
+              onChange={(v) => setField("reason", v)}
               placeholder="What made this a valid setup?"
             />
           </div>
@@ -432,24 +562,30 @@ function NewTrade() {
           <div className="space-y-4">
             <Picker
               label="Emotional state"
-              value={draft.fields["emotionAfter"] ?? ""} onChange={(v) => setField("emotionAfter", v)}
+              value={draft.fields["emotionAfter"] ?? ""}
+              onChange={(v) => setField("emotionAfter", v)}
               options={["Calm", "Satisfied", "Frustrated", "Angry", "Regretful", "Proud"]}
             />
             <AreaField
               label="Mistakes made"
-              value={draft.fields["mistakes"] ?? ""} onChange={(v) => setField("mistakes", v)}
+              value={draft.fields["mistakes"] ?? ""}
+              onChange={(v) => setField("mistakes", v)}
               placeholder="Entered before confirmation…"
             />
             <AreaField
               label="Lessons learned"
-              value={draft.fields["lessons"] ?? ""} onChange={(v) => setField("lessons", v)}
+              value={draft.fields["lessons"] ?? ""}
+              onChange={(v) => setField("lessons", v)}
               placeholder="Wait for the candle close next time."
             />
           </div>
         </Panel>
       </div>
 
-      <Panel title="Tags" subtitle="Categorize the trade for later filtering and AI pattern detection">
+      <Panel
+        title="Tags"
+        subtitle="Categorize the trade for later filtering and AI pattern detection"
+      >
         <div className="flex flex-wrap gap-2">
           {TAGS.map((tag) => {
             const active = draft.tags.includes(tag);
@@ -476,7 +612,10 @@ function NewTrade() {
         </div>
       </Panel>
 
-      <Panel title="Attachments" subtitle="Charts, screenshots, videos, voice notes, plans — all searchable by AI">
+      <Panel
+        title="Attachments"
+        subtitle="Charts, screenshots, videos, voice notes, plans — all searchable by AI"
+      >
         <div className="grid gap-3 sm:grid-cols-3">
           {ATTACHMENT_SLOTS.map((slot) => (
             <AttachmentSlot
@@ -492,7 +631,6 @@ function NewTrade() {
           <Pill tone="accent">Uploads are stored with the trade</Pill>
         </div>
       </Panel>
-
 
       <div className="flex flex-wrap items-center justify-end gap-2 pb-4">
         <span className="mr-auto text-xs text-muted-foreground">
