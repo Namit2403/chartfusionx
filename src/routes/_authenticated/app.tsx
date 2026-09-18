@@ -496,7 +496,9 @@ function TradingQuotesCard({ reveal }: { reveal?: number | undefined }) {
           >
             "{quote.text}"
           </p>
-          <p className="mt-2 text-xs text-muted-foreground">— {quote.author}</p>
+          <p key={`a-${index}`} className="fade-rise mt-2 text-xs text-muted-foreground" style={{ animationDelay: "80ms" }}>
+            — {quote.author}
+          </p>
           <div className="mt-3 flex items-center gap-1.5" aria-hidden>
             {TRADING_QUOTES.map((q, i) => (
               <button
@@ -506,7 +508,9 @@ function TradingQuotesCard({ reveal }: { reveal?: number | undefined }) {
                 onClick={() => setIndex(i)}
                 className={cn(
                   "size-1.5 rounded-full transition-all",
-                  i === index ? "w-4 bg-violet-400" : "bg-white/20 hover:bg-white/40",
+                  i === index
+                    ? "w-4 bg-violet-600 dark:bg-violet-400"
+                    : "bg-black/25 hover:bg-black/45 dark:bg-white/20 dark:hover:bg-white/40",
                 )}
               />
             ))}
