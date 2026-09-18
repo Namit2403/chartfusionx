@@ -13,16 +13,18 @@ import {
   YAxis,
 } from "recharts";
 import {
+  Bell,
   Bot,
-  CalendarDays,
   ChevronLeft,
   ChevronRight,
   Flame,
   LineChart,
+  Plus,
   Quote,
   RotateCcw,
   Sparkles,
   Target,
+  TrendingDown,
   TrendingUp,
   TriangleAlert,
   Zap,
@@ -62,25 +64,39 @@ export const Route = createFileRoute("/_authenticated/app")({
 /* Small building blocks                                               */
 /* ------------------------------------------------------------------ */
 
+/** Gloss tint as [from, to, glow] RGB triplets for the `.gloss` surface. */
+type Gloss = [from: string, to: string, glow: string];
+
+const GLOSS_VIOLET: Gloss = ["139 92 246", "217 70 239", "139 92 246"];
+const GLOSS_SKY: Gloss = ["56 189 248", "34 211 238", "56 189 248"];
+const GLOSS_AMBER: Gloss = ["245 158 11", "249 115 22", "245 158 11"];
+const GLOSS_EMERALD: Gloss = ["16 185 129", "20 184 166", "16 185 129"];
+const GLOSS_NEUTRAL: Gloss = ["129 140 248", "56 189 248", "99 102 241"];
+
 function Card({
   className,
   reveal,
+  gloss,
   children,
+  ...rest
 }: {
   className?: string;
   reveal?: number | undefined;
+  gloss?: Gloss | undefined;
   children: React.ReactNode;
-}) {
+} & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       style={
-        reveal !== undefined ? ({ "--reveal-delay": reveal } as React.CSSProperties) : undefined
+        {
+          ...(reveal !== undefined ? { "--reveal-delay": reveal } : undefined),
+          ...(gloss
+            ? { "--gloss-from": gloss[0], "--gloss-to": gloss[1], "--gloss-glow": gloss[2] }
+            : undefined),
+        } as React.CSSProperties
       }
-      className={cn(
-        "rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.8)]",
-        "fade-rise",
-        className,
-      )}
+      className={cn("glass fade-rise rounded-2xl p-5", gloss && "gloss", className)}
+      {...rest}
     >
       {children}
     </div>
@@ -100,8 +116,7 @@ function SectionHeader({ title, action }: { title: string; action?: React.ReactN
  * Placeholder for a data surface that has no numbers to show yet. Used while a
  * signed-in trader's trades are still loading, and once they load empty — a new
  * trader must never be shown sample numbers as their own results.
- */
-function ChartPlaceholder({
+ */ function ChartPlaceholder({
   message,
   className,
 }: {
@@ -111,7 +126,7 @@ function ChartPlaceholder({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-6 text-center",
+        "glass flex flex-col items-center justify-center gap-2 rounded-xl px-6 text-center",
         className,
       )}
     >
@@ -130,6 +145,8 @@ function StatCard({
   reveal,
   loading,
   muted,
+  spark,
+  gloss,
 }: {
   label: string;
   value: string;
@@ -139,9 +156,11 @@ function StatCard({
   reveal?: number | undefined;
   loading?: boolean | undefined;
   muted?: boolean | undefined;
+  spark?: number[] | undefined;
+  gloss?: Gloss | undefined;
 }) {
   return (
-    <Card className="relative overflow-hidden" reveal={reveal}>
+    <Card className="relative overflow-hidden" reveal={reveal} gloss={gloss}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
@@ -175,72 +194,45 @@ function StatCard({
           <Icon className="size-5" />
         </span>
       </div>
+      {!loading && spark && <PnlSpark points={spark} />}
     </Card>
   );
 }
 
-function gradeTone(grade: string) {
-  if (grade.startsWith("A")) return "bg-emerald-500/15 text-emerald-300 border-emerald-500/30";
-  if (grade.startsWith("B")) return "bg-sky-500/15 text-sky-300 border-sky-500/30";
-  if (grade.startsWith("C")) return "bg-amber-500/15 text-amber-300 border-amber-500/30";
-  return "bg-rose-500/15 text-rose-300 border-rose-500/30";
-}
-
-function RecentTradeCard({ trade, reveal }: { trade: Trade; reveal?: number | undefined }) {
-  const win = trade.pnl >= 0;
-  const barPct = Math.min(100, (Math.abs(trade.r) / 3.5) * 100);
+/** Mini cumulative-P&L line for the Net P&L card. Pure SVG — no data, no line. */
+function PnlSpark({ points }: { points: number[] }) {
+  if (points.length < 2) return null;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const span = max - min || 1;
+  const step = 120 / (points.length - 1);
+  const coords = points.map(
+    (p, i) => `${(i * step).toFixed(1)},${(28 - ((p - min) / span) * 24).toFixed(1)}`,
+  );
+  const up = (points[points.length - 1] ?? 0) >= (points[0] ?? 0);
   return (
-    <div
-      style={
-        reveal !== undefined ? ({ "--reveal-delay": reveal } as React.CSSProperties) : undefined
-      }
-      className="group fade-rise rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-4 transition hover:border-violet-500/40"
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-foreground">{trade.asset}</p>
-          <p className="truncate text-xs text-muted-foreground">{trade.strategy}</p>
-        </div>
-        <span
-          className={cn(
-            "rounded-full border px-2 py-0.5 text-[10px] font-semibold",
-            gradeTone(trade.grade),
-          )}
-        >
-          {trade.grade}
-        </span>
-      </div>
-      <div className="mt-4">
-        <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-          <div
-            className={cn(
-              "h-full rounded-full bg-gradient-to-r",
-              win ? "from-violet-500 to-fuchsia-400" : "from-rose-500 to-orange-400",
-            )}
-            style={{ width: `${Math.max(8, barPct)}%` }}
-          />
-        </div>
-        <div className="mt-3 flex items-center justify-between">
-          <span className="num text-[11px] text-muted-foreground">
-            {trade.r >= 0 ? "+" : ""}
-            {trade.r.toFixed(1)}R · {trade.session}
-          </span>
-          <span
-            className={cn("num text-sm font-semibold", win ? "text-emerald-300" : "text-rose-300")}
-          >
-            {currency(trade.pnl)}
-          </span>
-        </div>
-      </div>
-    </div>
+    <svg viewBox="0 0 120 32" preserveAspectRatio="none" className="mt-3 h-8 w-full" aria-hidden>
+      <polyline
+        points={coords.join(" ")}
+        fill="none"
+        stroke={up ? "#34d399" : "#fb7185"}
+        strokeWidth={2}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
+
+/** Compact whole-dollar money for tight tiles — precision lives in `title`. */
+const shortMoney = (n: number) =>
+  `${n < 0 ? "-" : "+"}$${Math.abs(Math.round(n)).toLocaleString("en-US")}`;
 
 /* ------------------------------------------------------------------ */
 /* Right rail widgets                                                  */
 /* ------------------------------------------------------------------ */
 
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 function MiniCalendar({
   markedDates,
@@ -407,6 +399,174 @@ function SessionCountdowns({ reveal }: { reveal?: number | undefined }) {
   );
 }
 
+/** Quick-stats tile — icon above a big value above its label. */
+function QuickTile({
+  label,
+  value,
+  icon: Icon,
+  title,
+  reveal,
+}: {
+  label: string;
+  value: string;
+  icon: typeof Flame;
+  title?: string | undefined;
+  reveal?: number | undefined;
+}) {
+  return (
+    <Card
+      className="flex min-w-0 flex-col items-center gap-1 p-3.5 text-center"
+      reveal={reveal}
+      gloss={GLOSS_NEUTRAL}
+    >
+      <Icon className="size-4 text-violet-300" />
+      <p
+        className="num w-full truncate text-lg font-semibold tracking-tight text-foreground"
+        title={title}
+      >
+        {value}
+      </p>
+      <p className="w-full text-[11px] leading-tight text-muted-foreground">{label}</p>
+    </Card>
+  );
+}
+
+function gradeTone(grade: string) {
+  if (grade.startsWith("A")) return "bg-emerald-500/15 text-emerald-300 border-emerald-500/30";
+  if (grade.startsWith("B")) return "bg-sky-500/15 text-sky-300 border-sky-500/30";
+  if (grade.startsWith("C")) return "bg-amber-500/15 text-amber-300 border-amber-500/30";
+  return "bg-rose-500/15 text-rose-300 border-rose-500/30";
+}
+
+const TRADING_QUOTES: Array<{ text: string; author: string }> = [
+  {
+    text: "It's not whether you're right or wrong that matters, but how much money you make when you're right and how much you lose when you're wrong.",
+    author: "George Soros",
+  },
+  {
+    text: "The goal of a successful trader is to make the best trades. Money is secondary.",
+    author: "Alexander Elder",
+  },
+  {
+    text: "Plan the trade and trade the plan.",
+    author: "Trading proverb",
+  },
+  {
+    text: "Amateurs want to be right. Professionals want to know.",
+    author: "Tom Hougaard",
+  },
+  {
+    text: "The markets can remain irrational longer than you can remain solvent.",
+    author: "attributed to John Maynard Keynes",
+  },
+  {
+    text: "Cut your losses quickly, without hesitation. It's like a thief in your house — you don't negotiate, you throw him out.",
+    author: "Alexander Elder",
+  },
+];
+
+/** Rotating trading wisdom — picks up where the stats leave off. */
+function TradingQuotesCard({ reveal }: { reveal?: number | undefined }) {
+  const [index, setIndex] = useState(() => Math.floor(Math.random() * TRADING_QUOTES.length));
+  const [paused, setPaused] = useState(false);
+  const quote = TRADING_QUOTES[index]!;
+
+  useEffect(() => {
+    if (paused) return;
+    const id = setInterval(() => setIndex((i) => (i + 1) % TRADING_QUOTES.length), 8000);
+    return () => clearInterval(id);
+  }, [paused]);
+
+  return (
+    <Card
+      className="relative overflow-hidden lg:col-span-2"
+      reveal={reveal}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="pointer-events-none absolute -left-8 -top-8 size-32 rounded-full bg-violet-500/20 blur-3xl" />
+      <div className="relative flex h-full items-start gap-4">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/30">
+          <Quote className="size-4" />
+        </span>
+        <div className="min-w-0 flex-1" aria-live="polite">
+          <p
+            key={index}
+            className="fade-rise text-sm font-medium italic leading-relaxed text-foreground"
+          >
+            "{quote.text}"
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">— {quote.author}</p>
+          <div className="mt-3 flex items-center gap-1.5" aria-hidden>
+            {TRADING_QUOTES.map((q, i) => (
+              <button
+                key={q.author + i}
+                type="button"
+                aria-label={`Quote ${i + 1} of ${TRADING_QUOTES.length}`}
+                onClick={() => setIndex(i)}
+                className={cn(
+                  "size-1.5 rounded-full transition-all",
+                  i === index ? "w-4 bg-violet-400" : "bg-white/20 hover:bg-white/40",
+                )}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function RecentTradeCard({ trade, reveal }: { trade: Trade; reveal?: number | undefined }) {
+  const win = trade.pnl >= 0;
+  const barPct = Math.min(100, (Math.abs(trade.r) / 3.5) * 100);
+  return (
+    <div
+      style={
+        reveal !== undefined ? ({ "--reveal-delay": reveal } as React.CSSProperties) : undefined
+      }
+      className="glass fade-rise rounded-2xl p-4 transition hover:border-violet-500/40"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">{trade.asset}</p>
+          <p className="truncate text-xs text-muted-foreground">{trade.strategy}</p>
+        </div>
+        <span
+          className={cn(
+            "rounded-full border px-2 py-0.5 text-[10px] font-semibold",
+            gradeTone(trade.grade),
+          )}
+        >
+          {trade.grade}
+        </span>
+      </div>
+      <div className="mt-4">
+        <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+          <div
+            className={cn(
+              "h-full rounded-full bg-gradient-to-r",
+              win ? "from-violet-500 to-fuchsia-400" : "from-rose-500 to-orange-400",
+            )}
+            style={{ width: `${barPct}%` }}
+          />
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between">
+        <span
+          className={cn("num text-sm font-semibold", win ? "text-emerald-300" : "text-rose-300")}
+        >
+          {currency(trade.pnl)}
+        </span>
+        <span className={cn("num text-xs", win ? "text-emerald-300" : "text-rose-300")}>
+          {trade.r >= 0 ? "+" : ""}
+          {trade.r.toFixed(1)}R
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Dashboard                                                           */
 /* ------------------------------------------------------------------ */
@@ -457,12 +617,36 @@ function Dashboard() {
 
   const recentTrades = trades.slice(0, 4);
 
+  // Cumulative P&L trend for the Net P&L card's spark. Trades arrive
+  // newest-first, so accumulate over a reversed copy. Primary window is the
+  // card's own 30-day scope; if the journal has no trades that recent, fall
+  // back to the latest 30 trades so the trend line still says something.
+  const pnlSpark = useMemo(() => {
+    if (trades.length === 0) return [];
+    const monthAgo = new Date();
+    monthAgo.setDate(monthAgo.getDate() - 30);
+    const start = monthAgo.toISOString().slice(0, 10);
+    const accumulate = (list: Trade[]) => {
+      const series: number[] = [];
+      let sum = 0;
+      for (const t of list) {
+        sum += t.pnl;
+        series.push(Number(sum.toFixed(2)));
+      }
+      return series;
+    };
+    const monthTrades = [...trades].reverse().filter((t) => t.date >= start);
+    if (monthTrades.length > 0) return accumulate(monthTrades);
+    return accumulate(trades.slice(0, 30).reverse());
+  }, [trades]);
+
   // With an empty journal the deltas have no meaning yet, so they say so
   // instead of reading like results ("↑ 0.00% account growth"). A failed fetch
   // is not an empty journal though — never claim the trader has no trades when
   // we simply couldn't read them.
   const noTradesYet = !loading && !isDemo && isEmpty && !error;
   const statHint = error ? "Not available right now" : null;
+  const mutedStats = statHint !== null || noTradesYet;
 
   return (
     <div className="flex w-full gap-6">
@@ -471,8 +655,11 @@ function Dashboard() {
       {/* ------------------------------ Main column ------------------------------ */}
       <div className="min-w-0 flex-1 space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-            Welcome back{name ? `, ${name}` : ""}! <span aria-hidden>👋</span>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-[28px]">
+            Welcome back{" "}
+            <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+              {name}
+            </span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {authLoading || (loading && !isDemo)
@@ -487,7 +674,7 @@ function Dashboard() {
 
         {/* Demo banner — shows what this page becomes once you sign in */}
         {isDemo && !authLoading && (
-          <div className="fade-rise flex flex-wrap items-center justify-between gap-3 rounded-xl border border-violet-500/25 bg-violet-500/[0.08] px-4 py-3">
+          <div className="glass fade-rise flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-2.5">
             <p className="flex items-center gap-2 text-xs text-muted-foreground">
               <Sparkles className="size-4 shrink-0 text-violet-300" />
               This is a sample trader's journal. Sign in and every number here becomes yours.
@@ -495,7 +682,7 @@ function Dashboard() {
             <button
               type="button"
               onClick={() => void navigate({ to: "/auth" })}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-500/15 px-2.5 py-1 text-[11px] font-semibold text-violet-200 transition hover:bg-violet-500/25 hover:text-violet-100"
+              className="rounded-lg border border-violet-500/30 bg-violet-500/15 px-2.5 py-1 text-[11px] font-semibold text-violet-200 transition hover:bg-violet-500/25 hover:text-violet-100"
             >
               Sign in to make it yours
             </button>
@@ -507,7 +694,7 @@ function Dashboard() {
 
         {/* The fetch failed — say so instead of showing zeros as if they were results */}
         {error && !isDemo && (
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/25 bg-amber-500/[0.07] px-4 py-3">
+          <div className="glass flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-2.5">
             <p className="flex items-center gap-2 text-xs text-amber-200">
               <TriangleAlert className="size-4 shrink-0" />
               We couldn't load your trades just now — these numbers may be out of date.
@@ -515,18 +702,35 @@ function Dashboard() {
             <button
               type="button"
               onClick={refresh}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-200 transition hover:bg-amber-500/20"
+              className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-200 transition hover:bg-amber-500/20"
             >
-              <RotateCcw className="size-3" />
+              <RotateCcw className="mr-1 inline size-3" />
               Retry
             </button>
           </div>
         )}
 
+        <div className="glass-btn flex w-fit flex-wrap items-center gap-2 rounded-full px-1.5 py-1.5">
+          <Link
+            to="/journal/new"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 px-3.5 text-xs font-semibold text-white shadow-lg shadow-violet-500/30 transition hover:opacity-90"
+          >
+            <Plus className="size-3.5" />
+            Log trade
+          </Link>
+          <Link
+            to="/notifications"
+            aria-label="Notifications"
+            className="inline-flex size-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white/5 hover:text-foreground"
+          >
+            <Bell className="size-4" />
+          </Link>
+        </div>
+
         {/* Stat cards */}
         <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
           <StatCard
-            label="Net P&L (month)"
+            label="Net P&L (30 days)"
             value={currency(stats.monthlyPnl)}
             delta={
               statHint ??
@@ -534,11 +738,13 @@ function Dashboard() {
                 ? "No trades logged yet"
                 : `↑ ${stats.accountGrowth.toFixed(2)}% account growth`)
             }
-            muted={statHint !== null || noTradesYet}
+            muted={mutedStats}
             icon={TrendingUp}
             tile="bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-violet-500/30"
             reveal={0}
             loading={loading}
+            spark={statHint === null && !noTradesYet ? pnlSpark : undefined}
+            gloss={GLOSS_VIOLET}
           />
           <StatCard
             label="Win rate"
@@ -547,11 +753,12 @@ function Dashboard() {
               statHint ??
               (noTradesYet ? "Nothing to rate yet" : `${stats.totalTrades} trades logged`)
             }
-            muted={statHint !== null || noTradesYet}
+            muted={mutedStats}
             icon={Target}
             tile="bg-gradient-to-br from-sky-500 to-cyan-400 shadow-sky-500/30"
             reveal={1}
             loading={loading}
+            gloss={GLOSS_SKY}
           />
           <StatCard
             label="Win streak"
@@ -560,15 +767,20 @@ function Dashboard() {
               statHint ??
               (noTradesYet
                 ? "Log a trade to start a streak"
-                : stats.streak === 1
-                  ? "1 win in a row"
-                  : `${stats.streak} wins in a row`)
+                : stats.streakType === "winning"
+                  ? stats.streak === 1
+                    ? "1 win in a row"
+                    : `${stats.streak} wins in a row`
+                  : stats.streak === 1
+                    ? "1 loss in a row"
+                    : `${stats.streak} losses in a row`)
             }
-            muted={statHint !== null || noTradesYet}
+            muted={mutedStats}
             icon={Flame}
             tile="bg-gradient-to-br from-amber-500 to-orange-500 shadow-amber-500/30"
             reveal={2}
             loading={loading}
+            gloss={GLOSS_AMBER}
           />
           <StatCard
             label="Avg R / trade"
@@ -579,11 +791,60 @@ function Dashboard() {
                 ? "Waiting on your first trade"
                 : `profit factor ${stats.profitFactor.toFixed(2)}`)
             }
-            muted={statHint !== null || noTradesYet}
+            muted={mutedStats}
             icon={Zap}
             tile="bg-gradient-to-br from-emerald-500 to-teal-400 shadow-emerald-500/30"
             reveal={3}
             loading={loading}
+            gloss={GLOSS_EMERALD}
+          />
+        </div>
+
+        {/* Quick stats — the metrics the top cards don't show */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <QuickTile
+            label="Trades logged"
+            value={loading ? "" : mutedStats ? "—" : String(stats.totalTrades)}
+            icon={Target}
+            reveal={13}
+          />
+          <QuickTile
+            label="Profit factor"
+            value={loading ? "" : mutedStats ? "—" : stats.profitFactor.toFixed(2)}
+            icon={TrendingUp}
+            reveal={14}
+          />
+          <QuickTile
+            label="Expectancy"
+            value={
+              loading
+                ? ""
+                : mutedStats
+                  ? "—"
+                  : `${stats.expectancy >= 0 ? "+" : ""}${stats.expectancy.toFixed(2)}R`
+            }
+            icon={Zap}
+            reveal={15}
+          />
+          <QuickTile
+            label="Avg win"
+            value={loading ? "" : mutedStats ? "—" : shortMoney(stats.avgWinner)}
+            title={loading ? undefined : currency(stats.avgWinner)}
+            icon={TrendingUp}
+            reveal={16}
+          />
+          <QuickTile
+            label="Best trade"
+            value={loading ? "" : mutedStats ? "—" : shortMoney(stats.largestWin)}
+            title={loading ? undefined : currency(stats.largestWin)}
+            icon={Sparkles}
+            reveal={17}
+          />
+          <QuickTile
+            label="Max drawdown"
+            value={loading ? "" : mutedStats ? "—" : currency(stats.maxDrawdown)}
+            icon={TrendingDown}
+            reveal={18}
           />
         </div>
 
@@ -638,14 +899,14 @@ function Dashboard() {
               }
             />
             {loading ? (
-              <Skeleton className="h-64 w-full rounded-xl" />
+              <Skeleton className="h-52 w-full rounded-xl" />
             ) : isEmpty ? (
               <ChartPlaceholder
-                className="h-64"
+                className="h-52"
                 message="Your equity curve appears once you log your first trade."
               />
             ) : (
-              <div className="h-64">
+              <div className="h-52">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={equityCurve} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
                     <defs>
@@ -762,21 +1023,7 @@ function Dashboard() {
 
         {/* Quote + AI coach */}
         <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="relative overflow-hidden lg:col-span-2" reveal={10}>
-            <div className="pointer-events-none absolute -left-8 -top-8 size-32 rounded-full bg-violet-500/20 blur-3xl" />
-            <div className="relative flex items-start gap-4">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/30">
-                <Quote className="size-4" />
-              </span>
-              <div>
-                <p className="text-sm font-medium italic leading-relaxed text-foreground">
-                  "It's not whether you're right or wrong that matters, but how much money you make
-                  when you're right and how much you lose when you're wrong."
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">— George Soros</p>
-              </div>
-            </div>
-          </Card>
+          <TradingQuotesCard reveal={10} />
 
           <Card className="relative overflow-hidden" reveal={11}>
             <div className="pointer-events-none absolute -right-6 -top-10 size-28 rounded-full bg-fuchsia-500/20 blur-3xl" />

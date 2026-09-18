@@ -147,14 +147,14 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SidebarProvider>
-        <div className="flex min-h-screen w-full bg-background">
+        <div className="app-sky flex h-screen w-full overflow-hidden p-2 sm:p-3">
           <AppSidebar />
-          <div className="flex min-w-0 flex-1 flex-col">
-            <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background px-4">
+          <div className="app-cockpit flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl">
+            <header className="liquid-bar sticky top-2 z-30 mx-2 mt-2 flex h-12 items-center gap-3 px-5">
               <SidebarTrigger />
               <span className="hidden items-center gap-2 sm:flex">
                 <span className="text-sm font-semibold tracking-tight">ChartFusionX</span>
-                <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <span className="whitespace-nowrap rounded-full border border-border bg-muted px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   Free beta
                 </span>
               </span>
@@ -175,10 +175,10 @@ function RootComponent() {
                 <AccountMenu />
               </div>
             </header>
-            <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <main className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
               <Outlet />
             </main>
-            <footer className="border-t border-border px-4 py-6 pb-24 text-xs text-muted-foreground sm:px-6 lg:px-8 md:pb-6">
+            <footer className="px-0 pb-2 pt-4 text-xs text-muted-foreground">
               <RiskDisclaimerLine />
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                 <span>© {new Date().getFullYear()} ChartFusionX</span>
@@ -191,7 +191,6 @@ function RootComponent() {
                 <Link to="/privacy" className="hover:text-foreground">
                   Privacy Policy
                 </Link>
-
                 <Link to="/terms" className="hover:text-foreground">
                   Terms of Service
                 </Link>

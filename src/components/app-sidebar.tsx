@@ -109,7 +109,7 @@ function SidebarBrand({ collapsed }: { collapsed: boolean }) {
           aria-label="ChartFusionX home"
           className="flex min-w-0 flex-col items-center"
         >
-          <span className="glass-item flex size-9 shrink-0 items-center justify-center rounded-xl">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 shadow-[0_0_18px_rgba(59,130,246,0.55)]">
             <span className="font-display text-sm font-bold text-white">X</span>
           </span>
           {!collapsed && (
@@ -324,17 +324,17 @@ export function AppSidebar() {
                   return (
                     <SidebarMenuItem
                       key={item.url}
-                      className={cn(active && "glass-item overflow-hidden rounded-xl")}
+                      className={cn(active && "overflow-hidden rounded-xl")}
                     >
                       <SidebarMenuButton
                         asChild
                         isActive={active}
                         tooltip={item.soon ? `${item.title} — coming soon` : item.title}
                         className={cn(
-                          "h-10 gap-3 rounded-xl px-3 text-[13px] font-medium",
+                          "h-10 gap-3 px-3 text-[13px] font-medium",
                           active
-                            ? "text-white"
-                            : "text-white/55 hover:bg-white/[0.05] hover:text-white",
+                            ? "rounded-full"
+                            : "rounded-xl text-white/55 hover:bg-white/[0.05] hover:text-white",
                         )}
                       >
                         <Link to={item.url} className="flex items-center gap-3">
@@ -349,12 +349,6 @@ export function AppSidebar() {
                           )}
                         </Link>
                       </SidebarMenuButton>
-                      {active && (
-                        <span
-                          aria-hidden
-                          className="absolute right-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-white/90 to-white/40 shadow-[0_0_10px_rgba(255,255,255,0.5)] group-data-[collapsible=icon]:hidden"
-                        />
-                      )}
                     </SidebarMenuItem>
                   );
                 })}

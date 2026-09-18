@@ -17,6 +17,7 @@ import {
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { FounderTierCta } from "@/components/founder-tier-cta";
+import SplitFlapText from "@/components/split-flap-text";
 import { FOUNDER_CTA_LABEL, FOUNDER_CTA_LIVE, FOUNDER_PLANS } from "@/lib/whop-founding";
 
 export const Route = createFileRoute("/")({
@@ -59,9 +60,6 @@ type StickerFeature = {
   name: string;
   body: string;
   icon: LucideIcon;
-  fill: string;
-  text: string;
-  rotate: string;
   status: "live" | "soon";
   intro: string;
   points: string[];
@@ -72,9 +70,6 @@ const STICKER_FEATURES: StickerFeature[] = [
   {
     name: "Trade Journal",
     body: "Log entries, exits, size, risk, tags, emotions and chart screenshots. Every detail becomes searchable data.",
-    fill: "bg-mint-pop",
-    text: "text-carbon",
-    rotate: "-rotate-2",
     status: "live",
     icon: NotebookPen,
     intro:
@@ -97,9 +92,6 @@ const STICKER_FEATURES: StickerFeature[] = [
   {
     name: "Performance Dashboard",
     body: "Equity curve, win rate, expectancy, profit factor and drawdown — computed from your own logged trades.",
-    fill: "bg-electric-blue",
-    text: "text-carbon",
-    rotate: "rotate-1",
     status: "live",
     icon: BarChart3,
     intro:
@@ -122,9 +114,6 @@ const STICKER_FEATURES: StickerFeature[] = [
   {
     name: "Playbook",
     body: "Write down your setups and rules, then measure real trades against them.",
-    fill: "bg-lavender",
-    text: "text-carbon",
-    rotate: "-rotate-1",
     status: "live",
     icon: BookOpen,
     intro:
@@ -146,9 +135,6 @@ const STICKER_FEATURES: StickerFeature[] = [
   {
     name: "Analytics",
     body: "Breakdowns by setup, session, instrument and weekday. Find out where your edge actually lives.",
-    fill: "bg-sunburst",
-    text: "text-carbon",
-    rotate: "rotate-2",
     status: "live",
     icon: LineChart,
     intro:
@@ -170,9 +156,6 @@ const STICKER_FEATURES: StickerFeature[] = [
   {
     name: "Goals & Habits",
     body: "Set process goals and track the habits behind them — daily risk, revenge-trade streaks, journaling.",
-    fill: "bg-paper-white",
-    text: "text-carbon",
-    rotate: "-rotate-2",
     status: "live",
     icon: Target,
     intro:
@@ -194,9 +177,6 @@ const STICKER_FEATURES: StickerFeature[] = [
   {
     name: "Reports",
     body: "Weekly, monthly and yearly reviews you can export and share with a mentor.",
-    fill: "bg-sky-wash",
-    text: "text-carbon",
-    rotate: "rotate-1",
     status: "live",
     icon: Activity,
     intro:
@@ -220,9 +200,6 @@ const AI_MODULES: StickerFeature[] = [
   {
     name: "AI Trade Review",
     body: "A personal coach reviews every trade you log.",
-    fill: "bg-voltage-violet",
-    text: "text-white",
-    rotate: "rotate-1",
     status: "soon",
     icon: Sparkles,
     intro:
@@ -244,9 +221,6 @@ const AI_MODULES: StickerFeature[] = [
   {
     name: "AI Chart Critique",
     body: "Structured critique of a marked-up chart, before you enter.",
-    fill: "bg-ember",
-    text: "text-white",
-    rotate: "-rotate-1",
     status: "soon",
     icon: Camera,
     intro:
@@ -268,9 +242,6 @@ const AI_MODULES: StickerFeature[] = [
   {
     name: "Screenshot Reader",
     body: "Turn a chart screenshot into journal fields.",
-    fill: "bg-mint-pop",
-    text: "text-carbon",
-    rotate: "rotate-1",
     status: "soon",
     icon: BrainCircuit,
     intro:
@@ -292,9 +263,6 @@ const AI_MODULES: StickerFeature[] = [
   {
     name: "Strategy Discovery",
     body: "Find which setups actually carry your results.",
-    fill: "bg-lavender",
-    text: "text-carbon",
-    rotate: "-rotate-1",
     status: "soon",
     icon: LineChart,
     intro:
@@ -316,9 +284,6 @@ const AI_MODULES: StickerFeature[] = [
   {
     name: "Trader DNA",
     body: "A behavioural profile that evolves with your history.",
-    fill: "bg-sunburst",
-    text: "text-carbon",
-    rotate: "rotate-1",
     status: "soon",
     icon: Activity,
     intro:
@@ -340,9 +305,6 @@ const AI_MODULES: StickerFeature[] = [
   {
     name: "Voice Summary",
     body: "A spoken end-of-session recap while you eat dinner.",
-    fill: "bg-paper-white",
-    text: "text-carbon",
-    rotate: "-rotate-1",
     status: "soon",
     icon: Mic,
     intro:
@@ -368,7 +330,7 @@ const ALL_FEATURES = [...STICKER_FEATURES, ...AI_MODULES];
 function Marquee() {
   const row = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
   return (
-    <div className="slush-marquee slush-ui w-full">
+    <div className="slush-marquee lp-marquee w-full">
       <div className="slush-marquee-track">
         {row.map((item, i) => (
           <span
@@ -384,34 +346,14 @@ function Marquee() {
   );
 }
 
-function StickerBadge({
-  label,
-  fill,
-  className = "",
-}: {
-  label: string;
-  fill: string;
-  className?: string;
-}) {
-  return (
-    <span
-      className={`slush-sticker slush-pill-label ${fill} ${className} px-3 py-1.5 text-[11px] text-carbon`}
-    >
-      {label}
-    </span>
-  );
-}
-
 function StickerCard({ feature, onOpen }: { feature: StickerFeature; onOpen: () => void }) {
   const isLive = feature.status === "live";
   // Touch vs pointer copy: exactly one span renders (the other is display:none,
   // so screen readers also read only one). See .detail-hint-* in styles.css.
   const status = isLive ? "Live now" : "Coming soon";
-  const pillTouch = `${status} — tap for details`;
-  const pillPointer = `${status} — click for details`;
   const statusTag = (
-    <span className={isLive ? "tag-solid" : "tag-stamp"}>
-      {isLive && <Check className="size-3 text-up" strokeWidth={3} aria-hidden />}
+    <span className={isLive ? "lp-tag lp-tag-live" : "lp-tag"}>
+      <span className="lp-tag-dot" aria-hidden />
       <span className="mono-label">{status}</span>
       <span className="detail-hint-touch"> — {"tap"} for details</span>
       <span className="detail-hint-pointer"> — {"click"} for details</span>
@@ -423,8 +365,8 @@ function StickerCard({ feature, onOpen }: { feature: StickerFeature; onOpen: () 
         type="button"
         onClick={onOpen}
         aria-haspopup="dialog"
-        className={`group relative h-full w-full cursor-pointer p-6 text-left ${
-          isLive ? "card-live" : "card-soon"
+        className={`group relative h-full w-full cursor-pointer rounded-3xl p-6 text-left ${
+          isLive ? "lp-card lp-card-hot" : "lp-card"
         }`}
       >
         <div className="flex items-start justify-between gap-3">
@@ -453,58 +395,57 @@ function FeatureDetailDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const dark = feature?.text === "text-white";
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="slush-ui max-h-[85dvh] max-w-2xl gap-0 overflow-y-auto rounded-[32px] border-carbon bg-paper-white p-0 text-carbon sm:rounded-[32px]">
+      <DialogContent className="lp-slide max-h-[85dvh] max-w-2xl gap-0 overflow-y-auto rounded-[28px] p-0 text-[#eaf2ff] sm:rounded-[28px]">
         {feature && (
           <>
-            <div
-              className={`${feature.fill} ${feature.text} rounded-t-[32px] border-b border-carbon p-6 sm:p-8`}
-            >
+            <div className="rounded-t-[28px] border-b border-white/12 bg-white/[0.04] p-6 sm:p-8">
               <div className="flex items-start justify-between gap-4">
-                <span className="slush-sticker bg-paper-white p-2.5">
-                  <feature.icon className="size-6 text-carbon" strokeWidth={2.2} />
+                <span className="lp-card flex size-11 items-center justify-center rounded-2xl">
+                  <feature.icon className="size-5 text-sky-300" strokeWidth={2.2} />
                 </span>
-                <span className="slush-pill-label w-fit rounded-full border border-carbon bg-paper-white px-3 py-1 text-[10px] text-carbon">
+                <span
+                  className={`lp-tag text-[10px] font-semibold ${
+                    feature.status === "live" ? "lp-tag-live" : ""
+                  }`}
+                >
+                  <span className="lp-tag-dot" aria-hidden />
                   {feature.status === "live" ? "Live now" : "Coming soon"}
                 </span>
               </div>
-              <DialogTitle
-                className="slush-display mt-4 text-3xl sm:text-4xl"
-                style={dark ? { color: "#ffffff" } : undefined}
-              >
+              <DialogTitle className="lp-display mt-4 text-3xl sm:text-4xl">
                 {feature.name}
               </DialogTitle>
             </div>
             <div className="p-6 sm:p-8">
-              <DialogDescription className="text-base font-medium leading-relaxed text-carbon/85">
+              <DialogDescription className="text-base font-medium leading-relaxed text-[#c9d8ef]">
                 {feature.intro}
               </DialogDescription>
 
-              <h4 className="slush-pill-label mt-7 text-xs">What you can do</h4>
+              <h4 className="mono-label mt-7 text-xs text-[#9fb6d9]">What you can do</h4>
               <ul className="mt-3 space-y-2.5">
                 {feature.points.map((point) => (
                   <li
                     key={point}
-                    className="flex gap-3 text-sm font-medium leading-relaxed text-carbon/80"
+                    className="flex gap-3 text-sm font-medium leading-relaxed text-[#c9d8ef]"
                   >
-                    <span className="mt-1.5 inline-block size-1.5 shrink-0 rounded-full bg-sunburst" />
+                    <span className="mt-1.5 inline-block size-1.5 shrink-0 rounded-full bg-sky-400" />
                     {point}
                   </li>
                 ))}
               </ul>
 
-              <h4 className="slush-pill-label mt-7 text-xs">
+              <h4 className="mono-label mt-7 text-xs text-[#9fb6d9]">
                 {feature.status === "live" ? "How it fits your day" : "How it will work"}
               </h4>
               <ol className="mt-3 space-y-2.5">
                 {feature.steps.map((step, i) => (
                   <li
                     key={step}
-                    className="flex items-start gap-3 text-sm font-medium leading-relaxed text-carbon/80"
+                    className="flex items-start gap-3 text-sm font-medium leading-relaxed text-[#c9d8ef]"
                   >
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-carbon bg-paper-white text-[11px] font-bold">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/5 text-[11px] font-bold text-white">
                       {i + 1}
                     </span>
                     {step}
@@ -512,11 +453,11 @@ function FeatureDetailDialog({
                 ))}
               </ol>
 
-              <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-carbon pt-6">
+              <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/12 pt-6">
                 {feature.status === "live" ? (
                   <Link
                     to="/app"
-                    className="slush-cta px-6 py-3 text-sm"
+                    className="lp-btn-primary px-6 py-3 text-sm"
                     onClick={() => onOpenChange(false)}
                   >
                     Open it in the app
@@ -524,13 +465,13 @@ function FeatureDetailDialog({
                 ) : (
                   <Link
                     to="/whats-coming"
-                    className="slush-cta px-6 py-3 text-sm"
+                    className="lp-btn-ghost px-6 py-3 text-sm"
                     onClick={() => onOpenChange(false)}
                   >
                     Join the waitlist
                   </Link>
                 )}
-                <span className="mono-label text-carbon/60">
+                <span className="mono-label text-[#9fb6d9]">
                   <span>Free while in beta</span>
                   <span aria-hidden>—</span>
                   <span>No card required</span>
@@ -552,66 +493,68 @@ function LandingPage() {
     setDetailOpen(true);
   };
   return (
-    <div className="slush-ui min-h-screen bg-paper-white text-carbon">
+    <div className="slush-ui lp-ground min-h-screen text-[#eaf2ff]">
       <Marquee />
 
-      {/* Nav */}
-      <header className="sticky top-0 z-40 border-b border-carbon bg-paper-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6">
+      {/* Nav — floating glass pill over the starfield */}
+      <header className="sticky top-4 z-40 mx-auto w-full max-w-7xl px-4 sm:px-6">
+        <div className="lp-card flex items-center gap-3 rounded-full px-4 py-2.5">
           <Link to="/" className="flex items-center gap-2">
-            <span className="slush-sticker flex size-9 rounded-full bg-paper-white">
-              <span className="slush-display text-base">X</span>
+            <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-sky-400 to-blue-600 text-sm font-bold text-white shadow-[0_0_18px_rgba(59,130,246,0.6)]">
+              X
             </span>
-            <span className="slush-display text-lg">ChartFusionX</span>
+            <span className="text-sm font-semibold tracking-tight text-white">ChartFusionX</span>
           </Link>
           <nav className="ml-auto hidden items-center gap-1 md:flex">
-            <a href="#features" className="slush-sticker-btn px-4 py-2 text-xs">
+            <a href="#features" className="lp-navlink">
               Features
             </a>
-            <a href="#ai" className="slush-sticker-btn px-4 py-2 text-xs">
+            <a href="#ai" className="lp-navlink">
               AI Modules
             </a>
-            <a href="#pricing" className="slush-sticker-btn px-4 py-2 text-xs">
+            <a href="#pricing" className="lp-navlink">
               Pricing
             </a>
-            <a href="#get-started" className="slush-sticker-btn px-4 py-2 text-xs">
+            <a href="#get-started" className="lp-navlink">
               Sign in
             </a>
           </nav>
-          <Link to="/app" className="slush-cta px-5 py-2.5 text-xs">
+          <Link to="/app" className="lp-btn-primary ml-auto px-5 py-2 text-xs md:ml-2">
             Start Journaling
           </Link>
         </div>
       </header>
 
-      {/* Hero — ledger paper with graph ruling */}
-      <section className="ledger-grid relative overflow-hidden bg-paper-white">
-        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-16 text-center sm:px-6 md:pt-24">
-          <h1 className="slush-display text-[72px] sm:text-[110px] md:text-[150px]">
-            Chart
-            <br />
-            Fusion
-            <span className="text-blueprint">X</span>
+      {/* Hero — starfield slide with light beam */}
+      <section className="lp-slide lp-stars relative mx-auto mt-4 max-w-7xl overflow-hidden rounded-[32px]">
+        <div className="lp-beam" aria-hidden />
+        <div className="relative mx-auto flex max-w-5xl flex-col items-center px-4 pb-20 pt-20 text-center sm:px-6 md:pt-28">
+          <span className="lp-tag mb-6 text-xs">
+            <Sparkles className="size-3.5 text-sky-300" aria-hidden />
+            AI trade review — arriving soon
+          </span>
+          <h1 className="lp-display lp-glowtext text-[64px] leading-[0.95] sm:text-[104px] md:text-[136px]">
+            ChartFusionX
           </h1>
-          <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-carbon sm:text-2xl">
+          <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-[#c9d8ef] sm:text-2xl">
             Log every trade, understand your behavior, improve your execution. The AI operating
             system for serious traders — in development, arriving soon.
           </p>
           {/* TODO(social-proof): when a real, verifiable trader count exists, insert the line
               below directly after this comment (replace N — never an estimate or round-up).
-              <p className="mt-6 text-sm font-medium text-carbon/60">
+              <p className="mt-6 text-sm font-medium text-[#9fb6d9]">
                 Join <span className="num">N</span> traders already journaling on ChartFusionX.
               </p>
           */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/app" className="slush-cta px-8 py-4 text-sm">
+            <Link to="/app" className="lp-btn-primary px-8 py-3.5 text-sm">
               Try Now — it's free
             </Link>
-            <a href="#pricing" className="slush-sticker-btn px-8 py-4 text-sm">
+            <a href="#pricing" className="lp-btn-ghost px-8 py-3.5 text-sm">
               See pricing
             </a>
           </div>
-          <div className="meta-row mt-4 text-carbon/60">
+          <div className="meta-row mt-4 text-[#9fb6d9]">
             <span className="mono-label">Free while in beta</span>
             <span className="mono-label">No card required</span>
           </div>
@@ -666,25 +609,25 @@ function LandingPage() {
                 strokeLinecap="round"
               />
             </svg>
-            <figcaption className="mono-label mt-2 text-carbon/55">
+            <figcaption className="mono-label mt-2 text-[#9fb6d9]">
               Illustrative session — not real data
             </figcaption>
           </figure>
         </div>
-
-        {/* inflated ribbon band */}
-        <div className="relative h-16 bg-blueprint sm:h-20" aria-hidden />
       </section>
 
-      {/* Features — ledger paper band */}
-      <section id="features" className="ledger-grid bg-paper-white py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <h2 className="slush-display text-[40px] sm:text-[70px]">
+      {/* Features — glass cards on a dark slide */}
+      <section
+        id="features"
+        className="lp-slide lp-stars relative mx-auto mt-6 max-w-7xl rounded-[32px] py-20"
+      >
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+          <h2 className="lp-display text-[40px] sm:text-[70px]">
             Every trade,
             <br />
             on the record
           </h2>
-          <p className="mt-4 max-w-2xl text-base font-medium text-carbon/70 sm:text-xl">
+          <p className="mt-4 max-w-2xl text-base font-medium text-[#c9d8ef] sm:text-xl">
             The journal is the foundation — every AI feature learns from what you log.
           </p>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -695,9 +638,12 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* AI modules — draft band: bare ledger ground, dashed cards */}
-      <section id="ai" className="bg-paper-white py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      {/* AI modules — dark slide, glass roadmap cards, arrival board */}
+      <section
+        id="ai"
+        className="lp-slide lp-stars relative mx-auto mt-6 max-w-7xl rounded-[32px] py-20"
+      >
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <h2 className="slush-display text-[40px] sm:text-[70px]">
               The AI
@@ -705,13 +651,29 @@ function LandingPage() {
               systems
             </h2>
             <div className="max-w-md pb-2">
-              <p className="text-base font-medium text-carbon/70 sm:text-lg">
+              <p className="text-base font-medium text-[#c9d8ef] sm:text-lg">
                 Six AI modules in development, trained on your own trading history — not on the
                 market.
               </p>
+              {/* Arrival board: the modules are inbound, like departures at a terminal. */}
+              <div className="mt-5">
+                <p className="mono-label mb-2 text-[#9fb6d9]">Next arrivals</p>
+                <SplitFlapText
+                  words={["AI TRADE REVIEW", "AI CHART CRITIQUE", "SCREENSHOT READER"]}
+                  fontSize={22}
+                  tileColor="#0a1322"
+                  textColor="#dcebff"
+                  tileRadius={5}
+                  gap={3}
+                  flipDuration={0.1}
+                  stagger={0.045}
+                  cycleDelay={2800}
+                  padTo={17}
+                />
+              </div>
             </div>
           </div>
-          <div className="mt-14 grid gap-8 border-t border-dashed border-carbon/30 pt-12 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-14 grid gap-8 border-t border-white/15 pt-12 sm:grid-cols-2 lg:grid-cols-3">
             {AI_MODULES.map((f) => (
               <StickerCard key={f.name} feature={f} onOpen={() => openDetail(f.name)} />
             ))}
@@ -719,61 +681,63 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing — white band */}
-      <section id="pricing" className="scroll-mt-20 bg-paper-white py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <h2 className="slush-display text-[40px] sm:text-[70px]">
+      {/* Pricing — glass cards on a dark slide; Pro card glows like the mock */}
+      <section
+        id="pricing"
+        className="lp-slide lp-stars relative mx-auto mt-6 max-w-7xl scroll-mt-24 rounded-[32px] py-20"
+      >
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+          <h2 className="lp-display text-[40px] sm:text-[70px]">
             Free while
             <br />
             it's in beta
           </h2>
-          <p className="mt-4 max-w-2xl text-base font-medium text-carbon/70 sm:text-xl">
+          <p className="mt-4 max-w-2xl text-base font-medium text-[#c9d8ef] sm:text-xl">
             No card, no checkout, no trial clock. Pro is $29/mo and Max is $69/mo once the beta ends
             — waitlist members get first pick.
           </p>
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
-            <div className="card-live flex flex-col p-6">
-              <span className="tag-solid w-fit">
-                <Check className="size-3 text-up" strokeWidth={3} aria-hidden />
-                <span className="mono-label">Live now</span>
+            <div className="lp-card flex flex-col rounded-3xl p-6">
+              <span className="lp-tag lp-tag-live w-fit text-[11px] font-semibold">
+                <span className="lp-tag-dot" aria-hidden />
+                Live now
               </span>
-              <h3 className="slush-display mt-4 text-3xl">Free Beta</h3>
-              <p className="slush-display mt-1 text-5xl">$0</p>
-              <ul className="mt-5 flex-1 space-y-2 text-sm font-medium text-carbon/80">
+              <h3 className="lp-display mt-4 text-3xl">Free Beta</h3>
+              <p className="lp-display mt-1 text-5xl">$0</p>
+              <ul className="mt-5 flex-1 space-y-2 text-sm font-medium text-[#c9d8ef]">
                 <li>✓ Unlimited trades &amp; attachments</li>
                 <li>✓ Performance dashboard &amp; analytics</li>
                 <li>✓ Playbook, goals &amp; reports</li>
                 <li>✓ Demo mode — try it without an account</li>
               </ul>
-              <Link to="/app" className="slush-cta mt-6 px-6 py-3 text-center text-sm">
+              <Link to="/app" className="lp-btn-primary mt-6 px-6 py-3 text-center text-sm">
                 Try Now
               </Link>
             </div>
-            <div className="card-live flex flex-col p-6">
-              <span className="tag-stamp w-fit">
-                <span className="mono-label">
-                  {FOUNDER_CTA_LIVE ? "Founding access" : "After beta"}
-                </span>
+            <div className="lp-card lp-card-hot flex flex-col rounded-3xl p-6">
+              <span className="lp-tag w-fit text-[11px] font-semibold">
+                <span className="lp-tag-dot" aria-hidden />
+                {FOUNDER_CTA_LIVE ? "Founding access" : "After beta"}
               </span>
-              <h3 className="slush-display mt-4 text-3xl">Pro</h3>
-              <p className="slush-display mt-1 text-5xl">
+              <h3 className="lp-display mt-4 text-3xl">Pro</h3>
+              <p className="lp-display mt-1 text-5xl">
                 {FOUNDER_CTA_LIVE ? (
                   <>
                     ${FOUNDER_PLANS.pro_founding.price}
-                    <span className="mono-label mt-1 block text-carbon/50">
+                    <span className="mono-label mt-1 block text-[#9fb6d9]">
                       One-time — founding year
                     </span>
                   </>
                 ) : (
                   <>
                     $29
-                    <span className="mono-label mt-1 block text-carbon/50">
+                    <span className="mono-label mt-1 block text-[#9fb6d9]">
                       Per month — after beta
                     </span>
                   </>
                 )}
               </p>
-              <ul className="mt-5 flex-1 space-y-2 text-sm font-medium text-carbon/80">
+              <ul className="mt-5 flex-1 space-y-2 text-sm font-medium text-[#c9d8ef]">
                 <li>✓ Everything in Free Beta</li>
                 <li>✓ All six AI modules</li>
                 <li>✓ 50 AI actions per month</li>
@@ -781,32 +745,33 @@ function LandingPage() {
               </ul>
               <FounderTierCta
                 planId="pro_founding"
-                className="slush-sticker-btn mt-6 px-6 py-3 text-center text-sm"
+                className="lp-btn-primary mt-6 px-6 py-3 text-center text-sm"
               />
             </div>
-            <div className="card-live flex flex-col p-6">
-              <span className="tag-stamp w-fit">
-                <span className="mono-label">Best for heavy reviewers</span>
+            <div className="lp-card flex flex-col rounded-3xl p-6">
+              <span className="lp-tag w-fit text-[11px] font-semibold">
+                <span className="lp-tag-dot" aria-hidden />
+                Best for heavy reviewers
               </span>
-              <h3 className="slush-display mt-4 text-3xl">Max</h3>
-              <p className="slush-display mt-1 text-5xl">
+              <h3 className="lp-display mt-4 text-3xl">Max</h3>
+              <p className="lp-display mt-1 text-5xl">
                 {FOUNDER_CTA_LIVE ? (
                   <>
                     ${FOUNDER_PLANS.max_founding.price}
-                    <span className="mono-label mt-1 block text-carbon/50">
+                    <span className="mono-label mt-1 block text-[#9fb6d9]">
                       One-time — founding year
                     </span>
                   </>
                 ) : (
                   <>
                     $69
-                    <span className="mono-label mt-1 block text-carbon/50">
+                    <span className="mono-label mt-1 block text-[#9fb6d9]">
                       Per month — after beta
                     </span>
                   </>
                 )}
               </p>
-              <ul className="mt-5 flex-1 space-y-2 text-sm font-medium text-carbon/80">
+              <ul className="mt-5 flex-1 space-y-2 text-sm font-medium text-[#c9d8ef]">
                 <li>✓ Everything in Pro</li>
                 <li>✓ All six AI modules</li>
                 <li>✓ Unlimited AI actions</li>
@@ -814,62 +779,81 @@ function LandingPage() {
               </ul>
               <FounderTierCta
                 planId="max_founding"
-                className="slush-sticker-btn mt-6 px-6 py-3 text-center text-sm"
+                className="lp-btn-ghost mt-6 px-6 py-3 text-center text-sm"
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA band — ink, the ledger closes */}
-      <section id="get-started" className="scroll-mt-20 bg-carbon py-24 text-paper-white">
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 text-center sm:px-6">
-          <h2 className="slush-display text-[48px] sm:text-[80px] text-paper-white">
+      {/* CTA slide — starfield closes the story */}
+      <section
+        id="get-started"
+        className="lp-slide lp-stars relative mx-auto mt-6 max-w-7xl scroll-mt-24 overflow-hidden rounded-[32px] py-24"
+      >
+        <div className="lp-beam" aria-hidden />
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 text-center sm:px-6">
+          <h2 className="lp-display text-[48px] sm:text-[80px]">
             Stop guessing.
             <br />
             Start logging.
           </h2>
-          <p className="mt-5 max-w-xl text-base font-medium text-paper-white/75 sm:text-xl">
+          <p className="mt-5 max-w-xl text-base font-medium text-[#c9d8ef] sm:text-xl">
             Every trade creates data. Every piece of data creates insight. Every insight creates
             improvement.
           </p>
+          {/* Split-flap board: the daily loop, on the board. */}
+          <div className="mt-8">
+            <SplitFlapText
+              words={["LOG THE TRADE", "REVIEW THE TRADE", "IMPROVE THE TRADE"]}
+              fontSize={20}
+              tileColor="#0a1322"
+              textColor="#dcebff"
+              tileRadius={4}
+              gap={3}
+              flipDuration={0.1}
+              stagger={0.045}
+              cycleDelay={2800}
+              padTo={17}
+            />
+          </div>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/app" className="slush-cta px-10 py-4 text-sm">
+            <Link to="/app" className="lp-btn-primary px-10 py-3.5 text-sm">
               Try Now
             </Link>
-            <Link to="/auth" className="slush-sticker-btn px-10 py-4 text-sm">
+            <Link to="/auth" className="lp-btn-ghost px-10 py-3.5 text-sm">
               Sign in
             </Link>
           </div>
           <div className="meta-row mt-4">
-            <span className="mono-label text-paper-white/65">Free while in beta</span>
-            <span className="mono-label text-paper-white/65">No card required</span>
-            <span className="mono-label text-paper-white/65">Demo mode available</span>
+            <span className="mono-label text-[#9fb6d9]">Free while in beta</span>
+            <span className="mono-label text-[#9fb6d9]">No card required</span>
+            <span className="mono-label text-[#9fb6d9]">Demo mode available</span>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-carbon bg-paper-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-8 text-xs font-medium text-carbon/60 sm:px-6">
-          <span className="mono-label text-carbon">ChartFusionX</span>
+      <footer className="mx-auto max-w-7xl px-2 pb-4">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-6 text-xs font-medium text-[#9fb6d9] sm:px-6">
+          <span className="mono-label text-[#dcebff]">ChartFusionX</span>
           <span>© {new Date().getFullYear()}</span>
-          <a href="#pricing" className="hover:text-carbon">
+          <a href="#pricing" className="transition hover:text-white">
             Pricing
           </a>
-          <Link to="/whats-coming" className="hover:text-carbon">
+          <Link to="/whats-coming" className="transition hover:text-white">
             What's Coming
           </Link>
-          <Link to="/privacy" className="hover:text-carbon">
+          <Link to="/privacy" className="transition hover:text-white">
             Privacy Policy
           </Link>
-          <Link to="/terms" className="hover:text-carbon">
+          <Link to="/terms" className="transition hover:text-white">
             Terms of Service
           </Link>
-          <Link to="/refund-policy" className="hover:text-carbon">
+          <Link to="/refund-policy" className="transition hover:text-white">
             Refund Policy
           </Link>
-          <span className="ml-auto text-carbon/45">
+          <span className="ml-auto text-[#8aa3c7]">
             Analytics and journaling only — not financial advice.
           </span>
         </div>

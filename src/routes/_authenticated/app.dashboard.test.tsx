@@ -161,6 +161,22 @@ afterEach(() => {
 /* ------------------------------------------------------------------ */
 
 describe("dashboard data behaviour", () => {
+  it("labels a losing streak as losses, not wins", async () => {
+    authState = "signed-in";
+    authUser = { id: "user-1" };
+    // Newest-first: the trader's latest rows are losses.
+    queryRows = [
+      todayRow({ id: "t1", pnl: -150, r_multiple: -1 }),
+      todayRow({ id: "t2", pnl: -120, r_multiple: -0.8, traded_at: new Date(Date.now() - 36e5).toISOString() }),
+      todayRow({ id: "t3", pnl: 300, r_multiple: 3, traded_at: new Date(Date.now() - 72e5).toISOString() }),
+    ];
+
+    renderDash();
+
+    await waitFor(() => expect(screen.getByText("2 losses in a row")).toBeInTheDocument());
+    expect(screen.queryByText("2 wins in a row")).toBeNull();
+  });
+
   it("signed-out visitor sees the demo journal and is told it is a demo", async () => {
     renderDash();
 

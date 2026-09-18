@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { CreditCard, Sparkles } from "lucide-react";
 
 import { PageHeader, Panel } from "@/components/shell";
+import { AiUsageBudget } from "@/components/ai-usage-budget";
 import { Button } from "@/components/ui/button";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -141,6 +142,16 @@ function BetaPlanPage() {
             limit={aiLimit}
             icon={<Sparkles className="size-4 text-muted-foreground" />}
           />
+        </div>
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold">AI budget settings</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Set how many AI actions you allow yourself per month and when to be warned. Stored on
+            this device — enforcement arrives with the AI modules.
+          </p>
+          <div className="mt-4">
+            <AiUsageBudget used={aiUsed} />
+          </div>
         </div>
       </Panel>
 

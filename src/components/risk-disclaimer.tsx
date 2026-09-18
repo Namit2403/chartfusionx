@@ -27,9 +27,9 @@ export function RiskDisclaimer({ className = "" }: { className?: string }) {
   );
 }
 
-export function RiskDisclaimerLine() {
+export function RiskDisclaimerLine({ className = "" }: { className?: string }) {
   return (
-    <p className="max-w-3xl leading-relaxed">
+    <p className={`max-w-3xl leading-relaxed ${className}`}>
       ChartFusionX provides analytics and journaling tools only. Nothing on this site or produced by
       its AI features is financial, investment, tax, or legal advice, a recommendation to buy or
       sell, or a regulated professional service. Trading involves substantial risk of loss.
