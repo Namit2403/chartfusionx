@@ -71,7 +71,10 @@ export function getPlan(priceId: string | null | undefined): PlanConfig | null {
 export const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
 /** How many trades a signed-in user can log before a plan is required. */
-export const FREE_TRADE_LIMIT = 10;
+export const FREE_TRADE_LIMIT = 15;
+
+/** AI features a signed-in free user can use while the beta runs. */
+export const FREE_AI_FEATURE_LIMIT = 2;
 
 /** Routes that stay reachable while signed in without an active subscription. */
 export const PAYWALL_EXEMPT_PATHS = [

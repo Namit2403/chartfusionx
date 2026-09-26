@@ -830,6 +830,11 @@
 :root:not(.dark) .glass-sidebar [class*="text-white/5"] {
   color: rgba(25, 26, 46, 0.55);
 }
+/* Tiny uppercase section headers (e.g. "AI Systems") need more weight in
+   daylight: 0.55 alpha on the pale glass measures ~3:1 at 10px. */
+:root:not(.dark) .glass-sidebar [data-sidebar="group-label"] {
+  color: rgba(25, 26, 46, 0.78);
+}
 :root:not(.dark) .glass-sidebar [class*="border-white"] {
   border-color: rgba(20, 21, 42, 0.1);
 }
@@ -1200,6 +1205,13 @@
 }
 .lp-slide .session-strip line {
   stroke: rgba(226, 238, 255, 0.55);
+}
+
+/* "The AI systems" heading reuses the Trader's Ledger ink style but sits on
+   the dark lp-slide panel — carbon black there is invisible. Flip to the
+   panel's paper tone; keeps the ledger typography. */
+.lp-slide .slush-display {
+  color: var(--color-paper-white);
 }
 
 /* ---- App cockpit shell: night-sky ground + rounded floating app panel ---- */

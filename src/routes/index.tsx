@@ -705,7 +705,8 @@ function LandingPage() {
               <h3 className="lp-display mt-4 text-3xl">Free Beta</h3>
               <p className="lp-display mt-1 text-5xl">$0</p>
               <ul className="mt-5 flex-1 space-y-2 text-sm font-medium text-[#c9d8ef]">
-                <li>✓ Unlimited trades &amp; attachments</li>
+                <li>✓ 15 trades with attachments</li>
+                <li>✓ 2 AI features</li>
                 <li>✓ Performance dashboard &amp; analytics</li>
                 <li>✓ Playbook, goals &amp; reports</li>
                 <li>✓ Demo mode — try it without an account</li>

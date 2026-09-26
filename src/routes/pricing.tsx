@@ -85,7 +85,8 @@ function PricingPage() {
             </div>
             <p className="num mt-3 text-3xl font-semibold tracking-tight">$0</p>
             <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
-              <li>Unlimited trades during the beta</li>
+              <li>15 trades with attachments</li>
+              <li>2 AI features</li>
               <li>Dashboard, analytics &amp; reports</li>
               <li>Playbook, goals &amp; gallery</li>
             </ul>

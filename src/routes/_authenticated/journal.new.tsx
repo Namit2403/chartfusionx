@@ -634,7 +634,7 @@ function NewTrade() {
 
       <div className="flex flex-wrap items-center justify-end gap-2 pb-4">
         <span className="mr-auto text-xs text-muted-foreground">
-          Free beta · unlimited trades. Draft autosaves on this device.
+          Free beta · 15 trades. Draft autosaves on this device.
         </span>
         <Button variant="secondary" onClick={saveDraft}>
           Save draft
