@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import { NoTradesYet } from "@/components/no-trades-yet";
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/gallery")({
 const filters = ["All", "Wins", "Losses", "A+ Setup", "FOMO", "London", "Asian", "New York"] as const;
 
 function Gallery() {
-  const { trades, isEmpty } = useTradeData();
+  const { trades, isEmpty, isDemo } = useTradeData();
   const [active, setActive] = useState<(typeof filters)[number]>("All");
 
   const shown = useMemo(() => {
@@ -50,6 +50,16 @@ function Gallery() {
         title="Trade Gallery"
         description="Every trade with its charts, notes and AI grade — filterable the way you actually think about your trading."
       />
+
+      {isDemo && (
+        <p className="text-xs text-muted-foreground">
+          Browsing the demo gallery — these trades are an example.{' '}
+          <Link to="/auth" className="font-medium text-violet-300 hover:text-violet-200">
+            Sign in
+          </Link>{' '}
+          and your own trades fill in here.
+        </p>
+      )}
 
       {isEmpty && (
         <NoTradesYet

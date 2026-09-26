@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/journal/")({
 });
 
 function Journal() {
-  const { trades, isEmpty } = useTradeData();
+  const { trades, isEmpty, isDemo } = useTradeData();
   const [q, setQ] = useState("");
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -55,6 +55,16 @@ function Journal() {
           </Button>
         }
       />
+
+      {isDemo && (
+        <p className="text-xs text-muted-foreground">
+          Browsing the demo journal — these entries are an example.{' '}
+          <Link to="/auth" className="font-medium text-violet-300 hover:text-violet-200">
+            Sign in
+          </Link>{' '}
+          and your own trades fill in here.
+        </p>
+      )}
 
       {isEmpty && (
         <NoTradesYet
