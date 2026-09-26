@@ -171,7 +171,10 @@ function StatCard({
             </>
           ) : (
             <>
-              <p className="num mt-2 text-2xl font-semibold tracking-tight text-foreground xl:text-3xl">
+              <p
+                className="num mt-2 truncate text-2xl font-semibold tracking-tight text-foreground xl:text-3xl"
+                title={value}
+              >
                 {value}
               </p>
               <p

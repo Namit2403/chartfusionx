@@ -7,6 +7,7 @@ import { AiUsageBudget } from "@/components/ai-usage-budget";
 import { Button } from "@/components/ui/button";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { useSubscription } from "@/hooks/useSubscription";
+import { FREE_TRADE_LIMIT } from "@/lib/entitlements";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/billing")({
@@ -70,7 +71,7 @@ function UsageRow({
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
         {unlimited
-          ? "No cap during the free beta."
+          ? "No cap on your current plan."
           : nearLimit
             ? "You're close to the limit for this period."
             : `${Math.max(0, limit - used).toLocaleString()} remaining this period.`}
@@ -82,6 +83,10 @@ function UsageRow({
 function BetaPlanPage() {
   const { loading, entitled, planName, subscription, aiUsed, aiLimit, tradesUsed, tradeLimit } =
     useSubscription();
+
+  // A null limit means "unlimited" — true only for subscribers. For demo
+  // views and not-yet-loaded states the honest number is the free tier's.
+  const effectiveTradeLimit = entitled ? tradeLimit : (tradeLimit ?? FREE_TRADE_LIMIT);
 
   const renewsOn = subscription?.current_period_end
     ? format(new Date(subscription.current_period_end), "d MMM yyyy")
@@ -133,7 +138,7 @@ function BetaPlanPage() {
           <UsageRow
             label="Trades logged"
             used={tradesUsed}
-            limit={tradeLimit}
+            limit={effectiveTradeLimit}
             icon={<CreditCard className="size-4 text-muted-foreground" />}
           />
           <UsageRow

@@ -24,6 +24,7 @@ import {
 
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useSubscription } from "@/hooks/useSubscription";
+import { FREE_TRADE_LIMIT } from "@/lib/entitlements";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import {
@@ -252,6 +253,9 @@ function ThemeToggle({ collapsed }: { collapsed: boolean }) {
 
 function SidebarPlanCard({ collapsed }: { collapsed: boolean }) {
   const { planName, tradesUsed, tradeLimit, entitled } = useSubscription();
+  // A null limit means "unlimited" — true only for subscribers. For demo
+  // views and not-yet-loaded states the honest number is the free tier's.
+  const effectiveTradeLimit = entitled ? tradeLimit : (tradeLimit ?? FREE_TRADE_LIMIT);
 
   if (collapsed) {
     return (
@@ -288,7 +292,7 @@ function SidebarPlanCard({ collapsed }: { collapsed: boolean }) {
             </span>
           </div>
           <div className="mt-3 space-y-2.5">
-            <UsageMeter label="Trades logged" used={tradesUsed} limit={tradeLimit} />
+            <UsageMeter label="Trades logged" used={tradesUsed} limit={effectiveTradeLimit} />
             <UpcomingMeter label="AI actions" />
           </div>
         </Link>
