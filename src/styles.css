@@ -246,6 +246,34 @@
     border-color: var(--color-border);
   }
 
+  /* Chromeless scrolling: hide scrollbars app-wide (panels, lists, tables).
+     Scrolling itself — wheel, trackpad, touch, keyboard — is untouched.
+     Position affordances are restored inside Radix popper overlays
+     (dropdown/select menus), where a hidden scrollbar would hide position
+     in a small listbox. Horizontal tables scroll with shift+wheel. */
+  * {
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  [data-radix-popper-content-wrapper] * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--color-muted-foreground) 55%, transparent)
+      transparent;
+  }
+  [data-radix-popper-content-wrapper] *::-webkit-scrollbar {
+    display: block;
+    width: 6px;
+  }
+  [data-radix-popper-content-wrapper] *::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--color-muted-foreground) 55%, transparent);
+  }
+  [data-radix-popper-content-wrapper] *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
   html {
     color-scheme: light;
     scroll-behavior: smooth;
