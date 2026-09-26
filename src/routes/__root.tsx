@@ -175,30 +175,32 @@ function RootComponent() {
                 <AccountMenu />
               </div>
             </header>
-            <main className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
-              <Outlet />
-            </main>
-            <footer className="px-0 pb-2 pt-4 text-xs text-muted-foreground">
-              <RiskDisclaimerLine />
-              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-                <span>© {new Date().getFullYear()} ChartFusionX</span>
-                <Link to="/" className="hover:text-foreground">
-                  Landing
-                </Link>
-                <Link to="/whats-coming" className="hover:text-foreground">
-                  What's Coming
-                </Link>
-                <Link to="/privacy" className="hover:text-foreground">
-                  Privacy Policy
-                </Link>
-                <Link to="/terms" className="hover:text-foreground">
-                  Terms of Service
-                </Link>
-                <Link to="/refund-policy" className="hover:text-foreground">
-                  Refund Policy
-                </Link>
+            <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+              <div className="flex-1">
+                <Outlet />
               </div>
-            </footer>
+              <footer className="mt-auto pb-2 pt-4 text-xs text-muted-foreground">
+                <RiskDisclaimerLine />
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <span>© {new Date().getFullYear()} ChartFusionX</span>
+                  <Link to="/" className="hover:text-foreground">
+                    Landing
+                  </Link>
+                  <Link to="/whats-coming" className="hover:text-foreground">
+                    What's Coming
+                  </Link>
+                  <Link to="/privacy" className="hover:text-foreground">
+                    Privacy Policy
+                  </Link>
+                  <Link to="/terms" className="hover:text-foreground">
+                    Terms of Service
+                  </Link>
+                  <Link to="/refund-policy" className="hover:text-foreground">
+                    Refund Policy
+                  </Link>
+                </div>
+              </footer>
+            </main>
           </div>
           <MobileBottomNav />
         </div>
