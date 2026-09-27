@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -44,6 +44,16 @@ function safePath(value: string | undefined) {
   }
 }
 
+/** Muted-look while the button is dodging (invalid form); style only — the
+    button stays enabled so keyboard submit still triggers real validation. */
+function cnAuthSubmit(dodging: boolean) {
+  return dodging ? "auth-primary-btn auth-primary-btn--muted" : "auth-primary-btn";
+}
+
+function cnAuthHelper(dodging: boolean) {
+  return dodging ? "mt-1 text-center text-xs text-white/40" : "mt-1 text-center text-xs text-positive";
+}
+
 function GoogleIcon() {
   return (
     <svg aria-hidden viewBox="0 0 24 24" className="size-4">
@@ -76,6 +86,77 @@ function AuthPage() {
   const [displayName, setDisplayName] = useState("");
   const [busy, setBusy] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState(false);
+
+  /* Cosmetic dodge state. Validity mirrors the inputs' REAL native rules
+     (type=email + required, required + minLength=8) read via checkValidity —
+     nothing invented, nothing weakened. The button is never disabled by this
+     layer; keyboard users Tab to it and Enter submits exactly as before. */
+  const [emailValid, setEmailValid] = useState(false);
+  const [passwordValid, setPasswordValid] = useState(false);
+  const [finePointer, setFinePointer] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [pointerOffset, setPointerOffset] = useState({ x: 0, y: 0 });
+  const formRef = useRef<HTMLFormElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+
+    const fineQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      setFinePointer(fineQuery.matches);
+      setReducedMotion(motionQuery.matches);
+    };
+
+    sync();
+    fineQuery.addEventListener("change", sync);
+    motionQuery.addEventListener("change", sync);
+    return () => {
+      fineQuery.removeEventListener("change", sync);
+      motionQuery.removeEventListener("change", sync);
+    };
+  }, []);
+
+  const invalidCount = (emailValid ? 0 : 1) + (passwordValid ? 0 : 1);
+  const formValid = invalidCount === 0;
+  const dodgeEnabled = finePointer && !reducedMotion && !formValid && !busy;
+
+  // Park the button back in place whenever the gag deactivates.
+  useEffect(() => {
+    if (!dodgeEnabled) setPointerOffset({ x: 0, y: 0 });
+  }, [dodgeEnabled]);
+
+  const handlePointerMove = useCallback(
+    (event: React.PointerEvent<HTMLFormElement>) => {
+      if (!dodgeEnabled) return;
+
+      const button = submitRef.current?.getBoundingClientRect();
+      if (!button) return;
+
+      const buttonCX = button.left + button.width / 2;
+      const buttonCY = button.top + button.height / 2;
+      if (Math.hypot(event.clientX - buttonCX, event.clientY - buttonCY) > 96) return;
+
+      const awayX = buttonCX - event.clientX;
+      const awayY = buttonCY - event.clientY;
+      const magnitude = Math.hypot(awayX, awayY) || 1;
+      const step = 56;
+
+      // The button is full-width inside the card: keep the wander inside the
+      // card's padding so it never leaves the glass panel.
+      const nextX = Math.max(-20, Math.min(20, pointerOffset.x + (awayX / magnitude) * step));
+      const nextY = Math.max(-36, Math.min(36, pointerOffset.y + (awayY / magnitude) * step));
+
+      setPointerOffset({ x: nextX, y: nextY });
+    },
+    [dodgeEnabled, pointerOffset.x, pointerOffset.y],
+  );
+
+  const handlePointerLeave = useCallback(() => {
+    if (!dodgeEnabled) return;
+    setPointerOffset({ x: 0, y: 0 });
+  }, [dodgeEnabled]);
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
@@ -167,7 +248,13 @@ function AuthPage() {
             <span className="h-px flex-1 bg-white/10" />
           </div>
 
-          <form onSubmit={submit} className="space-y-3.5">
+          <form
+            ref={formRef}
+            onPointerMove={handlePointerMove}
+            onPointerLeave={handlePointerLeave}
+            onSubmit={submit}
+            className="space-y-3.5"
+          >
             {mode === "signup" && (
               <div className="space-y-1.5">
                 <label htmlFor="displayName" className="block text-xs font-medium text-white/60">
@@ -191,7 +278,11 @@ function AuthPage() {
                 required
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailValid(e.target.checkValidity());
+                }}
+                onBlur={(e) => setEmailValid(e.target.checkValidity())}
                 placeholder="Your email address"
               />
             </div>
@@ -217,13 +308,42 @@ function AuthPage() {
                 minLength={8}
                 autoComplete={mode === "signin" ? "current-password" : "new-password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordValid(e.target.checkValidity());
+                }}
+                onBlur={(e) => setPasswordValid(e.target.checkValidity())}
                 placeholder="Your password"
               />
             </div>
-            <button type="submit" disabled={busy} className="auth-primary-btn">
-              {busy ? "One moment…" : mode === "signin" ? "Continue" : "Create account"}
-            </button>
+            <div className="relative">
+              <button
+                ref={submitRef}
+                type="submit"
+                disabled={busy}
+                aria-disabled={busy}
+                style={{
+                  transform: `translate(${pointerOffset.x}px, ${pointerOffset.y}px)`,
+                  transition: reducedMotion ? "none" : "transform 0.16s ease-out",
+                }}
+                className={cnAuthSubmit(dodgeEnabled)}
+              >
+                {busy ? "One moment…" : mode === "signin" ? "Continue" : "Create account"}
+              </button>
+              <span className="sr-only">
+                The submit button is always reachable by keyboard: Tab to it and press Enter.
+              </span>
+            </div>
+            <p
+              aria-live="polite"
+              className={cnAuthHelper(dodgeEnabled)}
+            >
+              {dodgeEnabled
+                ? invalidCount === 2
+                  ? "Two fields to fill before it stands still."
+                  : "One field to go before it stands still."
+                : "Locked in. Go on then — Tab reaches it, Enter submits."}
+            </p>
           </form>
 
           <p className="mt-6 text-center text-sm text-white/45">

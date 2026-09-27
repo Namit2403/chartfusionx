@@ -825,6 +825,17 @@
   pointer-events: none;
   opacity: 0.6;
 }
+
+/* Cosmetic dodge state (invalid form): muted look only — the button stays
+   enabled and fully keyboard-operable. */
+.auth-primary-btn--muted {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.dark .auth-primary-btn--muted:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
 .dark .auth-primary-btn {
   background: #ffffff;
   color: #0b0c14;
