@@ -330,19 +330,21 @@ function AuthPage() {
               >
                 {busy ? "One moment…" : mode === "signin" ? "Continue" : "Create account"}
               </button>
+              {/* Permanent keyboard note (sr-only, structurally separate from the
+                  status line so the two can never read as one string). */}
               <span className="sr-only">
                 The submit button is always reachable by keyboard: Tab to it and press Enter.
               </span>
             </div>
-            <p
-              aria-live="polite"
-              className={cnAuthHelper(dodgeEnabled)}
-            >
+            {/* Dynamic status: the only visible line under the button. */}
+            <p aria-live="polite" className={cnAuthHelper(dodgeEnabled)}>
               {dodgeEnabled
                 ? invalidCount === 2
                   ? "Two fields to fill before it stands still."
                   : "One field to go before it stands still."
-                : "Locked in. Go on then — Tab reaches it, Enter submits."}
+                : formValid
+                  ? "Locked in. Go on then."
+                  : "Tab reaches it. Enter submits."}
             </p>
           </form>
 

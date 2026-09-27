@@ -14,7 +14,7 @@ import {
   Target,
   type LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { FounderTierCta } from "@/components/founder-tier-cta";
 import SplitFlapText from "@/components/split-flap-text";
@@ -358,17 +358,59 @@ function Marquee() {
   );
 }
 
-function StickerCard({ feature, onOpen }: { feature: StickerFeature; onOpen: () => void }) {
+type PointerKind = "touch" | "pointer" | "unknown";
+
+/**
+ * Single decision point for input-dependent copy. The old approach kept two
+ * spans in the DOM and toggled one with CSS media queries, which is how
+ * "both strings render together" bugs kept resurfacing — now exactly one
+ * string is chosen in JS and only that node exists.
+ */
+function usePointerKind(): PointerKind {
+  const [kind, setKind] = useState<PointerKind>("unknown");
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const coarse = window.matchMedia("(hover: none), (pointer: coarse)");
+    const sync = () => setKind(fine.matches ? "pointer" : coarse.matches ? "touch" : "unknown");
+
+    sync();
+    fine.addEventListener("change", sync);
+    coarse.addEventListener("change", sync);
+    return () => {
+      fine.removeEventListener("change", sync);
+      coarse.removeEventListener("change", sync);
+    };
+  }, []);
+
+  return kind;
+}
+
+function StickerCard({
+  feature,
+  onOpen,
+  pointerKind,
+}: {
+  feature: StickerFeature;
+  onOpen: () => void;
+  pointerKind: PointerKind;
+}) {
   const isLive = feature.status === "live";
-  // Touch vs pointer copy: exactly one span renders (the other is display:none,
-  // so screen readers also read only one). See .detail-hint-* in styles.css.
   const status = isLive ? "Live now" : "Coming soon";
+  // Exactly one hint string exists in the DOM — no CSS-toggled twin to leak.
+  const hint =
+    pointerKind === "pointer"
+      ? " — click for details"
+      : pointerKind === "touch"
+        ? " — tap for details"
+        : "";
   const statusTag = (
     <span className={isLive ? "lp-tag lp-tag-live" : "lp-tag"}>
       <span className="lp-tag-dot" aria-hidden />
       <span className="mono-label">{status}</span>
-      <span className="detail-hint-touch"> — {"tap"} for details</span>
-      <span className="detail-hint-pointer"> — {"click"} for details</span>
+      {hint && <span className="detail-hint">{hint}</span>}
     </span>
   );
   return (
@@ -500,6 +542,7 @@ function FeatureDetailDialog({
 function LandingPage() {
   const [active, setActive] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const pointerKind = usePointerKind();
   const openDetail = (name: string) => {
     setActive(name);
     setDetailOpen(true);
@@ -644,7 +687,12 @@ function LandingPage() {
           </p>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {STICKER_FEATURES.map((f) => (
-              <StickerCard key={f.name} feature={f} onOpen={() => openDetail(f.name)} />
+              <StickerCard
+                key={f.name}
+                feature={f}
+                onOpen={() => openDetail(f.name)}
+                pointerKind={pointerKind}
+              />
             ))}
           </div>
         </div>
@@ -687,7 +735,12 @@ function LandingPage() {
           </div>
           <div className="mt-14 grid gap-8 border-t border-white/15 pt-12 sm:grid-cols-2 lg:grid-cols-3">
             {AI_MODULES.map((f) => (
-              <StickerCard key={f.name} feature={f} onOpen={() => openDetail(f.name)} />
+              <StickerCard
+                key={f.name}
+                feature={f}
+                onOpen={() => openDetail(f.name)}
+                pointerKind={pointerKind}
+              />
             ))}
           </div>
         </div>

@@ -641,20 +641,8 @@
   background-size: 44px 44px;
 }
 
-/* Card detail hints: show the touch or pointer variant, never both. The two
-   queries are jointly exhaustive (any viewport matches at least one) and the
-   hidden span is display:none, so it is also removed from the a11y tree. */
-@media (hover: none), (pointer: coarse) {
-  .detail-hint-pointer {
-    display: none;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .detail-hint-touch {
-    display: none;
-  }
-}
+/* Card detail hint: a single span chosen in JS (usePointerKind) — no CSS
+   toggling, so both variants can never render together. */
 
 @utility slush-marquee {
   background: var(--color-carbon);
