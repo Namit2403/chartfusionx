@@ -328,13 +328,24 @@ const AI_MODULES: StickerFeature[] = [
 const ALL_FEATURES = [...STICKER_FEATURES, ...AI_MODULES];
 
 function Marquee() {
-  const row = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
   return (
     <div className="slush-marquee lp-marquee w-full">
       <div className="slush-marquee-track">
-        {row.map((item, i) => (
+        {MARQUEE_ITEMS.map((item) => (
           <span
-            key={`${item}-${i}`}
+            key={item}
+            className="mono-label mx-4 inline-flex items-center gap-4 text-[11px]"
+          >
+            {item}
+            <span className="tape-sep" aria-hidden />
+          </span>
+        ))}
+        {/* Loop echo: second copy for the seamless scroll; hidden from the
+            accessibility tree so screen readers read the items once. */}
+        {MARQUEE_ITEMS.map((item) => (
+          <span
+            key={`echo-${item}`}
+            aria-hidden="true"
             className="mono-label mx-4 inline-flex items-center gap-4 text-[11px]"
           >
             {item}

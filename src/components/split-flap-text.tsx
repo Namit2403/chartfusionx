@@ -328,18 +328,16 @@ const SplitFlapText = ({
       style={componentStyle}
       role="img"
       aria-label={settledText || undefined}
-    >
-      {tiles.map((tile, index) => (
+    >      {tiles.map((tile, index) => (
         <span className="split-flap-text__tile" aria-hidden="true" key={`${index}-${tiles.length}`}>
           <span className="split-flap-text__half split-flap-text__half--top">
-            <span className="split-flap-text__char">
-              {tile.current === " " ? " " : tile.current}
-            </span>
+            <span className="split-flap-text__char" data-char={tile.current} />
           </span>
           <span className="split-flap-text__half split-flap-text__half--bottom">
-            <span className="split-flap-text__char">
-              {tile.flipping ? tile.next : tile.current}
-            </span>
+            <span
+              className="split-flap-text__char"
+              data-char={tile.flipping ? tile.next : tile.current}
+            />
           </span>
 
           {tile.flipping && (
@@ -348,15 +346,13 @@ const SplitFlapText = ({
                 className="split-flap-text__flap split-flap-text__flap--front"
                 key={`front-${index}-${tile.tick}`}
               >
-                <span className="split-flap-text__char">
-                  {tile.current === " " ? " " : tile.current}
-                </span>
+                <span className="split-flap-text__char" data-char={tile.current} />
               </span>
               <span
                 className="split-flap-text__flap split-flap-text__flap--back"
                 key={`back-${index}-${tile.tick}`}
               >
-                <span className="split-flap-text__char">{tile.next === " " ? " " : tile.next}</span>
+                <span className="split-flap-text__char" data-char={tile.next} />
               </span>
             </>
           )}

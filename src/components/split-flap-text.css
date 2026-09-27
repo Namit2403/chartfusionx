@@ -113,6 +113,11 @@
     0 0.09em 0.16em rgba(0, 0, 0, 0.42);
 }
 
+.split-flap-text__char::before {
+  content: attr(data-char);
+  white-space: pre;
+}
+
 .split-flap-text__half--top .split-flap-text__char,
 .split-flap-text__flap--front .split-flap-text__char {
   top: 0;
