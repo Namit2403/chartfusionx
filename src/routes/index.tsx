@@ -18,6 +18,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { FounderTierCta } from "@/components/founder-tier-cta";
 import SplitFlapText from "@/components/split-flap-text";
+import { RadialShareMenu } from "@/components/radial-share-menu";
 import { FOUNDER_CTA_LABEL, FOUNDER_CTA_LIVE, FOUNDER_PLANS } from "@/lib/whop-founding";
 
 export const Route = createFileRoute("/")({
@@ -836,6 +837,9 @@ function LandingPage() {
             <Link to="/auth" className="lp-btn-ghost px-10 py-3.5 text-sm">
               Sign in
             </Link>
+          </div>
+          <div className="mt-6 flex justify-center">
+            <RadialShareMenu />
           </div>
           <div className="meta-row mt-4">
             <span className="mono-label text-[#9fb6d9]">Free while in beta</span>

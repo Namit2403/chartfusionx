@@ -1477,9 +1477,64 @@
 :root:not(.dark) span.bg-violet-500 {
   background-color: #6d28d9;
 }
+/* Daylight: white text on small violet fills (calendar today chip, avatar
+   initials) sits at ~4.2:1 on the mid violet — deepen the fill so ink-white
+   numerals clear AA comfortably. */
+:root:not(.dark) .bg-violet-500 {
+  --tw-gradient-from: #6d28d9;
+}
+:root:not(.dark) span.bg-violet-500 {
+  background-color: #6d28d9;
+}
 :root:not(.dark) .from-violet-500 {
   --tw-gradient-from: #6d28d9;
 }
 :root:not(.dark) .to-fuchsia-500 {
   --tw-gradient-to: #c026d3;
+}
+
+/* ------------------------------------------------------------------------
+   Radial share menu (landing CTA). The trigger morphs into a close control
+   and the channels fan out on an arc above it. Geometry comes from the
+   --share-angle custom property; only transform/opacity animate.
+   ------------------------------------------------------------------------ */
+.share-fan-item {
+  translate: -50% -50%;
+  opacity: 0;
+  scale: 0.4;
+}
+
+.share-fan-item--motion {
+  transition:
+    opacity 0.2s ease,
+    scale 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    translate 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.share-fan-item--instant {
+  transition: none;
+}
+
+/* Expanded: each slot rides its arc angle (0deg = straight up). */
+.share-fan-item--open {
+  --share-x: calc(sin(var(--share-angle)) * var(--share-radius, 84px));
+  --share-y: calc(-1 * cos(var(--share-angle)) * var(--share-radius, 84px));
+  translate: calc(-50% + var(--share-x)) calc(-50% + var(--share-y));
+  opacity: 1;
+  scale: 1;
+  transition-delay: var(--share-delay, 0s);
+}
+
+@media (max-width: 640px) {
+  .share-fan-item--open {
+    --share-radius: 80px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .share-fan-item--motion,
+  .share-fan-item--open {
+    transition: none;
+    transition-delay: 0s;
+  }
 }
