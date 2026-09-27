@@ -1538,3 +1538,70 @@
     transition-delay: 0s;
   }
 }
+
+/* ------------------------------------------------------------------------
+   Waitlist email capture (shared WaitlistForm). Idle/send/error states live
+   on the pill border and trailing icon; the paper-plane only flies on real
+   submissions, and prefers-reduced-motion swaps the flight for an instant
+   swap to the spinner.
+   ------------------------------------------------------------------------ */
+@keyframes waitlist-plane-fly {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  55% {
+    transform: translate(9px, -7px) rotate(-8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(26px, -14px) rotate(-14deg);
+    opacity: 0;
+  }
+}
+
+/* Trail: a fading streak left behind as the plane departs. */
+@keyframes waitlist-plane-trail {
+  0% {
+    opacity: 0.7;
+    transform: translateX(0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(14px) scaleX(0.4);
+  }
+}
+
+.waitlist-send[data-flying="true"] .waitlist-plane {
+  animation: waitlist-plane-fly 0.55s cubic-bezier(0.32, 0, 0.36, 1) forwards;
+}
+
+.waitlist-send[data-flying="true"]::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  width: 14px;
+  height: 2px;
+  translate: 0 -50%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-positive), transparent);
+  animation: waitlist-plane-trail 0.5s ease-out forwards;
+}
+
+.waitlist-send[data-flying="true"] .waitlist-plane-spinner {
+  animation: none;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waitlist-send[data-flying="true"] .waitlist-plane,
+  .waitlist-send[data-flying="true"]::after {
+    animation: none;
+    opacity: 1;
+  }
+  .waitlist-send[data-flying="true"] .waitlist-plane-spinner {
+    opacity: 1;
+    animation: none;
+  }
+}
