@@ -22,10 +22,10 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { THEME_BOOT_SCRIPT, getTheme } from "@/lib/theme";
 import { RiskDisclaimerLine } from "@/components/risk-disclaimer";
-import { NotFound as GhostNotFound } from "@/components/ui/ghost-404-page-1";
+import { NotFound404 } from "@/components/not-found-404";
 
 function NotFoundComponent() {
-  return <GhostNotFound />;
+  return <NotFound404 />;
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {

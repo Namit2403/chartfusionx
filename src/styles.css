@@ -1605,3 +1605,49 @@
     animation: none;
   }
 }
+
+/* ------------------------------------------------------------------------
+   404 illustration: idle sway for the character/numeral group, and dust
+   motes drifting near the ground line. Both are disabled under
+   prefers-reduced-motion (the component also renders static SVG there).
+   ------------------------------------------------------------------------ */
+@keyframes cfx-404-sway {
+  0% {
+    transform: rotate(-1.1deg) translateY(0);
+  }
+  100% {
+    transform: rotate(1.1deg) translateY(-1.5px);
+  }
+}
+
+.cfx-404-sway {
+  animation: cfx-404-sway 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes cfx-404-mote {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  18% {
+    opacity: 0.55;
+  }
+  85% {
+    opacity: 0.18;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-16px, -14px);
+  }
+}
+
+.cfx-404-mote {
+  animation: cfx-404-mote 6.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cfx-404-sway,
+  .cfx-404-mote {
+    animation: none;
+  }
+}
