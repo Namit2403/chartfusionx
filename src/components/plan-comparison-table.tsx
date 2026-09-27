@@ -1,26 +1,30 @@
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 
-import { PLANS } from "@/lib/entitlements";
+import { FREE_TRADE_LIMIT, PLANS } from "@/lib/entitlements";
 import { cn } from "@/lib/utils";
 
 /**
  * Feature rows for the Free / Pro / Max comparison table.
- * The value is shown under every paid tier; the Free column shows
- * `check` when free users get the feature and `check: false` otherwise.
+ *
+ * `status` reflects what the product actually ships today:
+ * - "shipped": live in the app and free for everyone during the beta.
+ * - "soon": not built yet — shown with a "coming soon" chip in every
+ *   column instead of a check, so no tier claims a feature that
+ *   does not exist.
  */
-const COMPARISON_ROWS: { label: string; check: boolean }[] = [
-  { label: "Dashboard & KPIs", check: true },
-  { label: "Journal & Calendar", check: true },
-  { label: "CSV Import", check: true },
-  { label: "Sniper Score", check: true },
-  { label: "AI Insights", check: false },
-  { label: "AI Analyst Chat", check: false },
-  { label: "Ghost Mode", check: false },
-  { label: "Mistake Analytics", check: false },
-  { label: "Exchange API Sync", check: false },
-  { label: "PDF Export", check: false },
-  { label: "Multi-Portfolio", check: false },
-  { label: "Heatmaps & Hold Time", check: false },
+const COMPARISON_ROWS: { label: string; status: "shipped" | "soon" }[] = [
+  { label: "Dashboard & KPIs", status: "shipped" },
+  { label: "Journal & Calendar", status: "shipped" },
+  { label: "CSV Import", status: "soon" },
+  { label: "Sniper Score", status: "soon" },
+  { label: "AI Insights", status: "soon" },
+  { label: "AI Analyst Chat", status: "soon" },
+  { label: "Ghost Mode", status: "soon" },
+  { label: "Mistake Analytics", status: "shipped" },
+  { label: "Exchange API Sync", status: "soon" },
+  { label: "PDF Export", status: "soon" },
+  { label: "Multi-Portfolio", status: "soon" },
+  { label: "Heatmaps & Hold Time", status: "shipped" },
 ];
 
 const PAID_MAX_PRICE = PLANS.find((plan) => plan.priceId === "max_monthly")?.price ?? 69;
@@ -29,13 +33,12 @@ function YesIcon() {
   return <Check className="size-4 text-positive" strokeWidth={2.5} aria-label="Included" />;
 }
 
-function NoIcon() {
+/** Compact table-cell variant of the ComingSoonBadge styling. */
+function ComingSoonChip() {
   return (
-    <X
-      className="size-4 text-muted-foreground/60"
-      strokeWidth={2.5}
-      aria-label="Not included"
-    />
+    <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
+      Coming soon
+    </span>
   );
 }
 
@@ -101,7 +104,9 @@ export function PlanComparisonTable() {
         <tbody>
           <tr className="border-b border-border">
             <td className="px-5 py-3.5 font-medium text-foreground">Trades</td>
-            <td className="px-5 py-3.5 text-center text-muted-foreground">Up to 50</td>
+            <td className="px-5 py-3.5 text-center text-muted-foreground">
+              Up to {FREE_TRADE_LIMIT}
+            </td>
             <td className="px-5 py-3.5 text-center font-medium text-positive">Unlimited</td>
             <td className="px-5 py-3.5 text-center font-medium text-positive">Unlimited</td>
           </tr>
@@ -115,13 +120,13 @@ export function PlanComparisonTable() {
             >
               <td className="px-5 py-3.5 font-medium text-foreground">{row.label}</td>
               <td className="px-5 py-3.5 text-center">
-                {row.check ? <YesIcon /> : <NoIcon />}
+                {row.status === "shipped" ? <YesIcon /> : <ComingSoonChip />}
               </td>
               <td className="px-5 py-3.5 text-center">
-                <YesIcon />
+                {row.status === "shipped" ? <YesIcon /> : <ComingSoonChip />}
               </td>
               <td className="px-5 py-3.5 text-center">
-                <YesIcon />
+                {row.status === "shipped" ? <YesIcon /> : <ComingSoonChip />}
               </td>
             </tr>
           ))}

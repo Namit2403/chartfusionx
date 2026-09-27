@@ -104,4 +104,52 @@ describe("Free Beta card copy (honest-copy regression pins)", () => {
     expect(FREE_TRADE_LIMIT).toBe(15);
     expect(FREE_AI_FEATURE_LIMIT).toBe(2);
   });
+
+  it("comparison table advertises the enforced free trade limit, not more", () => {
+    render(<PricingPage />);
+    const table = screen.getByRole("table");
+
+    // Free column: the enforced limit, derived from the same constant the app
+    // enforces — a mismatch here would over-promise.
+    const rows = within(table as HTMLElement).getAllByRole("row");
+    const tradesRow = rows[1]!;
+    expect(tradesRow.textContent).toContain(`Up to ${FREE_TRADE_LIMIT}`);
+    expect(tradesRow.textContent).not.toContain("Up to 50");
+
+    // Three plan columns with the right badges and prices.
+    expect(within(table as HTMLElement).getByText("⚡ Pro")).toBeInTheDocument();
+    expect(within(table as HTMLElement).getByText("★ Max")).toBeInTheDocument();
+    expect(
+      within(table as HTMLElement).getByLabelText("Free — $0 per month"),
+    ).toBeInTheDocument();
+    const headerText = (table as HTMLElement).querySelector("thead")?.textContent ?? "";
+    expect(headerText).toContain("$29/mo");
+    expect(headerText).toContain("$69/mo");
+
+    // Row pattern: exact labels and order.
+    const featureLabels = rows
+      .slice(1)
+      .map((row) => row.querySelector("td")?.textContent?.trim());
+    expect(featureLabels).toEqual([
+      "Trades",
+      "Dashboard & KPIs",
+      "Journal & Calendar",
+      "CSV Import",
+      "Sniper Score",
+      "AI Insights",
+      "AI Analyst Chat",
+      "Ghost Mode",
+      "Mistake Analytics",
+      "Exchange API Sync",
+      "PDF Export",
+      "Multi-Portfolio",
+      "Heatmaps & Hold Time",
+    ]);
+    // Shipped features are included in every tier; unbuilt ones carry a
+    // coming-soon chip in all three columns instead of a check — no tier
+    // may claim a feature that does not exist.
+    expect(within(table as HTMLElement).getAllByLabelText("Included")).toHaveLength(12);
+    expect(within(table as HTMLElement).getAllByText("Coming soon")).toHaveLength(24);
+    expect(within(table as HTMLElement).queryByLabelText("Not included")).toBeNull();
+  });
 });
