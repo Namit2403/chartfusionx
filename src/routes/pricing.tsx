@@ -7,6 +7,7 @@ import { FounderTierCta } from "@/components/founder-tier-cta";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { AVAILABLE_NOW, COMING_SOON_FEATURES } from "@/lib/beta";
 import { PLANS, type PlanId } from "@/lib/entitlements";
+import { PlanComparisonTable } from "@/components/plan-comparison-table";
 import { FOUNDER_CTA_LIVE, FOUNDER_PLANS, type FounderPlanId } from "@/lib/whop-founding";
 
 const FOUNDER_PLAN_BY_TIER: Record<PlanId, FounderPlanId> = {
@@ -138,6 +139,16 @@ function PricingPage() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-xl font-semibold tracking-tight">Compare plans</h2>
+        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          Everything in each tier, side by side.
+        </p>
+        <div className="mt-4">
+          <PlanComparisonTable />
         </div>
       </section>
 
