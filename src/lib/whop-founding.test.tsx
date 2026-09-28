@@ -2,7 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { FOUNDER_PLANS as CHECKOUT_PLANS } from "@/lib/whop-founding";
+import { FOUNDER_PLANS as CHECKOUT_PLANS, FOUNDER_PRESALE_URL } from "@/lib/whop-founding";
 import { FOUNDER_PLANS as SERVER_PLANS } from "@/lib/whop-founding.server";
 
 vi.mock("@tanstack/react-router", () => ({
@@ -37,23 +37,23 @@ async function loadCta(flagValue: string | undefined) {
 }
 
 describe("FounderTierCta", () => {
-  it("links to the waitlist while founding checkout is not live (default)", async () => {
+  it("opens the founding-access presale in a new tab by default (no flag set)", async () => {
     const { FounderTierCta } = await loadCta(undefined);
     render(<FounderTierCta planId="pro_founding" className="cta-class" />);
-    const link = screen.getByRole("link", { name: "Join the waitlist" });
-    expect(link).toHaveAttribute("href", "/whats-coming");
+    const link = screen.getByRole("link", {
+      name: "Get Founding Access — Pro: $199 founding year",
+    });
+    expect(link).toHaveAttribute("href", FOUNDER_PRESALE_URL);
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
     expect(link.className).toContain("cta-class");
   });
 
-  it("links to the Whop checkout with founding pricing when live", async () => {
-    const { FounderTierCta } = await loadCta("true");
+  it("falls back to the waitlist when the kill switch is set (VITE_FOUNDER_CTA_LIVE=false)", async () => {
+    const { FounderTierCta } = await loadCta("false");
     render(<FounderTierCta planId="max_founding" className="cta-class" />);
-    const link = screen.getByRole("link", {
-      name: "Get Founding Access — Max: $399 founding year",
-    });
-    expect(link).toHaveAttribute("href", "https://whop.com/checkout/plan_w4Hiq9mjM33aQ");
-    expect(link).toHaveAttribute("target", "_blank");
-    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    const link = screen.getByRole("link", { name: "Join the waitlist" });
+    expect(link).toHaveAttribute("href", "/whats-coming");
     expect(link.className).toContain("cta-class");
   });
 });
@@ -70,12 +70,11 @@ describe("founding plan contract (shared vs server)", () => {
     });
   });
 
-  it("checkout URLs embed the exact Whop plan ids the webhook records", () => {
-    expect(CHECKOUT_PLANS.pro_founding.checkoutUrl).toBe(
-      "https://whop.com/checkout/plan_8ljFtIGCyybJb",
+  it("payment CTAs send both founding tiers to the shared presale URL", () => {
+    expect(FOUNDER_PRESALE_URL).toBe(
+      "https://chartfusionx-foundingaccess.lovable.app/presale",
     );
-    expect(CHECKOUT_PLANS.max_founding.checkoutUrl).toBe(
-      "https://whop.com/checkout/plan_w4Hiq9mjM33aQ",
-    );
+    expect(CHECKOUT_PLANS.pro_founding.checkoutUrl).toBe(FOUNDER_PRESALE_URL);
+    expect(CHECKOUT_PLANS.max_founding.checkoutUrl).toBe(FOUNDER_PRESALE_URL);
   });
 });

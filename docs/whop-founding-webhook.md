@@ -149,32 +149,32 @@ idempotent like everything else):
 
 Apply via the usual `supabase db push` (Lovable Cloud applies it on deploy).
 
-## CTA go-live switch (founder checkout links)
+## CTA destination (founding-access presale)
 
 The marketing pages (`/` and `/pricing`) read `VITE_FOUNDER_CTA_LIVE`:
 
-- **Unset / anything but `true`** → Pro/Max CTAs link to the waitlist
-  (`/whats-coming`) as before. The Whop checkout is never linked.
-- **`VITE_FOUNDER_CTA_LIVE=true`** (a build-time `import.meta.env` variable —
-  the `VITE_` prefix is required for Vite to expose it to client code) →
-  Pro/Max CTAs link to the canonical Whop checkout for each plan
-  (`whop.com/checkout/<plan_id>`) and the cards show founding pricing
-  ($199 Pro / $399 Max, one payment for a founding year).
+- **Default (unset)** → Pro/Max CTAs open the founding-access presale page
+  (`https://chartfusionx-foundingaccess.lovable.app/presale`) in a new tab,
+  and the cards show founding pricing ($199 Pro / $399 Max, one payment for
+  a founding year). Payment is taken on the presale page, not here.
+- **`VITE_FOUNDER_CTA_LIVE=false`** (kill switch) → CTAs fall back to the
+  waitlist (`/whats-coming`) and the cards show post-beta monthly pricing.
+  Use this while the presale is closed or down.
 
-Shared constants: `src/lib/whop-founding.ts` (checkout URLs, prices, label);
+Shared constants: `src/lib/whop-founding.ts` (presale URL, prices, label);
 the server module re-derives its webhook plan map from it so the two cannot
 drift.
 
-**Go-live order (do not reorder):**
+**Webhook go-live order (do not reorder):** presale payments do not flow
+through this app yet — until the webhook is verified, founding access for
+presale buyers must be granted manually.
 
 1. Configure `WHOP_WEBHOOK_SECRET` in the production environment (below).
 2. Create and verify the Whop webhook (steps 2–3 below) — send a test event
    and confirm it lands in `whop_webhook_events`.
-3. Only then set `FOUNDER_CTA_LIVE=true` and redeploy. If the webhook is not
-   yet verified, a customer could pay on Whop while the app records nothing.
-
-To stop offering founding access later, remove the flag and redeploy — CTAs
-fall back to the waitlist automatically.
+3. Once verified, purchases record themselves in `founding_entitlements`.
+   Direct per-plan Whop checkout links may then replace the presale URL in
+   `FOUNDER_PLANS`.
 
 ## Operational runbook
 

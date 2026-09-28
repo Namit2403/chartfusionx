@@ -10,8 +10,9 @@ import { cn } from "@/lib/utils";
 
 /**
  * CTA for the Pro/Max founding tiers. Exactly one monetization destination is
- * live at a time: the Whop Founding Access checkout (while FOUNDER_CTA_LIVE)
- * or the waitlist (default). The external checkout opens in a new tab.
+ * live at a time: the founding-access presale page (default) or the waitlist
+ * (while the kill switch `VITE_FOUNDER_CTA_LIVE=false` is set). The external
+ * presale opens in a new tab.
  */
 export function FounderTierCta({
   planId,
