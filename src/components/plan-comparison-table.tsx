@@ -30,7 +30,10 @@ const COMPARISON_ROWS: { label: string; status: "shipped" | "soon" }[] = [
 const PAID_MAX_PRICE = PLANS.find((plan) => plan.priceId === "max_monthly")?.price ?? 69;
 
 function YesIcon() {
-  return <Check className="size-4 text-positive" strokeWidth={2.5} aria-label="Included" />;
+  // mx-auto: the svg is display:block (Tailwind preflight), which ignores the
+  // cell's text-align:center — without auto margins the check hugs the left
+  // content edge while text and chips center.
+  return <Check className="mx-auto size-4 text-positive" strokeWidth={2.5} aria-label="Included" />;
 }
 
 /** Compact table-cell variant of the ComingSoonBadge styling. */
