@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
 const schema = z.object({
   text: z.string().min(1).max(4000),
   voice: z.string().optional(),
@@ -12,6 +14,7 @@ const schema = z.object({
  * side and returned as one MP3 the <audio> element owns end to end.
  */
 export const synthesizeSummary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
     const apiKey = process.env["LOVABLE_API_KEY"];

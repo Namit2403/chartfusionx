@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { getPaddleEnvironment } from "@/lib/paddle";
+import type { AiFeature } from "@/lib/entitlements";
 import {
   getBillingOverview,
   recordAiUsage,
@@ -129,7 +130,7 @@ export function useSubscription() {
  * Runs an AI action through the server-side entitlement + quota check.
  * Returns false when the action was refused, so callers can show a paywall.
  */
-export async function consumeAiAction(feature: string) {
+export async function consumeAiAction(feature: AiFeature) {
   return recordAiUsage({
     data: { feature, environment: getPaddleEnvironment() },
   }) as Promise<{ ok: boolean; reason: string; aiUsed: number; aiLimit: number | null }>;

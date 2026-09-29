@@ -295,7 +295,7 @@ export const recordTradeLog = createServerFn({ method: "POST" })
  */
 export const recordAiUsage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { feature: AiFeature | string; environment: PaddleEnv }) => data)
+  .validator((data: { feature: AiFeature; environment: PaddleEnv }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -327,7 +327,7 @@ export const recordAiUsage = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin
       .from("ai_usage_events")
-      .insert({ user_id: userId, feature: String(data.feature) });
+      .insert({ user_id: userId, feature: data.feature });
 
     return { ok: true as const, reason: "ok" as const, aiUsed: aiUsed + 1, aiLimit };
   });
@@ -348,6 +348,9 @@ export const changePlan = createServerFn({ method: "POST" })
       .limit(1)
       .maybeSingle();
 
+    if (!getPlan(data.priceId)) {
+      throw new Error("Unknown plan");
+    }
     if (!subscription) throw new Error("No subscription to change. Start a plan first.");
     if (subscription.price_id === data.priceId) {
       return { ok: true, unchanged: true };
@@ -510,6 +513,20 @@ export const createCheckoutIntent = createServerFn({ method: "POST" })
 
     const trialUsed = Boolean(profile?.trial_used_at) || Boolean(previous);
     const customerId = previous?.paddle_customer_id ?? null;
+
+    // Same restriction as resolvePaddlePrice: only accept price ids of plans
+    // we actually sell, so the endpoint cannot be probed with arbitrary ids.
+    if (!getPlan(data.priceId)) {
+      return {
+        ok: false as const,
+        message: "Unknown plan",
+        mode: null,
+        paddlePriceId: null,
+        transactionId: null,
+        customerId: null,
+        trialApplies: false,
+      };
+    }
 
     try {
       const priceRes = await gatewayFetch(
