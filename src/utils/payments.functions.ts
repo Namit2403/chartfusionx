@@ -123,8 +123,17 @@ function periodStart(sub: SubscriptionRecord | null) {
 }
 
 export const resolvePaddlePrice = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .validator((data: { priceId: string; environment: PaddleEnv }) => data)
   .handler(async ({ data }) => {
+    // Unauthenticated + unrestricted, this was an open oracle onto the Paddle
+    // gateway: any caller could resolve the internal price id for ANY
+    // external_id, not just our own plans. Auth alone isn't enough since any
+    // signed-in user could still probe arbitrary ids, so also restrict to the
+    // plans we actually sell.
+    if (!getPlan(data.priceId)) {
+      throw new Error("Unknown price");
+    }
     const response = await gatewayFetch(
       data.environment,
       `/prices?external_id=${encodeURIComponent(data.priceId)}`,
@@ -224,8 +233,19 @@ export const getBillingOverview = createServerFn({ method: "GET" })
   });
 
 /**
- * Records one logged trade. Free (signed-in) accounts get FREE_TRADE_LIMIT
- * trades; subscribers are unlimited. This is the real gate.
+ * Records one logged trade against FREE_TRADE_LIMIT and reports whether the
+ * free allowance is used up.
+ *
+ * NOT currently called from the trade-creation flow: `journal.new.tsx`
+ * inserts into `trades` directly and intentionally never calls this (see
+ * `protected-routes.test.tsx` > "free beta gating", which asserts
+ * `consumeTradeLog` must NOT appear in that route). Trade logging is
+ * unlimited for every signed-in user right now, by design, for the free
+ * beta — this function/the FREE_TRADE_LIMIT constant are the cap ready to
+ * re-enable, not an active gate. getBillingOverview still reports
+ * tradesUsed/tradeLimit for display, so the UI can show a free user as
+ * "past" the limit while nothing actually blocks them — that's expected
+ * under the current design, not a bug in this function.
  */
 export const recordTradeLog = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

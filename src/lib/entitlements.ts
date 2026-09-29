@@ -70,7 +70,17 @@ export function getPlan(priceId: string | null | undefined): PlanConfig | null {
 
 export const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
-/** How many trades a signed-in user can log before a plan is required. */
+/**
+ * How many trades a signed-in free user can log before a plan is required.
+ *
+ * Defined and used for display (getBillingOverview, the sidebar plan card,
+ * the pricing/plan-comparison table) but NOT currently enforced: the actual
+ * insert in `journal.new.tsx` never calls `recordTradeLog`/`consumeTradeLog`,
+ * by design, while ChartFusionX is a free open beta (see
+ * `protected-routes.test.tsx` > "free beta gating"). Right now every
+ * signed-in user can log unlimited trades regardless of this number. If that
+ * changes, wire `consumeTradeLog` into the save flow and update that test.
+ */
 export const FREE_TRADE_LIMIT = 15;
 
 /** AI features a signed-in free user can use while the beta runs. */
