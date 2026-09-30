@@ -8,6 +8,7 @@ import {
   recordFounderPurchase,
   refundFounderPurchase,
 } from "@/lib/whop-founding.server";
+import { trackEndorselyPurchase } from "@/lib/endorsely.server";
 
 /**
  * POST /api/webhooks/whop
@@ -85,6 +86,16 @@ async function handlePaymentSucceeded(envelope: WebhookEnvelope): Promise<string
     whopUserId: purchase.whopUserId,
     amountCents: purchase.amountCents,
     currency: purchase.currency,
+  });
+
+  // Affiliate attribution (best-effort; never fails the webhook): founding
+  // purchases credit the affiliate whose referral link the buyer followed.
+  await trackEndorselyPurchase({
+    email: purchase.email,
+    amountCents: purchase.amountCents ?? 0,
+    ...(purchase.email.includes("@")
+      ? { name: purchase.email.split("@")[0] }
+      : {}),
   });
 
   return "recorded";

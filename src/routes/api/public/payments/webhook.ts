@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
 import { verifyWebhook, EventName, type PaddleEnv } from "@/lib/paddle.server";
+import { trackEndorselyPurchase } from "@/lib/endorsely.server";
 
 let _supabase: ReturnType<typeof createClient<Database>> | null = null;
 function getSupabase() {
@@ -189,6 +190,8 @@ async function handleTransaction(data: any, env: PaddleEnv, status: string) {
   const priceId = item?.price?.importMeta?.externalId ?? null;
   const totals = data?.details?.totals;
 
+  const amountCents = Number(totals?.total ?? 0);
+
   await getSupabase()
     .from("payment_transactions")
     .upsert(
@@ -199,7 +202,7 @@ async function handleTransaction(data: any, env: PaddleEnv, status: string) {
         paddle_customer_id: data?.customerId ?? null,
         price_id: priceId,
         product_id: item?.price?.productId ?? null,
-        amount_cents: Number(totals?.total ?? 0),
+        amount_cents: amountCents,
         currency: data?.currencyCode ?? "USD",
         status,
         description: item?.price?.description ?? "ChartFusionX subscription",
@@ -209,6 +212,29 @@ async function handleTransaction(data: any, env: PaddleEnv, status: string) {
       },
       { onConflict: "paddle_transaction_id" },
     );
+
+  // Affiliate attribution (best-effort; never fails the webhook): record a
+  // purchase conversion when the buyer came through a referral. Recurring
+  // renewals each arrive as their own completed transaction and accumulate
+  // in Endorsely automatically.
+  if (status === "completed" && amountCents > 0) {
+    const email = await resolveUserEmail(userId);
+    await trackEndorselyPurchase({
+      userId,
+      email: email ?? "unknown@chartfusionx.app",
+      amountCents,
+      customerId: data?.customerId ?? null,
+    });
+  }
+}
+
+async function resolveUserEmail(userId: string): Promise<string | null> {
+  const { data: profile } = await getSupabase()
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .maybeSingle();
+  return profile?.email ?? null;
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 

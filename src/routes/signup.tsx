@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { AuthGhostButton, AuthGlassInput, AuthSceneCard } from "@/components/auth-scene";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { recordEndorselySignup } from "@/utils/endorsely.functions";
+import { endorselyReferralId } from "@/lib/endorsely";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
@@ -87,6 +89,16 @@ function SignUpPage() {
       if (error) throw error;
       if (data.session) {
         toast.success("Account created. Welcome to ChartFusionX.");
+        // Best-effort affiliate attribution — never blocks signup.
+        const referralId = endorselyReferralId();
+        if (referralId) {
+          void recordEndorselySignup({
+            data: {
+              referralId,
+              ...(displayName ? { name: displayName } : {}),
+            },
+          }).catch(() => {});
+        }
         navigate({ to: "/app", replace: true });
       } else {
         setPendingConfirm(true);

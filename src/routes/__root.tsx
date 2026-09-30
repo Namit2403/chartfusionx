@@ -21,6 +21,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { THEME_BOOT_SCRIPT, getTheme } from "@/lib/theme";
+import { forwardEndorselyReferral } from "@/lib/endorsely";
 import { RiskDisclaimerLine } from "@/components/risk-disclaimer";
 import { NotFound404 } from "@/components/not-found-404";
 
@@ -108,6 +109,16 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        {/*
+          Endorsely — referral/affiliate attribution snippet, site-wide.
+          `async` third-party script; keep in sync with the workspace id if it
+          ever changes.
+        */}
+        <script
+          async
+          src="https://assets.endorsely.com/endorsely.js"
+          data-endorsely="6d337b7e-68ff-466a-9844-68525c0155d6"
+        />
       </head>
       <body>
         {children}
@@ -133,6 +144,19 @@ function RootComponent() {
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
+
+  // Endorsely referral capture (docs step 3): forward a referral id to the
+  // backend as soon as one exists. The snippet is async, so also retry on
+  // load and after a short grace period; the helper no-ops once forwarded.
+  useEffect(() => {
+    forwardEndorselyReferral();
+    window.addEventListener("load", forwardEndorselyReferral);
+    const timer = window.setTimeout(forwardEndorselyReferral, 1500);
+    return () => {
+      window.removeEventListener("load", forwardEndorselyReferral);
+      window.clearTimeout(timer);
+    };
+  }, []);
 
   if (chromeless) {
     return (
